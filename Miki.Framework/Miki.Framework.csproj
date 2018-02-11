@@ -26,7 +26,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Miki.Common\Miki.Common.csproj" />
+    <ProjectReference Include="..\..\Miki.Common\Miki.Common\Miki.Common.csproj" />
   </ItemGroup>
   
 </Project>

@@ -7,7 +7,6 @@ namespace Miki.Framework
     public class Log
     {
         private static ClientInformation client;
-        private static FileWriter log;
 
         public static void InitializeLogging(ClientInformation c)
         {

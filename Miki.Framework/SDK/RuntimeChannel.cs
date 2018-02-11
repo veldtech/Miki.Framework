@@ -5,6 +5,7 @@ using Miki.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Miki.Common
@@ -46,40 +47,29 @@ namespace Miki.Common
 
         public async Task DeleteMessagesAsync(List<IDiscordMessage> messages)
         {
-            List<IMessage> m = new List<IMessage>();
-
-            foreach (IDiscordMessage msg in messages)
-            {
-                m.Add((msg as IProxy<IMessage>).ToNativeObject());
-            }
-
-            await (channel as IMessageChannel).DeleteMessagesAsync(m);
+            await (channel as IMessageChannel).DeleteMessagesAsync(
+				messages.Select(x => (x as IProxy<IMessage>).ToNativeObject())
+			);
         }
 
         public async Task<List<IDiscordMessage>> GetMessagesAsync(int amount = 100)
         {
-            IEnumerable<IMessage> users = await (channel as IMessageChannel).GetMessagesAsync(amount).Flatten();
-            List<IDiscordMessage> outputUsers = new List<IDiscordMessage>();
+            IEnumerable<IMessage> messages = await (channel as IMessageChannel).GetMessagesAsync(amount)
+				.Flatten();
 
-            foreach (IMessage u in users)
-            {
-                outputUsers.Add(new RuntimeMessage(u));
-            }
-
-            return outputUsers;
+			return messages.Select(x => new RuntimeMessage(x))
+				.Cast<IDiscordMessage>()
+				.ToList();
         }
 
         public async Task<List<IDiscordUser>> GetUsersAsync()
         {
-            IEnumerable<IUser> users = await channel.GetUsersAsync().Flatten();
-            List<IDiscordUser> outputUsers = new List<IDiscordUser>();
+            IEnumerable<IUser> users = await channel.GetUsersAsync()
+				.Flatten();
 
-            foreach (IUser u in users)
-            {
-                outputUsers.Add(new RuntimeUser(u));
-            }
-
-            return outputUsers; 
+            return users.Select(x => new RuntimeUser(x))
+				.Cast<IDiscordUser>()
+				.ToList(); 
         }
 
         public async Task<IDiscordMessage> SendFileAsync(string path)
@@ -102,24 +92,6 @@ namespace Miki.Common
             }
             catch (Exception ex)
             {
-                Log.ErrorAt("SendMessage", "failed to send");
-            }
-            return m;
-        }
-
-        public async Task<IDiscordMessage> SendMessage(IDiscordEmbed embed)
-        {
-            RuntimeMessage m = null;
-            try
-            {
-                Log.Message("Sent embed to channel " + channel.Name);
-                m = new RuntimeMessage(
-                    await (channel as IMessageChannel)
-                    .SendMessageAsync("", false, (embed as IProxy<EmbedBuilder>)
-                    .ToNativeObject()));
-            }
-            catch (Exception ex)
-            {
                 Log.ErrorAt("SendMessage", ex.Message);
             }
             return m;
@@ -135,7 +107,7 @@ namespace Miki.Common
             await (channel as IMessageChannel).TriggerTypingAsync();
         }
 
-		public async Task QueueMessageAsync(string message)
+		public void QueueMessageAsync(string message)
 		{
 			Task.Run(async () => await SendMessageAsync(message));
 		}

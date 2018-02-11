@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Miki.Common.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Miki.Common
@@ -17,95 +18,43 @@ namespace Miki.Common
         private RuntimeClient client = null;
 
         public ulong Id
-        {
-            get
-            {
-                return messageData.Id;
-            }
-        }
+			=> messageData.Id;
 
-        public IDiscordUser Author
-        {
-            get
-            {
-                return user;
-            }
-        }
+		public IDiscordUser Author
+			=> user;
 
-        public IDiscordUser Bot
-        {
-            get
-            {
-                return new RuntimeUser((Guild.GetUserAsync(Miki.Framework.Bot.instance.Client.GetShard(0).CurrentUser.Id).GetAwaiter().GetResult() as IProxy<IUser>).ToNativeObject());
-            }
-        }
+		public IDiscordUser Bot
+			=> Guild.GetCurrentUserAsync().GetAwaiter().GetResult();
 
-        public IDiscordMessageChannel Channel
-        {
-            get
-            {
-                return channel;
-            }
-        }
+		public IDiscordMessageChannel Channel
+			=> channel;
 
-        public IDiscordGuild Guild
-        {
-            get
-            {
-                return guild;
-            }
-        }
+		public Interfaces.IDiscordClient Discord
+			=> client;
 
-        public string Content
-        {
-            get
-            {
-                return messageData.Content;
-            }
-        }
+		public IDiscordGuild Guild
+			=> guild;
 
-        public IReadOnlyCollection<IDiscordAttachment> Attachments
-        {
-            get
-            {
-                List<IDiscordAttachment> output = new List<IDiscordAttachment>();
-                foreach (IAttachment a in messageData.Attachments)
-                {
-                    output.Add(new RuntimeAttachment(a));
-                }
-                return output;
-            }
-        }
+		public string Content
+			=> messageData.Content;
 
-        public IReadOnlyCollection<ulong> MentionedUserIds
-        {
-            get
-            {
-                return messageData.MentionedUserIds;
-            }
-        }
+		public IReadOnlyCollection<IDiscordAttachment> Attachments
+			=> messageData.Attachments
+				.Select(x => new RuntimeAttachment(x))
+				.Cast<IDiscordAttachment>()
+				.ToList();
 
-        public IReadOnlyCollection<ulong> MentionedRoleIds
-        {
-            get
-            {
-                return messageData.MentionedRoleIds;
-            }
-        }
+		public IReadOnlyCollection<ulong> MentionedUserIds
+			=> messageData.MentionedUserIds;
 
-        public DateTimeOffset Timestamp => messageData.Timestamp;
+		public IReadOnlyCollection<ulong> MentionedRoleIds
+			=> messageData.MentionedRoleIds;
 
-        public Interfaces.IDiscordClient Discord => client;
+		public DateTimeOffset Timestamp 
+			=> messageData.Timestamp;
 
-        public int ShardId => client.ShardId;
-
-        public IDiscordAudioChannel VoiceChannel
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public int ShardId 
+			=> client.ShardId;
 
         public Dictionary<DiscordEmoji, DiscordReactionMetadata> Reactions
         {
@@ -128,15 +77,17 @@ namespace Miki.Common
             }
         }
 
-        public IReadOnlyCollection<ulong> MentionedChannelIds => messageData.MentionedChannelIds;
+        public IReadOnlyCollection<ulong> MentionedChannelIds 
+			=> messageData.MentionedChannelIds;
 
-		public string ResolvedContent => (messageData as IUserMessage).Resolve(
-					TagHandling.NameNoPrefix,
-					TagHandling.NameNoPrefix,
-					TagHandling.NameNoPrefix,
-					TagHandling.NameNoPrefix,
-					TagHandling.NameNoPrefix
-					);
+		public string ResolvedContent 
+			=> (messageData as IUserMessage).Resolve(
+				TagHandling.NameNoPrefix,
+				TagHandling.NameNoPrefix,
+				TagHandling.NameNoPrefix,
+				TagHandling.NameNoPrefix,
+				TagHandling.NameNoPrefix
+			);
 
 		public RuntimeMessage(IMessage msg)
         {
@@ -151,7 +102,6 @@ namespace Miki.Common
                 guild = new RuntimeGuild(g);
             }
         }
-
         public RuntimeMessage(IMessage msg, DiscordSocketClient c)
         {
             messageData = msg;
@@ -166,7 +116,11 @@ namespace Miki.Common
             client = new RuntimeClient(c);
         }
 
-        public async Task AddReaction(string emoji)
+		public RuntimeMessage()
+		{
+		}
+
+		public async Task AddReaction(string emoji)
         {
             await (messageData as IUserMessage).AddReactionAsync(new Emoji(emoji));
         }
@@ -179,21 +133,15 @@ namespace Miki.Common
             }
         }
 
-        public async Task ModifyAsync(string message)
+        public void Modify(string message, IDiscordEmbed embed)
         {
 			Task.Run(async () => await (messageData as IUserMessage)?.ModifyAsync(x =>
 			{
-				x.Content = message;
-			}));
-        }
+				if(!string.IsNullOrEmpty(message))
+					x.Content = message;
 
-        public async Task ModifyAsync(IDiscordEmbed embed)
-        {
-			Task.Run(async () => await (messageData as IUserMessage)?.ModifyAsync(x =>
-			{
-				x.Embed = ((embed as RuntimeEmbed) as IProxy<EmbedBuilder>)
-					.ToNativeObject()
-					.Build();
+				if (embed != null)
+					x.Embed = (embed as RuntimeEmbed).ToNativeObject();
 			}));
         }
 
@@ -211,5 +159,5 @@ namespace Miki.Common
         {
             return messageData;
         }
-    }
+	}
 }

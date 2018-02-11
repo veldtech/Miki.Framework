@@ -21,8 +21,6 @@ namespace Miki.Framework.Events
 
 		private ConcurrentDictionary<ulong, string> cache = new ConcurrentDictionary<ulong, string>();
 
-		private object getLock;
-
 		internal PrefixInstance(string value, bool changable, bool forceExec)
 		{
 			Value = value;

@@ -16,37 +16,21 @@ namespace Miki.Common
         public RuntimeUser()
         {
         }
-
         public RuntimeUser(IUser author)
         {
             user = author;
         }
 
-        public string AvatarUrl
-        {
-            get
-            {
-                return user.GetAvatarUrl();
-            }
-        }
+        public string AvatarUrl 
+			=> user.GetAvatarUrl();
 
-        public DateTimeOffset CreatedAt
-        {
-            get
-            {
-                return user.CreatedAt;
-            }
-        }
-            
-        public string Discriminator
-        {
-            get
-            {
-                return user.Discriminator;
-            }
-        }
+		public DateTimeOffset CreatedAt
+			=> user.CreatedAt;
 
-        public IDiscordGuild Guild
+		public string Discriminator
+			=> user.Discriminator;
+
+		public IDiscordGuild Guild
         {
             get
             {
@@ -62,73 +46,28 @@ namespace Miki.Common
         }
 
         public int Hierarchy
-        {
-            get => (user as SocketGuildUser).Hierarchy;
-        }
+			=> (user as SocketGuildUser).Hierarchy;
 
-        public ulong Id
-        {
-            get => user.Id;
-        }
+		public ulong Id
+			=> user.Id;
 
-        public bool IsBot
-        {
-            get => user.IsBot;
-        }
+		public bool IsBot
+			=> user.IsBot;
 
-        public DateTimeOffset? JoinedAt
-        {
-            get
-            {
-                return (user as IGuildUser)?.JoinedAt;
-            }
-        }
+		public DateTimeOffset? JoinedAt
+			=> (user as IGuildUser)?.JoinedAt;
 
-        public string Mention
-        {
-            get
-            {
-                return user.Mention;
-            }
-        }
+		public string Mention
+			=> user.Mention;
 
-        public string Nickname
-        {
-            get
-            {
-                return (user as SocketGuildUser)?.Nickname;
-            }
-        }
+		public string Nickname
+			=> (user as SocketGuildUser)?.Nickname ?? user.Username;
 
-        public List<ulong> RoleIds
-        {
-            get
-            {
-                return (user as IGuildUser).RoleIds.ToList();
-            }
-        }
+		public List<ulong> RoleIds
+			=> (user as IGuildUser).RoleIds.ToList();
 
-        public string Username
-        {
-            get
-            {
-                return user.Username;
-            }
-        }
-
-        public IDiscordAudioChannel VoiceChannel
-        {
-            get
-            {
-                return new RuntimeAudioChannel((user as IGuildUser).VoiceChannel);
-            }
-        }
-
-        public async Task Ban(IDiscordGuild g, int pruneDay = 0, string reason = null)
-        {
-            IGuild x = (g as IProxy<IGuild>).ToNativeObject();
-            await x.AddBanAsync(user, pruneDay, reason);
-        }
+		public string Username
+			=> user.Username;
 
         public async Task AddRoleAsync(IDiscordRole role)
         {
@@ -149,7 +88,13 @@ namespace Miki.Common
             await u.AddRolesAsync(roleList);
         }
 
-        public string GetAvatarUrl(DiscordAvatarType type = DiscordAvatarType.PNG, ushort size = 128)
+		public async Task Ban(IDiscordGuild g, int pruneDay = 0, string reason = null)
+		{
+			IGuild x = (g as IProxy<IGuild>).ToNativeObject();
+			await x.AddBanAsync(user, pruneDay, reason);
+		}
+
+		public string GetAvatarUrl(DiscordAvatarType type = DiscordAvatarType.PNG, ushort size = 128)
         {
             ImageFormat i = ImageFormat.Png;
             if (type == DiscordAvatarType.GIF) i = ImageFormat.Gif;

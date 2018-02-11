@@ -3,6 +3,8 @@ using Miki.Common.Interfaces;
 using System;
 using System.Threading.Tasks;
 
+#pragma warning disable CS1998
+
 namespace Miki.Framework
 {
 	public partial class Bot

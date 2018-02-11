@@ -7,11 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Miki.Common
 {
-    public class RuntimeEmbed : IDiscordEmbed, IProxy<EmbedBuilder>, IQuery<RuntimeEmbed>
+    public class RuntimeEmbed : IDiscordEmbed, IQuery<RuntimeEmbed>
     {
         public EmbedBuilder embed;
 
@@ -190,7 +191,12 @@ namespace Miki.Common
             return this;
         }
 
-        public IEmbedFooter CreateFooter()
+		internal Embed ToNativeObject()
+		{
+			return embed;
+		}
+
+		public IEmbedFooter CreateFooter()
         {
             embed.Footer = new EmbedFooterBuilder();
             return Footer;
@@ -315,11 +321,11 @@ namespace Miki.Common
             {
                 if (!(await (m as IGuildChannel).Guild.GetCurrentUserAsync()).GuildPermissions.EmbedLinks)
                 {
-                    await message.ModifyAsync(ToMessageBuilder().Build());
+                    message.Modify(ToMessageBuilder().Build(), null);
                     return;
                 }
             }
-            await message.ModifyAsync(this);
+            message.Modify("", this);
         }
 
         public IDiscordEmbed SetAuthor(string name, string imageurl, string url)
@@ -402,29 +408,24 @@ namespace Miki.Common
             return b;
         }
 
-        public EmbedBuilder ToNativeObject()
-        {
-            return embed;
-        }
-
-		public async Task QueueToChannel(ulong channelId)
+		public void QueueToChannel(ulong channelId)
 		{
-			Task.Run(async () => await SendToChannel(channelId));
+			Task.Run(() => SendToChannel(channelId));
 		}
 
-		public async Task QueueToChannel(IDiscordMessageChannel channel)
+		public void QueueToChannel(IDiscordMessageChannel channel)
 		{
-			Task.Run(async () => await SendToChannel(channel));
+			Task.Run(() => SendToChannel(channel));
 		}
 
-		public async Task QueueToUser(ulong userId)
+		public void QueueToUser(ulong userId)
 		{
-			Task.Run(async () => await SendToUser(userId));
+			Task.Run(() => SendToUser(userId));
 		}
 
-		public async Task QueueToUser(IDiscordUser user)
+		public void QueueToUser(IDiscordUser user)
 		{
-			Task.Run(async () => await SendToUser(user));
+			Task.Run(() => SendToUser(user));
 		}
 
 		public IDiscordEmbed SetColor(int r, int g, int b)

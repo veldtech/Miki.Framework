@@ -191,6 +191,7 @@ namespace Miki.Framework.Events
             {
                 { "MISC", new List<string>() }
             };
+
             EventAccessibility userEventAccessibility = CommandHandler.GetUserAccessibility(e);
 
             foreach (ICommandEvent ev in CommandHandler.Commands.Values)
