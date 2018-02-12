@@ -15,8 +15,6 @@ namespace Miki.Framework
 
 		public event Func<IDiscordMessage, Task> MessageReceived;
 
-		//public event Func<IDiscordMessage, IDiscordMessageChannel, Task> MessageDeleted;
-
 		public event Func<IDiscordUser, Task> UserJoin;
 
 		public event Func<IDiscordUser, Task> UserLeft;
@@ -24,6 +22,7 @@ namespace Miki.Framework
 		public event Func<IDiscordUser, IDiscordUser, Task> UserUpdated;
 
 		public event Func<int, Task> OnShardConnect;
+
 		public event Func<Exception, int, Task> OnShardDisconnect;
 
 		public void LoadEvents()

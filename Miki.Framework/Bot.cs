@@ -8,6 +8,7 @@ using Miki.Common.Interfaces;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Miki.Common;
 
 namespace Miki.Framework
 {
@@ -26,18 +27,9 @@ namespace Miki.Framework
 
         internal ClientInformation clientInformation;
 
-        private string currentPath = Directory.GetCurrentDirectory();
-
         public Bot(ClientInformation info)
         {
             clientInformation = info;
-            InitializeBot().GetAwaiter().GetResult();
-        }
-
-        public Bot(Action<ClientInformation> info)
-        {
-            clientInformation = new ClientInformation();
-            info.Invoke(clientInformation);
             InitializeBot().GetAwaiter().GetResult();
         }
 
@@ -45,12 +37,10 @@ namespace Miki.Framework
         {
             Events.Developers.Add(id);
         }
-
         public void AddDeveloper(IDiscordUser user)
         {
             Events.Developers.Add(user.Id);
         }
-
         public void AddDeveloper(IUser user)
         {
             Events.Developers.Add(user.Id);
@@ -74,29 +64,19 @@ namespace Miki.Framework
             await Task.Delay(-1);
         }
 
-        public void Dispose()
-        {
-            GC.SuppressFinalize(this);
-        }
-
         public int GetShardId()
         {
             return clientInformation.ShardId;
         }
 
+		public DiscordSocketClient GetShardFor(IDiscordGuild guild)
+		{
+			return Client.GetShardFor((guild as RuntimeGuild).guild);
+		}
+
         public int GetTotalShards()
         {
             return clientInformation.ShardCount;
-        }
-
-        private ClientInformation LoadPreferenceFile()
-        {
-            ClientInformation outputBotInfo = new ClientInformation();
-            FileReader file = new FileReader("preferences", "config");
-            outputBotInfo.Name = file.ReadLine();
-            outputBotInfo.Token = file.ReadLine();
-            file.Finish();
-            return outputBotInfo;
         }
 
         private async Task InitializeBot()
