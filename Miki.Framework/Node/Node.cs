@@ -59,7 +59,7 @@ namespace Miki.Framework.Node
             start.RedirectStandardOutput = true;
             start.RedirectStandardError = true;
             RunProcessRealtime(start, programName, channel);
-            channel.SendMessage(":white_check_mark: " + programName + ".js successfully ended.").GetAwaiter().GetResult();
+			channel.SendMessageAsync(":white_check_mark: " + programName + ".js successfully ended.").GetAwaiter().GetResult();
         }
 
         private static string RunProcessAsync(ProcessStartInfo p)
@@ -87,7 +87,7 @@ namespace Miki.Framework.Node
                 process.EnableRaisingEvents = true;
                 process.OutputDataReceived += async (s, e) =>
                 {
-                    await channel.SendMessage("[" + programName + "] " + e.Data);
+                    await channel.SendMessageAsync("[" + programName + "] " + e.Data);
                 };
                 process.BeginOutputReadLine();
                 process.WaitForExit();

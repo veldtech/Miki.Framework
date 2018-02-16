@@ -1,4 +1,4 @@
-﻿using Miki.Framework.FileHandling;
+﻿using Miki.Common;
 using System;
 using System.IO;
 
@@ -25,10 +25,6 @@ namespace Miki.Framework
             }
 
             Console.ForegroundColor = ConsoleColor.White;
-			if (client.CanLog(LogLevel.MESSAGE))
-			{
-				Console.WriteLine("[msg]: " + message);
-			}
         }
 
         /// <summary>
@@ -43,50 +39,41 @@ namespace Miki.Framework
             }
 
             Console.ForegroundColor = ConsoleColor.Magenta;
-            if (client.CanLog(LogLevel.NOTICE))
-            {
                 Console.WriteLine("[!!!]: " + message);
-            }
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        /// <summary>
-        /// Display a error message.
-        /// </summary>
-        /// <param name="message">information about the action</param>
-        public static void Error(string message)
-        {
-            if (client == null)
-            {
-                return;
-            }
+		/// <summary>
+		/// Display a error message.
+		/// </summary>
+		/// <param name="message">information about the action</param>
+		public static void Error(string message)
+		{
+			if (client == null)
+			{
+				return;
+			}
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            if (client.CanLog(LogLevel.ERROR))
-            {
-                Console.WriteLine("[err]: " + message);
-            }
-            Console.ForegroundColor = ConsoleColor.White;
-        }
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("[err]: " + message);
+			Console.ForegroundColor = ConsoleColor.White;
+		}
 
-        /// <summary>
-        /// Display a error message.
-        /// </summary>
-        /// <param name="message">information about the action</param>
-        public static void ErrorAt(string target, string message)
-        {
-            if (client == null)
-            {
-                return;
-            }
+		/// <summary>
+		/// Display a error message.
+		/// </summary>
+		/// <param name="message">information about the action</param>
+		public static void ErrorAt(string target, string message)
+		{
+			if (client == null)
+			{
+				return;
+			}
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            if (client.CanLog(LogLevel.ERROR))
-            {
-                Console.WriteLine("[err@{0}]: {1}", target, message);
-            }
-            Console.ForegroundColor = ConsoleColor.White;
-        }
+			Console.ForegroundColor = ConsoleColor.Red;
+			Console.WriteLine("[err@{0}]: {1}", target, message);
+			Console.ForegroundColor = ConsoleColor.White;
+		}
 
         /// <summary>
         /// Display a warning message.
@@ -136,43 +123,20 @@ namespace Miki.Framework
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        /// <summary>
-        /// Display a message when something is done.
-        /// </summary>
-        /// <param name="message">information about the action</param>
-        public static void DoneAt(string target, string message)
-        {
-            if (client == null)
-            {
-                return;
-            }
+		/// <summary>
+		/// Display a message when something is done.
+		/// </summary>
+		/// <param name="message">information about the action</param>
+		public static void DoneAt(string target, string message)
+		{
+			if (client == null)
+			{
+				return;
+			}
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            if (client.CanLog(LogLevel.NOTICE))
-            {
-                Console.WriteLine("[yay@{0}]: {1}", target, message);
-            }
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        /// <summary>
-        /// Logs custom messages
-        /// </summary>
-        /// <param name="message">message that appears.</param>
-        /// <param name="color">the color the message appears in</param>
-        /// <param name="logLevel">the level the message will be filterd on</param>
-        public static void Print(string message, ConsoleColor color = ConsoleColor.White, LogLevel logLevel = LogLevel.MESSAGE)
-        {
-            if (client == null)
-            {
-                return;
-            }
-
-            Console.ForegroundColor = color;
-            if (client.CanLog(logLevel))
-            {
-                Console.WriteLine(message);
-            }
-        }
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("[yay@{0}]: {1}", target, message);
+			Console.ForegroundColor = ConsoleColor.White;
+		}
     }
 }

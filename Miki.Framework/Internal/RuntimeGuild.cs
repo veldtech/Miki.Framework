@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Miki.Common.Interfaces;
+using Miki.Framework.Internal;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,11 +16,17 @@ namespace Miki.Common
         public string Name => guild.Name;
 		public ulong OwnerId => guild.OwnerId;
 
-        public async Task<int> GetChannelCountAsync() => (await guild.GetChannelsAsync()).Count;
-        public async Task<int> GetVoiceChannelCountAsync() => (await guild.GetVoiceChannelsAsync()).Count;
-		public async Task<int> GetUserCountAsync() => (await guild.GetUsersAsync()).Count;
-        public async Task<IDiscordUser> GetOwnerAsync() => new RuntimeUser(await guild.GetOwnerAsync());
-		public async Task<IDiscordUser> GetCurrentUserAsync() => new RuntimeUser(await guild.GetCurrentUserAsync());
+        public async Task<int> GetChannelCountAsync() 
+			=> (await guild.GetChannelsAsync()).Count;
+        public async Task<int> GetVoiceChannelCountAsync() 
+			=> (await guild.GetVoiceChannelsAsync()).Count;
+		public async Task<int> GetUserCountAsync() 
+			=> (await guild.GetUsersAsync()).Count;
+        public async Task<IDiscordUser> GetOwnerAsync() 
+			=> new RuntimeUser(await guild.GetOwnerAsync());
+
+		public async Task<IDiscordUser> GetCurrentUserAsync() 
+			=> new RuntimeUser(await guild.GetCurrentUserAsync());
 
 		public List<IDiscordRole> Roles
         {

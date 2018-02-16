@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Miki.Common.Interfaces;
+using Miki.Framework.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;

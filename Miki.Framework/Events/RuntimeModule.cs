@@ -67,7 +67,7 @@ namespace Miki.Framework.Events
             info.Invoke(this);
         }
 
-        public async Task InstallAsync(object bot)
+        public void Install(object bot)
         {
             Bot b = (Bot)bot;
             Name = Name.ToLower();
@@ -79,7 +79,7 @@ namespace Miki.Framework.Events
 
             if (UserUpdated != null)
             {
-                b.UserUpdated += Module_UserUpdated;
+                b.UserUpdate += Module_UserUpdated;
             }
 
             if (UserJoinGuild != null)
@@ -89,7 +89,7 @@ namespace Miki.Framework.Events
 
             if (UserLeaveGuild != null)
             {
-                b.UserLeft += Module_UserLeft;
+                b.UserLeave += Module_UserLeft;
             }
 
             if (JoinedGuild != null)
@@ -102,23 +102,19 @@ namespace Miki.Framework.Events
                 b.GuildLeave += Module_LeftGuild;
             }
 
-            EventSystem = b.Events;
-
-            b.Events.CommandHandler.Modules.Add(Name, this);
+            EventSystem.CommandHandler.AddModule(this);
 
             foreach (ICommandEvent e in Events)
             {
                 RuntimeCommandEvent ev = new RuntimeCommandEvent(e)
                 {
-                    eventSystem = b.Events,
+                    eventSystem = EventSystem.Instance,
                     Module = this
                 };
                 EventSystem.CommandHandler.AddCommand(ev);
             }
 
             isInstalled = true;
-
-            await Task.CompletedTask;
         }
 
         public RuntimeModule AddCommand(ICommandEvent command)
@@ -127,7 +123,7 @@ namespace Miki.Framework.Events
             return this;
         }
 
-        public async Task UninstallAsync(object bot)
+        public void Uninstall(object bot)
         {
             Bot b = (Bot)bot;
 
@@ -136,9 +132,8 @@ namespace Miki.Framework.Events
                 return;
             }
 
-            b.Events.Modules.Remove(Name);
-
-            b.Events.CommandHandler.AddModule(this);
+            EventSystem.Modules.Remove(Name);
+            EventSystem.CommandHandler.AddModule(this);
 
             if (MessageRecieved != null)
             {
@@ -147,7 +142,7 @@ namespace Miki.Framework.Events
 
             if (UserUpdated != null)
             {
-                b.UserUpdated -= Module_UserUpdated;
+                b.UserUpdate -= Module_UserUpdated;
             }
 
             if (UserJoinGuild != null)
@@ -157,7 +152,7 @@ namespace Miki.Framework.Events
 
             if (UserLeaveGuild != null)
             {
-                b.UserLeft -= Module_UserLeft;
+                b.UserLeave -= Module_UserLeft;
             }
 
             if (JoinedGuild != null)
@@ -171,7 +166,6 @@ namespace Miki.Framework.Events
             }
 
             isInstalled = false;
-            await Task.CompletedTask;
         }
 
         private async Task Module_JoinedGuild(IDiscordGuild arg)

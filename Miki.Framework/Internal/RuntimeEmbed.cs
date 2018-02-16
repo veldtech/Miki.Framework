@@ -275,39 +275,34 @@ namespace Miki.Common
 
         public async Task<IDiscordMessage> SendToChannel(ulong channelId)
         {
-            IMessageChannel m = (Bot.instance.Client.GetChannel(channelId) as IMessageChannel);
-            if (m as IGuildChannel != null)
-            {
-                if (!(await (m as IGuildChannel).Guild.GetCurrentUserAsync()).GuildPermissions.EmbedLinks)
-                {
-                    if (string.IsNullOrWhiteSpace(ImageUrl))
-                    {
-                        return new RuntimeMessage(await m.SendMessageAsync(ToMessageBuilder().Build(), false));
-                    }
+            IDiscordMessageChannel channel = Bot.Instance.GetChannel(channelId);
+			if (!(await channel.Guild.GetCurrentUserAsync()).HasPermissions(channel, DiscordGuildPermission.EmbedLinks))
+			{
+				if (string.IsNullOrWhiteSpace(ImageUrl))
+				{
+					return await channel.SendMessageAsync(ToMessageBuilder().Build());
+				}
 
-                    using (WebClient wc = new WebClient())
-                    {
-                        byte[] image = wc.DownloadData(ImageUrl);
-                        using (MemoryStream ms = new MemoryStream(image))
-                        {
-                            return new RuntimeMessage(await m.SendFileAsync(ms, ImageUrl, ToMessageBuilder().Build()));
-                        }
-                    }
-                }
-            }
-            return new RuntimeMessage(await m.SendMessageAsync("", false, embed));
+				using (WebClient wc = new WebClient())
+				{
+					byte[] image = wc.DownloadData(ImageUrl);
+					using (MemoryStream ms = new MemoryStream(image))
+					{
+						return await channel.SendFileAsync(ms, ToMessageBuilder().Build());
+					}
+				}
+			}
+            return await channel.SendMessageAsync(null, this);
         }
 
         public async Task<IDiscordMessage> SendToChannel(IDiscordMessageChannel channel)
-        {
-            return await SendToChannel(channel.Id);
-        }
+			=> await SendToChannel(channel.Id);       
 
         public async Task<IDiscordMessage> SendToUser(ulong userId)
         {
-            IDMChannel channel = await (Bot.instance.Client.GetUser(userId)).GetOrCreateDMChannelAsync();
-            return new RuntimeMessage(await channel.SendMessageAsync("", false, embed));
-        }
+			return await Bot.Instance.GetUser(userId)
+				.SendMessageAsync(null, this);
+		}
 
         public async Task<IDiscordMessage> SendToUser(IDiscordUser user)
         {

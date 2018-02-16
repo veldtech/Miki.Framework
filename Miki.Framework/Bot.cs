@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-using Miki.Framework.Addons;
 using Miki.Framework.Events;
 using Miki.Framework.FileHandling;
 using Miki.Common.Interfaces;
@@ -9,41 +8,54 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Miki.Common;
+using System.Collections.Generic;
+using System.Linq;
+using Miki.Framework.Internal;
 
 namespace Miki.Framework
 {
-    public partial class Bot
+    public class Bot : IBot
     {
-        public AddonManager Addons { private set; get; }
+		public event Func<IDiscordGuild, Task> GuildJoin;
+		public event Func<IDiscordGuild, Task> GuildLeave;
+		public event Func<IDiscordGuild, IDiscordGuild, Task> GuildUpdate;
+
+		public event Func<IDiscordMessage, Task> MessageReceived;
+
+		public event Func<int, Task> ShardConnect;
+		public event Func<Exception, int, Task> ShardDisconnect;
+
+		public event Func<IDiscordUser, Task> UserJoin;
+		public event Func<IDiscordUser, Task> UserLeave;
+		public event Func<IDiscordUser, IDiscordUser, Task> UserUpdate;
+
+		public Func<Exception, Task> OnError = null;
+
+		public static IBot Instance { get; private set; }
+
         public DiscordShardedClient Client { private set; get; }
-        public EventSystem Events { internal set; get; }
 
-        public Func<Exception, Task> OnError = null;
+		public IDiscordSelfUser CurrentUser 
+			=> new RuntimeSelfUser(Client.CurrentUser);
 
-        public string Name => clientInformation.Name;
-		public string Version => clientInformation.Version;
+		public ClientInformation Information
+			=> clientInformation;
 
-        public static Bot instance;
+		public IReadOnlyList<IDiscordGuild> Guilds => 
+			Client.Guilds.Select(x => new RuntimeGuild(x))
+			.ToList();
 
-        internal ClientInformation clientInformation;
+		public int Latency
+			=> Client.Latency;
 
-        public Bot(ClientInformation info)
+		public IReadOnlyList<IShard> Shards => throw new NotImplementedException();
+
+		private ClientInformation clientInformation;
+
+		public Bot(ClientInformation info)
         {
             clientInformation = info;
-            InitializeBot().GetAwaiter().GetResult();
-        }
-
-        public void AddDeveloper(ulong id)
-        {
-            Events.Developers.Add(id);
-        }
-        public void AddDeveloper(IDiscordUser user)
-        {
-            Events.Developers.Add(user.Id);
-        }
-        public void AddDeveloper(IUser user)
-        {
-            Events.Developers.Add(user.Id);
+            InitializeBot();
         }
 
         public async Task ConnectAsync()
@@ -64,72 +76,77 @@ namespace Miki.Framework
             await Task.Delay(-1);
         }
 
-        public int GetShardId()
-        {
-            return clientInformation.ShardId;
-        }
+		public IDiscordMessageChannel GetChannel(ulong id)
+			=> new RuntimeMessageChannel(Client.GetChannel(id));
+
+		public IDiscordGuild GetGuild(ulong id)
+			=> new RuntimeGuild(Client.GetGuild(id));
+
+		public IDiscordUser GetUser(ulong id)
+			=> new RuntimeUser(Client.GetUser(id));
 
 		public DiscordSocketClient GetShardFor(IDiscordGuild guild)
 		{
 			return Client.GetShardFor((guild as RuntimeGuild).guild);
 		}
 
-        public int GetTotalShards()
-        {
-            return clientInformation.ShardCount;
-        }
-
-        private async Task InitializeBot()
-        {
-            instance = this;
+        private void InitializeBot()
+		{
+			if(Instance == null)
+				Instance = this;
 
 			Log.InitializeLogging(clientInformation);
 
             Client = new DiscordShardedClient(new DiscordSocketConfig()
             {
                 TotalShards = clientInformation.ShardCount,
-                LogLevel = LogSeverity.Info,
 				ConnectionTimeout = 150000,
-				LargeThreshold = 250,		
 			});
 
-            LoadEvents();
+			LoadEvents();
 
-            EventSystem.RegisterBot(this);
-
-            Addons = new AddonManager();
-            await Addons.Load(this);
-
-            if (clientInformation.EventLoaderMethod != null)
-            {
-                await clientInformation.EventLoaderMethod(this);
-            }
-
-            foreach (DiscordSocketClient c in Client.Shards)
+			foreach (DiscordSocketClient c in Client.Shards)
             {
                 c.Ready += async () =>
                 {
                     Log.Message($"shard {c.ShardId} ready!");
-                    await c.SetGameAsync($"{c.ShardId + 1}/{GetTotalShards()} | >help");
+                    await c.SetGameAsync($"{c.ShardId + 1}/{Information.ShardCount} | >help");
                 };
 
                 c.Connected += async () =>
                 {
-                    Log.Message($"{c.ShardId}| Connected!");
-					await Task.Yield();
+					await ShardConnect(c.ShardId);
                 };
 
                 c.Disconnected += async (e) =>
                 {
-                    Log.ErrorAt(c.ShardId + "| Disconnected", e.Message);
-					await Task.Yield();
+					await ShardDisconnect(e, c.ShardId);
 				};
             }
 
             Client.Log += Client_Log;
         }
+		private void LoadEvents()
+		{
+			Client.MessageReceived += async (m) 
+				=> await MessageReceived?.Invoke(new RuntimeMessage(m));
 
-        private async Task Client_Log(LogMessage arg)
+			Client.JoinedGuild += async (g) 
+				=> await GuildJoin?.Invoke(new RuntimeGuild(g));
+			Client.LeftGuild += async (g) 
+				=> await GuildLeave?.Invoke(new RuntimeGuild(g));
+			Client.GuildUpdated += async (gOld, gNew) 
+				=> await GuildUpdate?.Invoke(new RuntimeGuild(gOld), new RuntimeGuild(gNew));
+
+			Client.UserJoined += async (u) 
+				=> await UserJoin?.Invoke(new RuntimeUser(u));
+			Client.UserLeft += async (u) 
+				=> await UserLeave?.Invoke(new RuntimeUser(u));
+			Client.UserUpdated += async (uOld, uNew) 
+				=> await UserUpdate(new RuntimeUser(uOld), new RuntimeUser(uNew));
+		}
+
+		private async Task Client_Log(LogMessage arg)
         {
 			await Task.Yield();
 			if (!string.IsNullOrEmpty(arg.Message))
@@ -143,5 +160,15 @@ namespace Miki.Framework
 				Console.WriteLine(arg.Exception);
 			}
         }
-    }
+
+		public IShard GetShard(int id)
+		{
+			throw new NotImplementedException();
+		}
+
+		IShard IBot.GetShardFor(IDiscordGuild guild)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Miki.Common;
 using Miki.Common.Interfaces;
 using Miki.Framework;
 using System;
@@ -7,11 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Miki.Common
+namespace Miki.Framework.Internal
 {
-    public class RuntimeUser : IDiscordUser, IProxy<IUser>
+    internal class RuntimeUser : IDiscordUser, IProxy<IUser>
     {
-        private IUser user;
+        protected IUser user;
 
         public RuntimeUser()
         {
@@ -71,22 +72,14 @@ namespace Miki.Common
 
         public async Task AddRoleAsync(IDiscordRole role)
         {
-            await (user as IGuildUser).AddRolesAsync(new List<IRole> { (role as IProxy<IRole>).ToNativeObject() });
+            await (user as IGuildUser).AddRoleAsync((role as RuntimeRole).role);
         }
 
-        public async Task AddRolesAsync(List<IDiscordRole> roles)
-        {
-            List<IRole> roleList = new List<IRole>();
-
-            foreach (IDiscordRole a in roles)
-            {
-                roleList.Add((a as IProxy<IRole>).ToNativeObject());
-            }
-
-            IGuildUser u = (user as IGuildUser);
-
-            await u.AddRolesAsync(roleList);
-        }
+		public async Task AddRolesAsync(params IDiscordRole[] roles)
+		{
+			IGuildUser u = (user as IGuildUser);
+			await u.AddRolesAsync(roles.Select(x => (x as RuntimeRole).role));
+		}
 
 		public async Task Ban(IDiscordGuild g, int pruneDay = 0, string reason = null)
 		{
@@ -154,17 +147,17 @@ namespace Miki.Common
             await u.RemoveRolesAsync(roleList);
         }
 
-        public async Task SendFile(string path)
+        public async Task SendFileAsync(string path)
         {
             IDMChannel c = await user.GetOrCreateDMChannelAsync();
             await c.SendFileAsync(path);
         }
 
-        public async Task<IDiscordMessage> SendMessage(string message)
+        public async Task<IDiscordMessage> SendMessageAsync(string message, IDiscordEmbed embed = null)
         {
             IDMChannel c = await user.GetOrCreateDMChannelAsync();
 
-            RuntimeMessage m = new RuntimeMessage(await c.SendMessageAsync(message));
+			RuntimeMessage m = new RuntimeMessage(await c.SendMessageAsync(message ?? "", false, (embed as RuntimeEmbed).embed));
             Log.Message("Sent message to " + user.Username);
             return m;
         }
@@ -177,7 +170,7 @@ namespace Miki.Common
             return new RuntimeMessage(m);
         }
 
-        public async Task SetNickname(string text)
+        public async Task SetNicknameAsync(string text)
         {
             await (user as IGuildUser).ModifyAsync(x =>
             {
@@ -196,9 +189,9 @@ namespace Miki.Common
             return user;
         }
 
-		public async Task QueueMessageAsync(string text)
+		public async Task QueueMessageAsync(string text, IDiscordEmbed embed = null)
 		{
-			await Task.Run(async () => await SendMessage(text));
+			await Task.Run(async () => await SendMessageAsync(text, embed));
 		}
 	}
 }

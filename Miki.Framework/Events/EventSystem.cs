@@ -13,36 +13,48 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
-    public class EventSystem
+    public class EventSystem : IEventSystem
     {
         public static EventSystem Instance => _instance;
         private static EventSystem _instance = null;
 
         public delegate Task ExceptionDelegate(Exception ex, ICommandEvent command, IDiscordMessage message);
 
-        public List<ulong> Developers = new List<ulong>();
-        private Dictionary<ulong, OnRegisteredMessage> registeredUsers = new Dictionary<ulong, OnRegisteredMessage>();
+		public Dictionary<string, ICommandEvent> Commands 
+			=> commandHandler.commands;
 
-        public CommandHandler CommandHandler;
-        private List<CommandHandler> commandHandlers = new List<CommandHandler>();
+		public ICommandHandler CommandHandler 
+			=> commandHandler;
+
+		public int CommandsUsed
+			=> commandHandler.commands.Values
+				.Sum(x => x.TimesUsed);
+
+		public List<ulong> DeveloperIds => developers;
+
+		public Dictionary<string, IModule> Modules => commandHandler.modules;
+		
+		private List<ulong> developers = new List<ulong>();
+
+		private Dictionary<ulong, OnRegisteredMessage> registeredUsers = new Dictionary<ulong, OnRegisteredMessage>();
+
+		private CommandHandler commandHandler;
+
+		private List<ICommandHandler> commandHandlers = new List<ICommandHandler>();
 		
         private ConcurrentDictionary<Tuple<ulong, ulong>, CommandHandler> privateCommandHandlers = new ConcurrentDictionary<Tuple<ulong, ulong>, CommandHandler>();
+
 		private ConcurrentDictionary<Tuple<ulong, ulong>, Action<IDiscordMessage>> nextMessageRequests = new ConcurrentDictionary<Tuple<ulong, ulong>, Action<IDiscordMessage>>();
 
-        private object privateCommandHandlerLock = new object();
+		private Bot bot = null;
 
-        public Dictionary<string, IModule> Modules => CommandHandler.Modules;
-        public Dictionary<string, ICommandEvent> Commands => CommandHandler.Commands;
+		private List<ulong> ignore = new List<ulong>();
 
-        private List<ulong> ignore = new List<ulong>();
+		private EventContainer events = new EventContainer();
 
-        public Bot bot = null;
+        public ExceptionDelegate OnCommandError = async (ex, command, msg) => await Task.Yield();
 
-        internal EventContainer Events { private set; get; }
-
-        public ExceptionDelegate OnCommandError = async (ex, command, msg) => await Task.Delay(0);
-
-        public EventSystem(Bot bot)
+        private EventSystem(Bot bot)
         {
             if (this.bot != null)
             {
@@ -51,16 +63,10 @@ namespace Miki.Framework.Events
             }
 
             this.bot = bot;
-            bot.Events = this;
 
-            Events = new EventContainer();
-            CommandHandler = new CommandHandler(this);
-
-            RegisterAttributeCommands();
+            commandHandler = new CommandHandler(this);
 
             bot.MessageReceived += InternalMessageReceived;
-            bot.GuildJoin += InternalJoinedGuild;
-            bot.GuildLeave += InternalLeftGuild;
         }
 
         public void AddCommandDoneEvent(Action<CommandDoneEvent> info)
@@ -72,82 +78,35 @@ namespace Miki.Framework.Events
             {
                 foreach (string s in newEvent.Aliases)
                 {
-                    CommandHandler.Aliases.Add(s, newEvent.Name.ToLower());
+                    commandHandler.Aliases.Add(s, newEvent.Name.ToLower());
                 }
             }
-            Events.CommandDoneEvents.Add(newEvent.Name.ToLower(), newEvent);
+            events.CommandDoneEvents.Add(newEvent.Name.ToLower(), newEvent);
         }
 
-        public void Ignore(ulong id)
-        {
-            ignore.Add(id);
-        }
+		public void AddDeveloper(ulong id)
+			=> developers.Add(id);
 
-        public void AddContinuousEvent(Action<ContinuousEvent> info)
-        {
-            ContinuousEvent newEvent = new ContinuousEvent();
-            info.Invoke(newEvent);
-            newEvent.eventSystem = this;
-            Events.ContinuousEvents.Add(newEvent.Name.ToLower(), newEvent);
-        }
-
-        public void AddJoinEvent(Action<GuildEvent> info)
-        {
-            GuildEvent newEvent = new GuildEvent();
-            info.Invoke(newEvent);
-            newEvent.eventSystem = this;
-            if (newEvent.Aliases.Length > 0)
-            {
-                foreach (string s in newEvent.Aliases)
-                {
-                    CommandHandler.Aliases.Add(s, newEvent.Name.ToLower());
-                }
-            }
-            Events.JoinServerEvents.Add(newEvent.Name.ToLower(), newEvent);
-        }
-
-        public void AddLeaveEvent(Action<GuildEvent> info)
-        {
-            GuildEvent newEvent = new GuildEvent();
-            info.Invoke(newEvent);
-            newEvent.eventSystem = this;
-            if (newEvent.Aliases.Length > 0)
-            {
-                foreach (string s in newEvent.Aliases)
-                {
-                    CommandHandler.Aliases.Add(s, newEvent.Name.ToLower());
-                }
-            }
-            Events.LeaveServerEvents.Add(newEvent.Name.ToLower(), newEvent);
-        }
-
-        public int CommandsUsed()
-        {
-            int output = 0;
-            foreach (ICommandEvent e in CommandHandler.Commands.Values)
-            {
-                output += e.TimesUsed;
-            }
-            return output;
-        }
-
-        public int CommandsUsed(string eventName)
+        public int GetCommandsUsed(string eventName)
         {
             return CommandHandler.GetCommandEvent(eventName).TimesUsed;
         }
 
-        internal void DisposeCommandHandler(CommandHandler commandHandler)
+        internal void DisposeCommandHandler(ICommandHandler commandHandler)
         {
             commandHandlers.Remove(commandHandler);
         }
 
-        public bool PrivateCommandHandlerExist(ulong userId, ulong channelId)
-        {
-            lock (privateCommandHandlerLock)
-            {
-                return privateCommandHandlers.ContainsKey(new Tuple<ulong, ulong>(userId, channelId));
-            }
-        }
+		public void Ignore(ulong id)
+		{
+			ignore.Add(id);
+		}
+
+		public bool PrivateCommandHandlerExist(ulong userId, ulong channelId)
+		{
+			return privateCommandHandlers.ContainsKey(new Tuple<ulong, ulong>(userId, channelId));
+		}
+
         internal async Task DisposePrivateCommandHandlerAsync(Tuple<ulong, ulong> key)
         {
             if(!privateCommandHandlers.TryRemove(key, out CommandHandler v))
@@ -157,7 +116,7 @@ namespace Miki.Framework.Events
             }
         }
 
-		public async Task<IDiscordMessage> ListenForNextMessageAsync(ulong channelId, ulong userId)
+		public async Task<IDiscordMessage> ListenNextMessageAsync(ulong channelId, ulong userId)
 		{
 			IDiscordMessage outputMessage = null;
 
@@ -180,9 +139,9 @@ namespace Miki.Framework.Events
             await DisposePrivateCommandHandlerAsync(new Tuple<ulong, ulong>(msg.Author.Id, msg.Channel.Id));
         }
 
-        public IEvent GetEvent(string id)
+        public IEvent GetEventByName(string id)
         {
-            return Events.GetEvent(id);
+            return events.GetEvent(id);
         }
 
         public async Task<SortedDictionary<string, List<string>>> GetEventNamesAsync(IDiscordMessage e)
@@ -194,7 +153,7 @@ namespace Miki.Framework.Events
 
             EventAccessibility userEventAccessibility = CommandHandler.GetUserAccessibility(e);
 
-            foreach (ICommandEvent ev in CommandHandler.Commands.Values)
+            foreach (ICommandEvent ev in CommandHandler.Commands)
             {
                 if (await ev.IsEnabled(e.Channel.Id) && userEventAccessibility >= ev.Accessibility)
                 {
@@ -254,18 +213,20 @@ namespace Miki.Framework.Events
         {
             string prefix = defaultPrefix.ToLower();
 
-            if (CommandHandler.Prefixes.ContainsKey(prefix))
+            if (commandHandler.Prefixes.ContainsKey(prefix))
             {
-                return CommandHandler.Prefixes[prefix];
+                return commandHandler.Prefixes[prefix];
             }
             return null;
         }
 
         public IModule GetModuleByName(string name)
         {
-            if (CommandHandler.Modules.ContainsKey(name.ToLower()))
+			IModule m = CommandHandler.GetModule(name.ToLower());
+
+			if (m != null)
             {
-                return CommandHandler.Modules[name.ToLower()];
+				return m;
             }
             Log.Warning($"Could not find Module with name '{name}'");
             return null;
@@ -368,19 +329,21 @@ namespace Miki.Framework.Events
                     }
                 }
 
-                newModule.InstallAsync(bot).GetAwaiter().GetResult();
+				newModule.Install(bot);
             }
         }
 
-        internal static void RegisterBot(Bot bot)
+        public static EventSystem Start(Bot bot)
         {
             _instance = new EventSystem(bot);
-        }
+			_instance.RegisterAttributeCommands();
+			return _instance;
+		}
 
-        public PrefixInstance RegisterPrefixInstance(string prefix, bool canBeChanged = true, bool forceExecuteCommands = false)
+		public PrefixInstance RegisterPrefixInstance(string prefix, bool canBeChanged = true, bool forceExecuteCommands = false)
         {
             PrefixInstance newPrefix = new PrefixInstance(prefix.ToLower(), canBeChanged, forceExecuteCommands);
-            CommandHandler.Prefixes.Add(prefix, newPrefix);
+            commandHandler.Prefixes.Add(prefix, newPrefix);
             return newPrefix;
         }
 
@@ -388,7 +351,7 @@ namespace Miki.Framework.Events
 
         internal async Task OnCommandDone(IDiscordMessage e, ICommandEvent commandEvent, bool success = true, float time = 0.0f)
         {
-            foreach (CommandDoneEvent ev in Events.CommandDoneEvents.Values)
+            foreach (CommandDoneEvent ev in events.CommandDoneEvents.Values)
             {
 				try
 				{
@@ -401,39 +364,9 @@ namespace Miki.Framework.Events
             }
         }
 
-        private async Task OnGuildLeave(IDiscordGuild e)
-        {
-            foreach (GuildEvent ev in Events.LeaveServerEvents.Values)
-            {
-                if (await ev.IsEnabled(e.Id))
-                {
-                    await ev.CheckAsync(e);
-                }
-            }
-        }
-
-        private async Task OnGuildJoin(IDiscordGuild e)
-        {
-            foreach (GuildEvent ev in Events.JoinServerEvents.Values)
-            {
-                if (await ev.IsEnabled(e.Id))
-                {
-                    await ev.CheckAsync(e);
-                }
-            }
-        }
-
         private async Task OnPrivateMessage(IDiscordMessage arg)
         {
             await Task.CompletedTask;
-        }
-
-        private async Task OnMention(IDiscordMessage e)
-        {
-            foreach (RuntimeCommandEvent ev in Events.MentionEvents.Values)
-            {
-                await ev.Check(e, null);
-            }
         }
 
         private async Task OnMessageRecieved(IDiscordMessage msg)
@@ -443,17 +376,14 @@ namespace Miki.Framework.Events
                 return;
             }
 
-            await CommandHandler.CheckAsync(msg);
+            await commandHandler.CheckAsync(msg);
 
             foreach (CommandHandler c in commandHandlers)
             {
-                if (c.ShouldBeDisposed && c.ShouldDispose())
-                {
-                    lock (privateCommandHandlerLock)
-                    {
-                        commandHandlers.Remove(c);
-                    }
-                }
+				if (c.ShouldBeDisposed && c.ShouldDispose())
+				{
+					commandHandlers.Remove(c);
+				}
 
                 await c.CheckAsync(msg);
             }
@@ -491,9 +421,9 @@ namespace Miki.Framework.Events
                 });
         }
 
-        public void AddPrivateCommandHandler(IDiscordMessage msg, CommandHandler cHandler)
+        public void AddPrivateCommandHandler(IDiscordMessage msg, ICommandHandler cHandler)
         {
-            AddPrivateCommandHandler(new Tuple<ulong, ulong>(msg.Author.Id, msg.Channel.Id), cHandler);
+            AddPrivateCommandHandler(new Tuple<ulong, ulong>(msg.Author.Id, msg.Channel.Id), cHandler as CommandHandler);
         }
 
 		private async Task InternalMessageReceived(IDiscordMessage message)
@@ -508,16 +438,6 @@ namespace Miki.Framework.Events
 				Log.ErrorAt("messagerecieved", e.ToString());
 			};
 		}
-		
-        private async Task InternalJoinedGuild(IDiscordGuild g)
-        {
-            await OnGuildJoin(g);
-        }
-
-        private async Task InternalLeftGuild(IDiscordGuild g)
-        {
-            await OnGuildLeave(g);
-        }
 
         #endregion events
     }

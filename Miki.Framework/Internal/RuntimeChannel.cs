@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Miki.Common.Interfaces;
 using Miki.Framework;
+using Miki.Framework.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,30 +21,16 @@ namespace Miki.Common
         }
 
         public IDiscordGuild Guild
-        {
-            get
-            {
-                return new RuntimeGuild((channel as IGuildChannel).Guild);
-            }
-        }
+			=> new RuntimeGuild((channel as IGuildChannel).Guild);
 
         public ulong Id
-        {
-            get
-            {
-                return channel.Id;
-            }
-        }
+			=> channel.Id;
 
-        public string Name
-        {
-            get
-            {
-                return channel.Name;
-            }
-        }
+		public string Name
+			=> channel.Name;
 
-        public bool Nsfw => channel.IsNsfw;
+		public bool Nsfw 
+			=> channel.IsNsfw;
 
         public async Task DeleteMessagesAsync(List<IDiscordMessage> messages)
         {
@@ -72,29 +59,30 @@ namespace Miki.Common
 				.ToList(); 
         }
 
-        public async Task<IDiscordMessage> SendFileAsync(string path)
+        public async Task<IDiscordMessage> SendFileAsync(string path, string message = null)
         {
-            return new RuntimeMessage(await (channel as IMessageChannel).SendFileAsync(path));
+            return new RuntimeMessage(await (channel as IMessageChannel).SendFileAsync(path, message));
         }
 
-        public async Task<IDiscordMessage> SendFileAsync(MemoryStream stream, string extension)
+        public async Task<IDiscordMessage> SendFileAsync(MemoryStream stream, string message = null)
         {
-            return new RuntimeMessage(await (channel as IMessageChannel)?.SendFileAsync(stream, extension));
+            return new RuntimeMessage(await (channel as IMessageChannel)?.SendFileAsync(stream, message));
         }
 
-        public async Task<IDiscordMessage> SendMessageAsync(string message)
+        public async Task<IDiscordMessage> SendMessageAsync(string message, IDiscordEmbed embed = null)
         {
             RuntimeMessage m = null;
             try
             {
-                m = new RuntimeMessage(await (channel as IMessageChannel).SendMessage(message));
+                m = new RuntimeMessage(await (channel as IMessageChannel).SendMessageAsync(message ?? "", false, (embed as RuntimeEmbed)?.embed ?? null));
                 Log.Message("Sent message to channel " + channel.Name);
-            }
-            catch (Exception ex)
+				return m;
+			}
+			catch (Exception ex)
             {
                 Log.ErrorAt("SendMessage", ex.Message);
             }
-            return m;
+			return null;
         }
 
         public IChannel ToNativeObject()

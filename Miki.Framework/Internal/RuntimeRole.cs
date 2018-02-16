@@ -5,7 +5,7 @@ namespace Miki.Common
 {
     public class RuntimeRole : IDiscordRole, IProxy<IRole>
     {
-        private IRole role;
+        internal IRole role;
 
         public RuntimeRole(IRole role)
         {

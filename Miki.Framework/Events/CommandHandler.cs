@@ -13,11 +13,6 @@ namespace Miki.Framework.Events
     {
         private CommandHandler commandHandler = null;
 
-        public CommandHandlerBuilder()
-        {
-            commandHandler = new CommandHandler(Bot.instance.Events);
-        }
-
         public CommandHandlerBuilder(EventSystem eventSystem)
         {
             commandHandler = new CommandHandler(eventSystem);
@@ -67,7 +62,12 @@ namespace Miki.Framework.Events
 
     public class CommandHandler : ICommandHandler
     {
+		public List<ICommandEvent> Commands => commands.Values.ToList();
+
         public bool IsPrivate { get; set; } = false;
+
+		public List<IModule> Modules => modules.Values.ToList();
+
         public bool ShouldBeDisposed { get; set; } = false;
 
         public ulong Owner { get; set; } = 0;
@@ -85,8 +85,8 @@ namespace Miki.Framework.Events
 
         internal Dictionary<string, string> Aliases = new Dictionary<string, string>();
 
-        public Dictionary<string, IModule> Modules = new Dictionary<string, IModule>();
-        public Dictionary<string, ICommandEvent> Commands = new Dictionary<string, ICommandEvent>();
+        public Dictionary<string, IModule> modules = new Dictionary<string, IModule>();
+        public Dictionary<string, ICommandEvent> commands = new Dictionary<string, ICommandEvent>();
 
         public CommandHandler(EventSystem eventSystem)
         {
@@ -130,16 +130,12 @@ namespace Miki.Framework.Events
             {
                 Aliases.Add(a, cmd.Name.ToLower());
             }
-            Commands.Add(cmd.Name.ToLower(), cmd);
+            commands.Add(cmd.Name.ToLower(), cmd);
         }
 
         public void AddModule(IModule module)
         {
-            foreach (ICommandEvent c in module.Events)
-            {
-                AddCommand(c);
-            }
-            Modules.Add(module.Name.ToLower(), module);
+            modules.Add(module.Name.ToLower(), module);
         }
 
         public async Task<bool> TryRunCommandAsync(IDiscordMessage msg, PrefixInstance prefix)
@@ -185,7 +181,7 @@ namespace Miki.Framework.Events
         {
             if (e.Channel == null) return EventAccessibility.PUBLIC;
 
-            if (eventSystem.Developers.Contains(e.Author.Id)) return EventAccessibility.DEVELOPERONLY;
+            if (eventSystem.DeveloperIds.Contains(e.Author.Id)) return EventAccessibility.DEVELOPERONLY;
             if (e.Author.HasPermissions(e.Channel, DiscordGuildPermission.ManageRoles)) return EventAccessibility.ADMINONLY;
             return EventAccessibility.PUBLIC;
         }
@@ -196,19 +192,19 @@ namespace Miki.Framework.Events
 
             if(Aliases.ContainsKey(newVal))
             {
-                return Commands[Aliases[newVal]];
+                return commands[Aliases[newVal]];
             }
 
-            if (Commands.ContainsKey(newVal))
+            if (commands.ContainsKey(newVal))
             {
-                return Commands[newVal];
+                return commands[newVal];
             }
             return null;
         }
 
         public IEvent GetEvent(string value)
         {
-            foreach (IModule m in Modules.Values)
+            foreach (IModule m in modules.Values)
             {
                 IService s = m.Services.Where(x => x.Name.ToLower() == value.ToLower()).FirstOrDefault();
                 if (s != null)
@@ -241,9 +237,9 @@ namespace Miki.Framework.Events
 
         public IModule GetModule(string id)
         {
-            if (Modules.ContainsKey(id.ToLower()))
+            if (modules.ContainsKey(id.ToLower()))
             {
-                return Modules[id.ToLower()];
+                return modules[id.ToLower()];
             }
             return null;
         }
@@ -252,7 +248,7 @@ namespace Miki.Framework.Events
         {
             List<string> allEvents = new List<string>();
 
-            foreach (IModule m in Modules.Values)
+            foreach (IModule m in modules.Values)
             {
                 foreach (ICommandEvent c in m.Events)
                 {

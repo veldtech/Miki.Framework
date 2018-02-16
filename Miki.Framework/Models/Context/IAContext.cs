@@ -14,7 +14,7 @@ namespace Miki.Framework.Models.Context
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseNpgsql(Bot.instance.clientInformation.DatabaseConnectionString);
+			optionsBuilder.UseNpgsql(Bot.Instance.Information.DatabaseConnectionString);
 			base.OnConfiguring(optionsBuilder);
 		}
 

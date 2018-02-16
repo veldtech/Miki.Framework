@@ -107,7 +107,9 @@ namespace Miki.Framework.Events
             EventContext context = new EventContext();
             context.commandHandler = c;
             context.arguments = args;
-            context.message = e;    
+            context.message = e;
+			context.EventSystem = eventSystem;
+			
 
             if (await TryProcessCommand(targetCommand, context))
             {
