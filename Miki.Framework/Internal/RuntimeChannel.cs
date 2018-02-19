@@ -64,9 +64,9 @@ namespace Miki.Common
             return new RuntimeMessage(await (channel as IMessageChannel).SendFileAsync(path, message));
         }
 
-        public async Task<IDiscordMessage> SendFileAsync(MemoryStream stream, string message = null)
+        public async Task<IDiscordMessage> SendFileAsync(Stream stream, string fileName, string message = null)
         {
-            return new RuntimeMessage(await (channel as IMessageChannel)?.SendFileAsync(stream, message));
+            return new RuntimeMessage(await (channel as IMessageChannel)?.SendFileAsync(stream, fileName, message));
         }
 
         public async Task<IDiscordMessage> SendMessageAsync(string message, IDiscordEmbed embed = null)

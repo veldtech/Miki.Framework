@@ -69,7 +69,7 @@ namespace Miki.Framework.Events
 
         public async Task SetEnabledAll(IDiscordGuild guildId, bool enabled)
         {
-            List<IDiscordMessageChannel> channels = await guildId.GetChannels();
+            List<IDiscordMessageChannel> channels = await guildId.GetChannelsAsync();
             foreach (IDiscordMessageChannel c in channels)
             {
                 await SetEnabled(c.Id, enabled);

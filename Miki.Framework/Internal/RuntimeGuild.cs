@@ -11,73 +11,72 @@ namespace Miki.Common
     {
         public IGuild guild = null;
 
-        public string AvatarUrl => guild.IconUrl;
-        public ulong Id => guild.Id;
-        public string Name => guild.Name;
-		public ulong OwnerId => guild.OwnerId;
+        public string AvatarUrl 
+			=> guild.IconUrl;
 
-        public async Task<int> GetChannelCountAsync() 
-			=> (await guild.GetChannelsAsync()).Count;
-        public async Task<int> GetVoiceChannelCountAsync() 
-			=> (await guild.GetVoiceChannelsAsync()).Count;
-		public async Task<int> GetUserCountAsync() 
-			=> (await guild.GetUsersAsync()).Count;
-        public async Task<IDiscordUser> GetOwnerAsync() 
-			=> new RuntimeUser(await guild.GetOwnerAsync());
+		public ulong Id 
+			=> guild.Id;
 
-		public async Task<IDiscordUser> GetCurrentUserAsync() 
-			=> new RuntimeUser(await guild.GetCurrentUserAsync());
+		public string Name 
+			=> guild.Name;
+
+		public ulong OwnerId 
+			=> guild.OwnerId;
 
 		public List<IDiscordRole> Roles
-        {
-            get
-            {
-                List<IDiscordRole> output = new List<IDiscordRole>();
+			=> guild.Roles.Select(x => new RuntimeRole(x)).Cast<IDiscordRole>().ToList();
 
-                foreach (IRole role in guild.Roles)
-                {
-                    output.Add(new RuntimeRole(role));
-                }
-
-                return output;
-            }
-        }
-
-
-        public RuntimeGuild(IGuild g)
+		public RuntimeGuild(IGuild g)
         {
             guild = g;
         }
 
-        public async Task<IDiscordMessageChannel> GetDefaultChannel()
-        {
-            return new RuntimeMessageChannel(await guild.GetDefaultChannelAsync());
-        }
+		public async Task<int> GetChannelCountAsync()
+			=> (await guild.GetChannelsAsync()).Count;
 
-        public async Task<IDiscordUser> GetUserAsync(ulong user_id)
-        {
-            return new RuntimeUser(await guild.GetUserAsync(user_id));
-        }
+		public async Task<List<IDiscordMessageChannel>> GetChannelsAsync()
+		=> (await guild.GetChannelsAsync())
+			.Select(x => new RuntimeMessageChannel(x))
+			.Cast<IDiscordMessageChannel>()
+			.ToList();
 
-        public async Task<List<IDiscordMessageChannel>> GetChannels()
-        {
-            List<IGuildChannel> channels = (await guild.GetChannelsAsync()).ToList();
-            List<IDiscordMessageChannel> rChannels = new List<IDiscordMessageChannel>();
-            foreach (IGuildChannel c in channels)
-            {
-                rChannels.Add(new RuntimeMessageChannel(c));
-            }
-            return rChannels;
-        }
+		public async Task<IDiscordUser> GetCurrentUserAsync()
+			=> new RuntimeUser(await guild.GetCurrentUserAsync());
 
-        public IDiscordRole GetRole(ulong role_id)
-        {
-            return new RuntimeRole(guild.GetRole(role_id));
-        }
+		public async Task<IDiscordMessageChannel> GetDefaultChannelAsync()
+			=> new RuntimeMessageChannel(await guild.GetDefaultChannelAsync());
 
-        public IGuild ToNativeObject()
-        {
-            return guild;
-        }
-    }
+		public async Task<IDiscordUser> GetOwnerAsync()
+			=> new RuntimeUser(await guild.GetOwnerAsync());
+
+		public async Task<int> GetUserCountAsync()
+			=> (await guild.GetUsersAsync()).Count;
+
+		public async Task<int> GetVoiceChannelCountAsync()
+			=> (await guild.GetVoiceChannelsAsync()).Count;
+
+		public async Task<IDiscordUser> GetUserAsync(ulong userId)
+		{
+			var user = await guild.GetUserAsync(userId);
+
+			if(user != null)
+				return new RuntimeUser(user);
+			return null;
+		}
+		public async Task<IDiscordUser> GetUserAsync(string username)
+			=> (await GetUsersAsync())
+				.FirstOrDefault(x => x.Nickname == username || x.Username == username || $"{x.Username}#{x.Discriminator}" == username);
+
+		public async Task<List<IDiscordUser>> GetUsersAsync()
+			=> (await guild.GetUsersAsync())
+				.Select(x => new RuntimeUser(x))
+				.Cast<IDiscordUser>()
+				.ToList();
+
+        public IDiscordRole GetRole(ulong roleId)
+			=> new RuntimeRole(guild.GetRole(roleId));
+
+		public IGuild ToNativeObject()
+			=> guild;
+	}
 }
