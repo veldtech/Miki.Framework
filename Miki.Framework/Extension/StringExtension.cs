@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Miki.Framework.Extension
 {
@@ -8,82 +9,53 @@ namespace Miki.Framework.Extension
     {
         public static TimeSpan GetTimeFromString(this string value)
         {
-            List<string> arguments = value.Split(' ').ToList();
-            int splitIndex = 0;
-
-            for (int i = 0; i < arguments.Count; i++)
-            {
-                if (arguments[i].ToLower() == "in")
-                {
-                    splitIndex = i;
-                }
-            }
-
             TimeSpan timeUntilReminder = new TimeSpan();
 
-            List<string> timeList = new List<string>();
-            timeList.AddRange(arguments);
-            timeList.RemoveRange(0, splitIndex);
+			var matches = Regex.Matches(value.ToLower(), @"(\d+)(\s+)?(y|w|d|h|m|s)");
 
-            for (int i = 1; i < timeList.Count; i++)
-            {
-                switch (timeList[i])
-                {
-                    case "seconds":
-                    case "second":
-                    case "sec":
-                    case "s":
-                        int seconds = int.Parse(timeList[i - 1]);
-                        timeUntilReminder = timeUntilReminder.Add(new TimeSpan(0, 0, seconds));
-                        break;
+			foreach(Match match in matches)
+			{
+				if(match.Success)
+				{
+					timeUntilReminder += GetTimeFromMatch(match);
+				}
+			}
 
-                    case "minutes":
-                    case "minute":
-                    case "min":
-                    case "m":
-                        int minutes = int.Parse(timeList[i - 1]);
-                        timeUntilReminder = timeUntilReminder.Add(new TimeSpan(0, minutes, 0));
-                        break;
-
-                    case "hours":
-                    case "hour":
-                    case "hr":
-                    case "h":
-                        int hours = int.Parse(timeList[i - 1]);
-                        timeUntilReminder = timeUntilReminder.Add(new TimeSpan(hours, 0, 0));
-                        break;
-
-                    case "days":
-                    case "day":
-                    case "d":
-                        int days = int.Parse(timeList[i - 1]);
-                        timeUntilReminder = timeUntilReminder.Add(new TimeSpan(days, 0, 0, 0));
-                        break;
-
-                    case "week":
-                    case "weeks":
-                    case "wk":
-                    case "w":
-                        int weeks = int.Parse(timeList[i - 1]);
-                        timeUntilReminder = timeUntilReminder.Add(new TimeSpan(weeks * 7, 0, 0, 0, 0));
-                        break;
-
-                    case "year":
-                    case "years":
-                    case "yr":
-                    case "y":
-                        int years = int.Parse(timeList[i - 1]);
-                        timeUntilReminder = timeUntilReminder.Add(new TimeSpan(years * 365, 0, 0, 0));
-                        break;
-                }
-            }
-
-            if (timeUntilReminder >= TimeSpan.MaxValue)
+			if (timeUntilReminder >= TimeSpan.MaxValue)
             {
                 return new TimeSpan();
             }
 
             return timeUntilReminder;
         }
-    }
+
+		private static TimeSpan GetTimeFromMatch(Match m)
+		{
+			string value = m.Value;
+
+			char timeNotifier = value.Last();
+			value = value.Remove(value.Length - 1);
+
+			if(int.TryParse(value, out int result))
+			{
+				switch (timeNotifier)
+				{
+					case 'y':
+						return new TimeSpan(365 * result, 0, 0, 0, 0);
+					case 'w':
+						return new TimeSpan(7 * result, 0, 0, 0, 0);
+					case 'd':
+						return new TimeSpan(result, 0, 0, 0, 0);
+					case 'h':
+						return new TimeSpan(result, 0, 0);
+					case 'm':
+						return new TimeSpan(0, result, 0);
+					case 's':
+						return new TimeSpan(0, 0, result);
+				}
+			}
+
+			return new TimeSpan();
+		}
+	}
 }

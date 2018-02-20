@@ -65,7 +65,7 @@ namespace Miki.Common
 		}
 		public async Task<IDiscordUser> GetUserAsync(string username)
 			=> (await GetUsersAsync())
-				.FirstOrDefault(x => x.Nickname == username || x.Username == username || $"{x.Username}#{x.Discriminator}" == username);
+				.FirstOrDefault(x => x.Nickname.ToLower() == username.ToLower() || x.Username.ToLower() == username.ToLower() || $"{x.Username.ToLower()}#{x.Discriminator}" == username.ToLower());
 
 		public async Task<List<IDiscordUser>> GetUsersAsync()
 			=> (await guild.GetUsersAsync())

@@ -175,7 +175,7 @@ namespace Miki.Common
 
         public IDiscordEmbed AddInlineField(object title, object value)
         {
-            embed.AddInlineField(title.ToString(), value);
+            embed.AddField(title.ToString(), value, true);
             return this;
         }
 
@@ -193,7 +193,7 @@ namespace Miki.Common
 
 		internal Embed ToNativeObject()
 		{
-			return embed;
+			return embed.Build();
 		}
 
 		public IEmbedFooter CreateFooter()

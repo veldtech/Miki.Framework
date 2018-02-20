@@ -157,7 +157,7 @@ namespace Miki.Framework.Internal
         {
             IDMChannel c = await user.GetOrCreateDMChannelAsync();
 
-			RuntimeMessage m = new RuntimeMessage(await c.SendMessageAsync(message ?? "", false, (embed as RuntimeEmbed).embed));
+			RuntimeMessage m = new RuntimeMessage(await c.SendMessageAsync(message ?? "", false, (embed as RuntimeEmbed).embed.Build()));
             Log.Message("Sent message to " + user.Username);
             return m;
         }
@@ -165,7 +165,7 @@ namespace Miki.Framework.Internal
         public async Task<IDiscordMessage> SendMessage(IDiscordEmbed embed)
         {
             IDMChannel c = await user.GetOrCreateDMChannelAsync();
-            IMessage m = await c.SendMessageAsync("", false, (embed as IProxy<EmbedBuilder>).ToNativeObject());
+            IMessage m = await c.SendMessageAsync("", false, (embed as RuntimeEmbed).embed.Build());
             Log.Message("Sent message to " + user.Username);
             return new RuntimeMessage(m);
         }

@@ -44,7 +44,8 @@ namespace Miki.Common
 
         public async Task SetGameAsync(string game, string link = "")
         {
-            await client.SetGameAsync(game, (string.IsNullOrEmpty(link) ? null : link), (string.IsNullOrEmpty(link) ? Discord.StreamType.NotStreaming : Discord.StreamType.Twitch));
+            await client.SetGameAsync(game, 
+				(string.IsNullOrEmpty(link) ? null : link), (string.IsNullOrEmpty(link) ? ActivityType.Playing : ActivityType.Streaming));
         }
     }
 }

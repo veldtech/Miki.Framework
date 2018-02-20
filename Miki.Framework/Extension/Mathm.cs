@@ -4,8 +4,6 @@ namespace Miki.Framework
 {
     public class Mathm
     {
-        private static Random random = new Random();
-
         public static float Clamp(float value, float min, float max)
         {
             return Math.Min(Math.Max(value, min), max);

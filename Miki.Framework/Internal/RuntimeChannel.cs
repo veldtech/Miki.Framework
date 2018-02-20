@@ -30,19 +30,19 @@ namespace Miki.Common
 			=> channel.Name;
 
 		public bool Nsfw 
-			=> channel.IsNsfw;
+			=> (channel as ITextChannel).IsNsfw;
 
         public async Task DeleteMessagesAsync(List<IDiscordMessage> messages)
         {
-            await (channel as IMessageChannel).DeleteMessagesAsync(
+            await (channel as ITextChannel).DeleteMessagesAsync(
 				messages.Select(x => (x as IProxy<IMessage>).ToNativeObject())
 			);
         }
 
         public async Task<List<IDiscordMessage>> GetMessagesAsync(int amount = 100)
         {
-            IEnumerable<IMessage> messages = await (channel as IMessageChannel).GetMessagesAsync(amount)
-				.Flatten();
+            IEnumerable<IMessage> messages = await (channel as ITextChannel).GetMessagesAsync(amount)
+				.FlattenAsync();
 
 			return messages.Select(x => new RuntimeMessage(x))
 				.Cast<IDiscordMessage>()
@@ -52,7 +52,7 @@ namespace Miki.Common
         public async Task<List<IDiscordUser>> GetUsersAsync()
         {
             IEnumerable<IUser> users = await channel.GetUsersAsync()
-				.Flatten();
+				.FlattenAsync();
 
             return users.Select(x => new RuntimeUser(x))
 				.Cast<IDiscordUser>()
@@ -74,7 +74,7 @@ namespace Miki.Common
             RuntimeMessage m = null;
             try
             {
-                m = new RuntimeMessage(await (channel as IMessageChannel).SendMessageAsync(message ?? "", false, (embed as RuntimeEmbed)?.embed ?? null));
+                m = new RuntimeMessage(await (channel as IMessageChannel).SendMessageAsync(message ?? "", false, (embed as RuntimeEmbed)?.embed.Build() ?? null));
                 Log.Message("Sent message to channel " + channel.Name);
 				return m;
 			}
