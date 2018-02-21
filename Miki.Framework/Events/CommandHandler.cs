@@ -182,7 +182,10 @@ namespace Miki.Framework.Events
             if (e.Channel == null) return EventAccessibility.PUBLIC;
 
             if (eventSystem.DeveloperIds.Contains(e.Author.Id)) return EventAccessibility.DEVELOPERONLY;
-            if (e.Author.HasPermissions(e.Channel, DiscordGuildPermission.ManageRoles)) return EventAccessibility.ADMINONLY;
+	    
+            if (e.Author.HasPermissions(e.Channel, DiscordGuildPermission.Administrator) || 
+	    	e.Author.HasPermissions(e.Channel, DiscordGuildPermission.ManageRoles)) return EventAccessibility.ADMINONLY;
+	
             return EventAccessibility.PUBLIC;
         }
 
