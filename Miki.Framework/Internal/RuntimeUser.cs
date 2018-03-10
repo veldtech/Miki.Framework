@@ -12,11 +12,8 @@ namespace Miki.Framework.Internal
 {
     internal class RuntimeUser : IDiscordUser, IProxy<IUser>
     {
-        protected IUser user;
+        internal IUser user;
 
-        public RuntimeUser()
-        {
-        }
         public RuntimeUser(IUser author)
         {
             user = author;
@@ -86,6 +83,9 @@ namespace Miki.Framework.Internal
 			IGuild x = (g as IProxy<IGuild>).ToNativeObject();
 			await x.AddBanAsync(user, pruneDay, reason);
 		}
+
+		public override bool Equals(object obj)
+			=> ((IDiscordUser)obj).Id == Id;
 
 		public string GetAvatarUrl(DiscordAvatarType type = DiscordAvatarType.PNG, ushort size = 128)
         {

@@ -106,7 +106,7 @@ namespace Miki.Framework.Events
 
             EventContext context = new EventContext();
             context.commandHandler = c;
-            context.arguments = args;
+            context.Arguments = new Args(args);
             context.message = e;
 			context.EventSystem = eventSystem;
 			

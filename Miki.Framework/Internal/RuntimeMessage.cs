@@ -9,16 +9,16 @@ using System.Threading.Tasks;
 
 namespace Miki.Common
 {
-    public class RuntimeMessage : IDiscordMessage, IProxy<IMessage>
-    {
-        private IMessage messageData = null;
+	public class RuntimeMessage : IDiscordMessage, IProxy<IMessage>
+	{
+		private IMessage messageData = null;
 
-        private RuntimeGuild guild = null;
-        private RuntimeMessageChannel channel = null;
-        private RuntimeUser user = null;
-        private RuntimeClient client = null;
+		private RuntimeGuild guild = null;
+		private RuntimeMessageChannel channel = null;
+		private RuntimeUser user = null;
+		private RuntimeClient client = null;
 
-        public ulong Id
+		public ulong Id
 			=> messageData.Id;
 
 		public IDiscordUser Author
@@ -51,37 +51,37 @@ namespace Miki.Common
 		public IReadOnlyCollection<ulong> MentionedRoleIds
 			=> messageData.MentionedRoleIds;
 
-		public DateTimeOffset Timestamp 
+		public DateTimeOffset Timestamp
 			=> messageData.Timestamp;
 
-        public int ShardId 
+		public int ShardId
 			=> client.ShardId;
 
-        public Dictionary<DiscordEmoji, DiscordReactionMetadata> Reactions
-        {
-            get
-            {
-                IReadOnlyDictionary<IEmote, ReactionMetadata> x = (messageData as IUserMessage).Reactions;
-                Dictionary<DiscordEmoji, DiscordReactionMetadata> emojis = new Dictionary<DiscordEmoji, DiscordReactionMetadata>();
-                foreach (Emoji y in x.Keys)
-                {
-                    DiscordEmoji newEmoji = new DiscordEmoji();
-                    newEmoji.Name = y.Name;
+		public Dictionary<DiscordEmoji, DiscordReactionMetadata> Reactions
+		{
+			get
+			{
+				IReadOnlyDictionary<IEmote, ReactionMetadata> x = (messageData as IUserMessage).Reactions;
+				Dictionary<DiscordEmoji, DiscordReactionMetadata> emojis = new Dictionary<DiscordEmoji, DiscordReactionMetadata>();
+				foreach (var y in x.Keys)
+				{
+					DiscordEmoji newEmoji = new DiscordEmoji();
+					newEmoji.Name = y.Name;
 
-                    DiscordReactionMetadata metadata = new DiscordReactionMetadata();
-                    metadata.IsMe = x[y].IsMe;
-                    metadata.ReactionCount = x[y].ReactionCount;
+					DiscordReactionMetadata metadata = new DiscordReactionMetadata();
+					metadata.IsMe = x[y].IsMe;
+					metadata.ReactionCount = x[y].ReactionCount;
 
-                    emojis.Add(newEmoji, metadata);
-                }
-                return emojis;
-            }
-        }
+					emojis.Add(newEmoji, metadata);
+				}
+				return emojis;
+			}
+		}
 
-        public IReadOnlyCollection<ulong> MentionedChannelIds 
+		public IReadOnlyCollection<ulong> MentionedChannelIds
 			=> messageData.MentionedChannelIds;
 
-		public string ResolvedContent 
+		public string ResolvedContent
 			=> (messageData as IUserMessage).Resolve(
 				TagHandling.NameNoPrefix,
 				TagHandling.NameNoPrefix,
@@ -91,74 +91,88 @@ namespace Miki.Common
 			);
 
 		public RuntimeMessage(IMessage msg)
-        {
-            messageData = msg;
+		{
+			messageData = msg;
 
-            if (msg.Author != null) user = new RuntimeUser(msg.Author);
-            if (msg.Channel != null) channel = new RuntimeMessageChannel(msg.Channel);
-            IGuild g = (messageData.Channel as IGuildChannel)?.Guild;
+			if (msg.Author != null)
+				user = new RuntimeUser(msg.Author);
+			if (msg.Channel != null)
+				channel = new RuntimeMessageChannel(msg.Channel);
+			IGuild g = (messageData.Channel as IGuildChannel)?.Guild;
 
-            if (g != null)
-            {
-                guild = new RuntimeGuild(g);
-            }
-        }
-        public RuntimeMessage(IMessage msg, DiscordSocketClient c)
-        {
-            messageData = msg;
+			if (g != null)
+			{
+				guild = new RuntimeGuild(g);
+			}
+		}
+		public RuntimeMessage(IMessage msg, DiscordSocketClient c)
+		{
+			messageData = msg;
 
-            if (msg.Author != null) user = new RuntimeUser(msg.Author);
-            if (msg.Channel != null) channel = new RuntimeMessageChannel(msg.Channel);
-            IGuild g = (messageData.Author as IGuildUser)?.Guild;
-            if (g != null)
-            {
-                guild = new RuntimeGuild(g);
-            }
-            client = new RuntimeClient(c);
-        }
+			if (msg.Author != null)
+				user = new RuntimeUser(msg.Author);
+			if (msg.Channel != null)
+				channel = new RuntimeMessageChannel(msg.Channel);
+			IGuild g = (messageData.Author as IGuildUser)?.Guild;
+			if (g != null)
+			{
+				guild = new RuntimeGuild(g);
+			}
+			client = new RuntimeClient(c);
+		}
 
 		public RuntimeMessage()
 		{
 		}
 
-		public async Task AddReaction(string emoji)
-        {
-            await (messageData as IUserMessage).AddReactionAsync(new Emoji(emoji));
-        }
+		public async Task AddReactionAsync(string emoji)
+		{
+			await (messageData as IUserMessage).AddReactionAsync(new Emoji(emoji));
+		}
 
-        public async Task DeleteAsync()
-        {
-            if ((await Guild.GetCurrentUserAsync()).HasPermissions(Channel, DiscordGuildPermission.ManageMessages))
-            {
-                await messageData.DeleteAsync();
-            }
-        }
+		public async Task DeleteAsync()
+		{
+			if ((await Guild.GetCurrentUserAsync()).HasPermissions(Channel, DiscordGuildPermission.ManageMessages))
+			{
+				await messageData.DeleteAsync();
+			}
+		}
 
-        public void Modify(string message, IDiscordEmbed embed)
-        {
+		public async Task<IReadOnlyList<IDiscordUser>> GetReactionUsersAsync(DiscordEmoji emoji, int limit = 100, ulong? afterUserId = null)
+			=>	(await (messageData as IUserMessage).GetReactionUsersAsync(new Emoji(emoji.ToString()), limit, afterUserId))
+					.Select(x => new RuntimeUser(x)).ToList();
+
+		public void Modify(string message, IDiscordEmbed embed)
+		{
 			Task.Run(async () => await (messageData as IUserMessage)?.ModifyAsync(x =>
 			{
-				if(!string.IsNullOrEmpty(message))
+				if (!string.IsNullOrEmpty(message))
 					x.Content = message;
 
 				if (embed != null)
 					x.Embed = (embed as RuntimeEmbed).ToNativeObject();
 			}));
-        }
+		}
 
-        public async Task PinAsync()
-        {
-            await (messageData as IUserMessage)?.PinAsync();
-        }
+		public async Task PinAsync()
+		{
+			await (messageData as IUserMessage)?.PinAsync();
+		}
 
-        public async Task UnpinAsync()
-        {
-            await (messageData as IUserMessage)?.UnpinAsync();
-        }
+		public async Task RemoveReactionAsync(string emoji, IDiscordUser user)
+		{
+			await (messageData as IUserMessage)
+				.RemoveReactionAsync(new Emoji(emoji), (user as RuntimeUser).user);
+		}
 
-        public IMessage ToNativeObject()
-        {
-            return messageData;
-        }
+		public async Task UnpinAsync()
+		{
+			await (messageData as IUserMessage)?.UnpinAsync();
+		}
+
+		public IMessage ToNativeObject()
+		{
+			return messageData;
+		}
 	}
 }
