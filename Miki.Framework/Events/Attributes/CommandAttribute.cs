@@ -6,7 +6,7 @@ namespace Miki.Framework.Events.Attributes
     [AttributeUsage(AttributeTargets.Method)]
     public class CommandAttribute : Attribute
     {
-        internal RuntimeCommandEvent command = new RuntimeCommandEvent();
+        internal CommandEvent command = new CommandEvent();
         internal string on = "";
 
         public EventAccessibility Accessibility

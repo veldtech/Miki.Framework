@@ -1,6 +1,6 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Miki.Common;
-using Miki.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +11,8 @@ namespace Miki.Framework
 {
     public class ShardClient
     {
-		public event Func<IDiscordMessage, Task> MessageRecieved;
+		public event Func<IMessage, Task> MessageRecieved;
 		public event Func<int, Task> Ready;
-
-		public List<IDiscordGuild> Guilds => shards
-			.SelectMany(x => x.Guilds.Select(y => new RuntimeGuild(y)))
-			.Cast<IDiscordGuild>()
-			.ToList();
 
 		public List<DiscordSocketClient> Shards
 			=> shards;

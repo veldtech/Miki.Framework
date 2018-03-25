@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -10,6 +10,8 @@
     <Company />
     <Description>Miki discord bot framework</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.2.2</Version>
+    <PackageReleaseNotes>Improved Logging</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,16 +19,13 @@
     <PackageReference Include="DogStatsD-CSharp-Client" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
+    <PackageReference Include="Miki.Common" Version="1.2.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.1" />
     <PackageReference Include="StackExchange.Redis.Extensions.Protobuf" Version="3.1.0" />
   </ItemGroup>
   
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.1" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\..\Miki.Common\Miki.Common\Miki.Common.csproj" />
   </ItemGroup>
   
 </Project>

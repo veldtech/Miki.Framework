@@ -1,17 +1,46 @@
-﻿using Miki.Common;
+﻿using Microsoft.Extensions.Logging;
+using Miki.Common;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Miki.Framework
 {
-    public class Log
-    {
-        private static ClientInformation client;
+	public class LogTheme
+	{
+		Dictionary<LogLevel, LogColor> colors = new Dictionary<LogLevel, LogColor>();
 
-        public static void InitializeLogging(ClientInformation c)
-        {
-            client = c;
-        }
+		public LogColor GetColor(LogLevel level)
+		{
+			if(colors.TryGetValue(level, out LogColor value))
+			{
+				return value;
+			}
+			return new LogColor();
+		}
+
+		public void SetColor(LogLevel level, LogColor color)
+		{
+			if(colors.ContainsKey(level))
+			{
+				colors[level] = color;
+				return;
+			}
+			colors.Add(level, color);
+		}
+	}
+
+	public struct LogColor
+	{
+		public ConsoleColor? Foreground;
+		public ConsoleColor? Background;
+	}
+
+    public static class Log
+    {
+		public static event Action<string, LogLevel> OnLog;
+
+		public static LogTheme Theme = new LogTheme();
 
         /// <summary>
         /// Display a [msg] message.
@@ -19,29 +48,8 @@ namespace Miki.Framework
         /// <param name="message">information about the action</param>
         public static void Message(string message)
         {
-            if (client == null)
-            {
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        /// <summary>
-        /// Display a [!!!] message.
-        /// </summary>
-        /// <param name="message"></param>
-        public static void Notice(string message)
-        {
-            if (client == null)
-            {
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.Magenta;
-                Console.WriteLine("[!!!]: " + message);
-            Console.ForegroundColor = ConsoleColor.White;
-        }
+			WriteToLog("[info] " + message, LogLevel.Information);
+		}
 
 		/// <summary>
 		/// Display a error message.
@@ -49,30 +57,11 @@ namespace Miki.Framework
 		/// <param name="message">information about the action</param>
 		public static void Error(string message)
 		{
-			if (client == null)
-			{
-				return;
-			}
-
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("[err]: " + message);
-			Console.ForegroundColor = ConsoleColor.White;
+			WriteToLog("[crit] " + message, LogLevel.Error);
 		}
-
-		/// <summary>
-		/// Display a error message.
-		/// </summary>
-		/// <param name="message">information about the action</param>
-		public static void ErrorAt(string target, string message)
+		public static void Error(Exception exception)
 		{
-			if (client == null)
-			{
-				return;
-			}
-
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("[err@{0}]: {1}", target, message);
-			Console.ForegroundColor = ConsoleColor.White;
+			Error("[crit]" + exception.ToString());
 		}
 
         /// <summary>
@@ -81,14 +70,7 @@ namespace Miki.Framework
         /// <param name="message">information about the action</param>
         public static void Warning(string message)
         {
-            if (client == null)
-            {
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("[wrn]: " + message);
-            Console.ForegroundColor = ConsoleColor.White;
+			WriteToLog("[warn] " + message, LogLevel.Warning);
         }
 
         /// <summary>
@@ -97,46 +79,19 @@ namespace Miki.Framework
         /// <param name="message">information about the action</param>
         public static void WarningAt(string tag, string message)
         {
-            if (client == null)
-            {
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("[wrn@" + tag + "]: " + message);
-            Console.ForegroundColor = ConsoleColor.White;
+			WriteToLog($"[warn@{tag}] {message}", LogLevel.Warning);
         }
 
-        /// <summary>
-        /// Display a message when something is done.
-        /// </summary>
-        /// <param name="message">information about the action</param>
-        public static void Done(string message)
-        {
-            if (client == null)
-            {
-                return;
-            }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("[yay]: " + message);
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-		/// <summary>
-		/// Display a message when something is done.
-		/// </summary>
-		/// <param name="message">information about the action</param>
-		public static void DoneAt(string target, string message)
+		private static void WriteToLog(string message, LogLevel level)
 		{
-			if (client == null)
-			{
-				return;
-			}
+			LogColor color = Theme.GetColor(level);
 
-			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine("[yay@{0}]: {1}", target, message);
-			Console.ForegroundColor = ConsoleColor.White;
+			Console.ForegroundColor = color.Foreground ?? ConsoleColor.White;
+			Console.BackgroundColor = color.Background ?? ConsoleColor.Black;
+
+			OnLog?.Invoke(message, LogLevel.Information);
+
+			Console.ResetColor();
 		}
     }
 }

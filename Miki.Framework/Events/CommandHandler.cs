@@ -1,6 +1,5 @@
-﻿using Miki.Common;
-using Miki.Common.Events;
-using Miki.Common.Interfaces;
+﻿using Discord;
+using Miki.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,19 +17,20 @@ namespace Miki.Framework.Events
             commandHandler = new CommandHandler(eventSystem);
         }
 
-        public CommandHandlerBuilder AddCommand(ICommandEvent cmd)
+        public CommandHandlerBuilder AddCommand(CommandEvent cmd)
         {
+			(cmd as CommandEvent).eventSystem = commandHandler.eventSystem;
             commandHandler.AddCommand(cmd);
             return this;
         }
 
-        public CommandHandlerBuilder AddModule(IModule module)
+        public CommandHandlerBuilder AddModule(Module module)
         {
             commandHandler.AddModule(module);
             return this;
         }
 
-        public CommandHandlerBuilder SetOwner(IDiscordMessage owner)
+        public CommandHandlerBuilder SetOwner(IMessage owner)
         {
             commandHandler.IsPrivate = true;
             commandHandler.Owner = owner.Author.Id;
@@ -60,13 +60,13 @@ namespace Miki.Framework.Events
         }
     }
 
-    public class CommandHandler : ICommandHandler
+    public class CommandHandler
     {
-		public List<ICommandEvent> Commands => commands.Values.ToList();
+		public List<CommandEvent> Commands => commands.Values.ToList();
 
         public bool IsPrivate { get; set; } = false;
 
-		public List<IModule> Modules => modules.Values.ToList();
+		public List<Module> Modules => modules.Values.ToList();
 
         public bool ShouldBeDisposed { get; set; } = false;
 
@@ -85,8 +85,8 @@ namespace Miki.Framework.Events
 
         internal Dictionary<string, string> Aliases = new Dictionary<string, string>();
 
-        public Dictionary<string, IModule> modules = new Dictionary<string, IModule>();
-        public Dictionary<string, ICommandEvent> commands = new Dictionary<string, ICommandEvent>();
+        public Dictionary<string, Module> modules = new Dictionary<string, Module>();
+        public Dictionary<string, CommandEvent> commands = new Dictionary<string, CommandEvent>();
 
         public CommandHandler(EventSystem eventSystem)
         {
@@ -98,7 +98,7 @@ namespace Miki.Framework.Events
             return (DateTime.Now > timeDisposed);
         }
 
-        public async Task CheckAsync(IDiscordMessage msg)
+        public async Task CheckAsync(IMessage msg)
         {
             if (IsPrivate)
             {
@@ -124,7 +124,7 @@ namespace Miki.Framework.Events
             }
         }
 
-        public void AddCommand(ICommandEvent cmd)
+        public void AddCommand(CommandEvent cmd)
         {
             foreach (string a in cmd.Aliases)
             {
@@ -133,14 +133,14 @@ namespace Miki.Framework.Events
             commands.Add(cmd.Name.ToLower(), cmd);
         }
 
-        public void AddModule(IModule module)
+        public void AddModule(Module module)
         {
             modules.Add(module.Name.ToLower(), module);
         }
 
-        public async Task<bool> TryRunCommandAsync(IDiscordMessage msg, PrefixInstance prefix)
+        public async Task<bool> TryRunCommandAsync(IMessage msg, PrefixInstance prefix)
         {
-            string identifier = await prefix.GetForGuildAsync(msg.Guild.Id);
+            string identifier = await prefix.GetForGuildAsync((msg.Channel as IGuildChannel).Guild.Id);
             string message = msg.Content.ToLower();
 
             if (msg.Content.StartsWith(identifier))
@@ -154,7 +154,7 @@ namespace Miki.Framework.Events
 
                 command = (Aliases.ContainsKey(command)) ? Aliases[command] : command;
 
-                ICommandEvent eventInstance = GetCommandEvent(command);
+                CommandEvent eventInstance = GetCommandEvent(command);
 
                 if (eventInstance == null)
                 {
@@ -177,16 +177,21 @@ namespace Miki.Framework.Events
             return false;
         }
 
-        public EventAccessibility GetUserAccessibility(IDiscordMessage e)
+        public EventAccessibility GetUserAccessibility(IMessage e)
         {
-            if (e.Channel == null) return EventAccessibility.PUBLIC;
+            if (e.Channel == null)
+				return EventAccessibility.PUBLIC;
 
-            if (eventSystem.DeveloperIds.Contains(e.Author.Id)) return EventAccessibility.DEVELOPERONLY;
-            if (e.Author.HasPermissions(e.Channel, DiscordGuildPermission.ManageRoles)) return EventAccessibility.ADMINONLY;
-            return EventAccessibility.PUBLIC;
+            if (eventSystem.DeveloperIds.Contains(e.Author.Id))
+				return EventAccessibility.DEVELOPERONLY;
+
+			if ((e.Author as IGuildUser).GuildPermissions.Has(GuildPermission.ManageRoles))
+				return EventAccessibility.ADMINONLY;
+
+			return EventAccessibility.PUBLIC;
         }
 
-        public ICommandEvent GetCommandEvent(string value)
+        public CommandEvent GetCommandEvent(string value)
         {
             string newVal = value.ToLower();
 
@@ -202,11 +207,11 @@ namespace Miki.Framework.Events
             return null;
         }
 
-        public IEvent GetEvent(string value)
+        public Event GetEvent(string value)
         {
-            foreach (IModule m in modules.Values)
+            foreach (Module m in modules.Values)
             {
-                IService s = m.Services.Where(x => x.Name.ToLower() == value.ToLower()).FirstOrDefault();
+                BaseService s = m.Services.Where(x => x.Name.ToLower() == value.ToLower()).FirstOrDefault();
                 if (s != null)
                 {
                     return s;
@@ -235,7 +240,7 @@ namespace Miki.Framework.Events
             }
         }
 
-        public IModule GetModule(string id)
+        public Module GetModule(string id)
         {
             if (modules.ContainsKey(id.ToLower()))
             {
@@ -248,15 +253,15 @@ namespace Miki.Framework.Events
         {
             List<string> allEvents = new List<string>();
 
-            foreach (IModule m in modules.Values)
+            foreach (Module m in modules.Values)
             {
-                foreach (ICommandEvent c in m.Events)
+                foreach (CommandEvent c in m.Events)
                 {
                     allEvents.Add(c.Name);
                     allEvents.AddRange(c.Aliases);
                 }
 
-                foreach (IService s in m.Services)
+                foreach (BaseService s in m.Services)
                 {
                     allEvents.Add(s.Name);
                 }

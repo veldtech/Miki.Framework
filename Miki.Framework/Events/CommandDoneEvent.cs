@@ -1,13 +1,12 @@
-﻿using Miki.Common.Events;
-using Miki.Common.Interfaces;
+﻿using Discord;
 using System;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
-    public delegate Task ProcessCommandDoneEvent(IDiscordMessage m, ICommandEvent e, bool success, float time = 0.0f);
+    public delegate Task ProcessCommandDoneEvent(IMessage m, CommandEvent e, bool success, float time = 0.0f);
 
-    public class CommandDoneEvent : RuntimeCommandEvent
+    public class CommandDoneEvent : CommandEvent
     {
         public ProcessCommandDoneEvent processEvent;
 

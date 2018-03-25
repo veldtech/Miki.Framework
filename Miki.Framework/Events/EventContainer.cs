@@ -1,12 +1,11 @@
-﻿using Miki.Common.Events;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Miki.Framework.Events
 {
     internal class EventContainer
     {
-        public Dictionary<string, ICommandEvent> CommandEvents { private set; get; } = new Dictionary<string, ICommandEvent>();
+        public Dictionary<string, CommandEvent> CommandEvents { private set; get; } = new Dictionary<string, CommandEvent>();
         public Dictionary<string, CommandDoneEvent> CommandDoneEvents { private set; get; } = new Dictionary<string, CommandDoneEvent>();
 
         /// <summary>
@@ -14,7 +13,7 @@ namespace Miki.Framework.Events
         /// </summary>
         internal Dictionary<string, Event> InternalEvents { private set; get; } = new Dictionary<string, Event>();
 
-        public IEvent GetEvent(string name)
+        public Event GetEvent(string name)
         {
             if (CommandEvents.ContainsKey(name))
             {
@@ -28,16 +27,16 @@ namespace Miki.Framework.Events
             return InternalEvents[name];
         }
 
-        public IEvent[] GetAllEvents()
+        public Event[] GetAllEvents()
         {
-            List<IEvent> allEvents = new List<IEvent>();
+            List<Event> allEvents = new List<Event>();
             allEvents.AddRange(CommandEvents.Values);
             return allEvents.ToArray();
         }
 
-        public Dictionary<string, IEvent> GetAllEventsDictionary()
+        public Dictionary<string, Event> GetAllEventsDictionary()
         {
-            Dictionary<string, IEvent> allEvents = new Dictionary<string, IEvent>();
+            Dictionary<string, Event> allEvents = new Dictionary<string, Event>();
             CommandEvents.ToList().ForEach(x => allEvents.Add(x.Key, x.Value));
             return allEvents;
         }

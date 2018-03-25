@@ -2,28 +2,29 @@
 using Miki.Framework.Models;
 using Miki.Framework.Models.Context;
 using Miki.Common;
-using Miki.Common.Events;
-using Miki.Common.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
+using System.Diagnostics;
 
 namespace Miki.Framework.Events
 {
-    public class EventSystem : IEventSystem
+    public class EventSystem
     {
         public static EventSystem Instance => _instance;
         private static EventSystem _instance = null;
 
-        public delegate Task ExceptionDelegate(Exception ex, ICommandEvent command, IDiscordMessage message);
+        public delegate Task ExceptionDelegate(Exception ex, CommandEvent command, IMessage message);
 
-		public Dictionary<string, ICommandEvent> Commands 
+		public Dictionary<string, CommandEvent> Commands 
 			=> commandHandler.commands;
 
-		public ICommandHandler CommandHandler 
+		public CommandHandler CommandHandler 
 			=> commandHandler;
 
 		public int CommandsUsed
@@ -32,7 +33,7 @@ namespace Miki.Framework.Events
 
 		public List<ulong> DeveloperIds => developers;
 
-		public Dictionary<string, IModule> Modules => commandHandler.modules;
+		public Dictionary<string, Module> Modules => commandHandler.modules;
 		
 		private List<ulong> developers = new List<ulong>();
 
@@ -40,11 +41,11 @@ namespace Miki.Framework.Events
 
 		private CommandHandler commandHandler;
 
-		private List<ICommandHandler> commandHandlers = new List<ICommandHandler>();
+		private List<CommandHandler> commandHandlers = new List<CommandHandler>();
 		
         private ConcurrentDictionary<Tuple<ulong, ulong>, CommandHandler> privateCommandHandlers = new ConcurrentDictionary<Tuple<ulong, ulong>, CommandHandler>();
 
-		private ConcurrentDictionary<Tuple<ulong, ulong>, Action<IDiscordMessage>> nextMessageRequests = new ConcurrentDictionary<Tuple<ulong, ulong>, Action<IDiscordMessage>>();
+		private ConcurrentDictionary<Tuple<ulong, ulong>, Action<IMessage>> nextMessageRequests = new ConcurrentDictionary<Tuple<ulong, ulong>, Action<IMessage>>();
 
 		private Bot bot = null;
 
@@ -66,7 +67,7 @@ namespace Miki.Framework.Events
 
             commandHandler = new CommandHandler(this);
 
-            bot.MessageReceived += InternalMessageReceived;
+            bot.Client.MessageReceived += InternalMessageReceived;
         }
 
         public void AddCommandDoneEvent(Action<CommandDoneEvent> info)
@@ -92,7 +93,7 @@ namespace Miki.Framework.Events
             return CommandHandler.GetCommandEvent(eventName).TimesUsed;
         }
 
-        internal void DisposeCommandHandler(ICommandHandler commandHandler)
+        internal void DisposeCommandHandler(CommandHandler commandHandler)
         {
             commandHandlers.Remove(commandHandler);
         }
@@ -116,14 +117,14 @@ namespace Miki.Framework.Events
             }
         }
 
-		public async Task<IDiscordMessage> ListenNextMessageAsync(ulong channelId, ulong userId)
+		public async Task<IMessage> ListenNextMessageAsync(ulong channelId, ulong userId)
 		{
-			IDiscordMessage outputMessage = null;
+			IMessage outputMessage = null;
 
 			if (nextMessageRequests.TryAdd(new Tuple<ulong, ulong>(userId, channelId), (msg) =>
 			 {
 				 outputMessage = msg;
-				 nextMessageRequests.TryRemove(new Tuple<ulong, ulong>(userId, channelId), out Action<IDiscordMessage> v);
+				 nextMessageRequests.TryRemove(new Tuple<ulong, ulong>(userId, channelId), out Action<IMessage> v);
 			 }))
 			{
 				while (outputMessage == null)
@@ -134,17 +135,17 @@ namespace Miki.Framework.Events
 			return outputMessage;
 		}
 
-        internal async Task DisposePrivateCommandHandlerAsync(IDiscordMessage msg)
+        internal async Task DisposePrivateCommandHandlerAsync(IMessage msg)
         {
             await DisposePrivateCommandHandlerAsync(new Tuple<ulong, ulong>(msg.Author.Id, msg.Channel.Id));
         }
 
-        public IEvent GetEventByName(string id)
+        public Event GetEventByName(string id)
         {
             return events.GetEvent(id);
         }
 
-        public async Task<SortedDictionary<string, List<string>>> GetEventNamesAsync(IDiscordMessage e)
+        public async Task<SortedDictionary<string, List<string>>> GetEventNamesAsync(IMessage e)
         {
             SortedDictionary<string, List<string>> moduleEvents = new SortedDictionary<string, List<string>>
             {
@@ -153,7 +154,7 @@ namespace Miki.Framework.Events
 
             EventAccessibility userEventAccessibility = CommandHandler.GetUserAccessibility(e);
 
-            foreach (ICommandEvent ev in CommandHandler.Commands)
+            foreach (CommandEvent ev in CommandHandler.Commands)
             {
                 if (await ev.IsEnabled(e.Channel.Id) && userEventAccessibility >= ev.Accessibility)
                 {
@@ -220,9 +221,9 @@ namespace Miki.Framework.Events
             return null;
         }
 
-        public IModule GetModuleByName(string name)
+        public Module GetModuleByName(string name)
         {
-			IModule m = CommandHandler.GetModule(name.ToLower());
+			Module m = CommandHandler.GetModule(name.ToLower());
 
 			if (m != null)
             {
@@ -232,7 +233,7 @@ namespace Miki.Framework.Events
             return null;
         }
 
-        public async Task<string> ListCommandsAsync(IDiscordMessage e)
+        public async Task<string> ListCommandsAsync(IMessage e)
         {
             SortedDictionary<string, List<string>> moduleEvents = await GetEventNamesAsync(e);
 
@@ -250,11 +251,11 @@ namespace Miki.Framework.Events
             return output;
         }
 
-        public async Task<IDiscordEmbed> ListCommandsInEmbedAsync(IDiscordMessage e)
+        public async Task<Embed> ListCommandsInEmbedAsync(IMessage e)
         {
             SortedDictionary<string, List<string>> moduleEvents = await GetEventNamesAsync(e);
 
-            IDiscordEmbed embed = new RuntimeEmbed(new Discord.EmbedBuilder());
+			EmbedBuilder embed = new EmbedBuilder();
 
             foreach (KeyValuePair<string, List<string>> items in moduleEvents)
             {
@@ -265,7 +266,7 @@ namespace Miki.Framework.Events
 
                 embed.AddField(items.Key, string.Join(", ",items.Value));
             }
-            return embed;
+            return embed.Build();
         }
 
         public void RegisterAttributeCommands()
@@ -278,7 +279,7 @@ namespace Miki.Framework.Events
 
             foreach (var m in modules)
             {
-                RuntimeModule newModule = new RuntimeModule();
+                Module newModule = new Module();
                 object instance = null;
 
                 try
@@ -303,14 +304,14 @@ namespace Miki.Framework.Events
 
                 foreach (var x in methods)
                 {
-                    RuntimeCommandEvent newEvent = new RuntimeCommandEvent();
+                    CommandEvent newEvent = new CommandEvent();
                     CommandAttribute commandAttribute = x.GetCustomAttribute<CommandAttribute>();
 
                     newEvent = commandAttribute.command;
                     newEvent.ProcessCommand = async (context) => await (Task)x.Invoke(instance, new object[] { context });
                     newEvent.Module = newModule;
 
-                    ICommandEvent foundCommand = newModule.Events.Find(c => c.Name == newEvent.Name);
+                    CommandEvent foundCommand = newModule.Events.Find(c => c.Name == newEvent.Name);
 
                     if (foundCommand != null)
                     {
@@ -349,27 +350,29 @@ namespace Miki.Framework.Events
 
         #region events
 
-        internal async Task OnCommandDone(IDiscordMessage e, ICommandEvent commandEvent, bool success = true, float time = 0.0f)
+        internal async Task OnCommandDone(IMessage e, CommandEvent commandEvent, bool success = true, float time = 0.0f)
         {
             foreach (CommandDoneEvent ev in events.CommandDoneEvents.Values)
             {
+				Stopwatch sw = Stopwatch.StartNew();
+
 				try
 				{
                     await ev.processEvent(e, commandEvent, success, time);
                 }
                 catch (Exception ex)
                 {
-                    Log.ErrorAt($"commanddone@{ev.Name}", ex.Message);
-                }
-            }
+					Log.Error(ex);
+				}
+			}
         }
 
-        private async Task OnPrivateMessage(IDiscordMessage arg)
+        private async Task OnPrivateMessage(IMessage arg)
         {
             await Task.CompletedTask;
         }
 
-        private async Task OnMessageRecieved(IDiscordMessage msg)
+        private async Task OnMessageRecieved(IMessage msg)
         {
             if (msg.Author.IsBot || ignore.Contains(msg.Author.Id))
             {
@@ -402,7 +405,7 @@ namespace Miki.Framework.Events
                 }
             }
 
-			if (nextMessageRequests.TryGetValue(privateKey, out Action<IDiscordMessage> action))
+			if (nextMessageRequests.TryGetValue(privateKey, out Action<IMessage> action))
 			{
 				action(msg);
 			}
@@ -421,26 +424,32 @@ namespace Miki.Framework.Events
                 });
         }
 
-        public void AddPrivateCommandHandler(IDiscordMessage msg, ICommandHandler cHandler)
+        public void AddPrivateCommandHandler(IMessage msg, CommandHandler cHandler)
         {
             AddPrivateCommandHandler(new Tuple<ulong, ulong>(msg.Author.Id, msg.Channel.Id), cHandler as CommandHandler);
         }
 
-		private async Task InternalMessageReceived(IDiscordMessage message)
+		private async Task InternalMessageReceived(SocketMessage message)
 		{
-			await Task.Yield();
-			try
+			if (message.Channel is IGuildChannel)
 			{
-				Task.Run(() => OnMessageRecieved(message));
+				try
+				{
+					Task.Run(async () => await OnMessageRecieved(message));
+				}
+				catch (Exception e)
+				{
+					Log.Error(e);
+				};
 			}
-			catch (Exception e)
+			else
 			{
-				Log.ErrorAt("messagerecieved", e.ToString());
-			};
+				Log.Message($"[DM from {message.Author.ToString()}] {message.Content}");
+			}
 		}
 
         #endregion events
     }
 
-    public delegate void OnRegisteredMessage(IDiscordMessage m);
+    public delegate void OnRegisteredMessage(IMessage m);
 }

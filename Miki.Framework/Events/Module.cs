@@ -1,17 +1,17 @@
 ﻿using Miki.Framework.Models;
 using Miki.Framework.Models.Context;
 using Miki.Common;
-using Miki.Common.Events;
-using Miki.Common.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
 
 namespace Miki.Framework.Events
 {
-    public class RuntimeModule : IModule
+    public class Module
     {
         public string Name { get; set; } = "";
         public bool Nsfw { get; set; } = false;
@@ -20,15 +20,15 @@ namespace Miki.Framework.Events
 
         public Mutex threadLock;
 
-        public MessageRecievedEventDelegate MessageRecieved { get; set; } = null;
-        public UserUpdatedEventDelegate UserUpdated { get; set; } = null;
-        public GuildUserEventDelegate UserJoinGuild { get; set; } = null;
-        public GuildUserEventDelegate UserLeaveGuild { get; set; } = null;
-        public GuildEventDelegate JoinedGuild { get; set; } = null;
-        public GuildEventDelegate LeftGuild { get; set; } = null;
+        public Func<SocketMessage, Task> MessageRecieved { get; set; } = null;
+        public Func<IUser, IUser, Task> UserUpdated { get; set; } = null;
+        public Func<IUser, Task> UserJoinGuild { get; set; } = null;
+        public Func<IUser, Task> UserLeaveGuild { get; set; } = null;
+		public Func<IGuild, Task> JoinedGuild { get; set; } = null;
+        public Func<IGuild, Task> LeftGuild { get; set; } = null;
 
-        public List<ICommandEvent> Events { get; set; } = new List<ICommandEvent>();
-        public List<IService> Services { get; set; } = new List<IService>();
+        public List<CommandEvent> Events { get; set; } = new List<CommandEvent>();
+        public List<BaseService> Services { get; set; } = new List<BaseService>();
 
         private ConcurrentDictionary<ulong, bool> cache = new ConcurrentDictionary<ulong, bool>();
 
@@ -44,25 +44,15 @@ namespace Miki.Framework.Events
 
         private bool isInstalled = false;
 
-        internal RuntimeModule()
+        internal Module()
         {
         }
-
-        public RuntimeModule(string name, bool enabled = true)
+        public Module(string name, bool enabled = true)
         {
             Name = name;
             Enabled = enabled;
         }
-
-        public RuntimeModule(IModule info)
-        {
-            Name = info.Name;
-            Enabled = info.Enabled;
-            CanBeDisabled = info.CanBeDisabled;
-            Events = info.Events;
-        }
-
-        public RuntimeModule(Action<IModule> info)
+        public Module(Action<Module> info)
         {
             info.Invoke(this);
         }
@@ -74,50 +64,48 @@ namespace Miki.Framework.Events
 
             if (MessageRecieved != null)
             {
-                b.MessageReceived += Module_MessageReceived;
+                b.Client.MessageReceived += Module_MessageReceived;
             }
 
             if (UserUpdated != null)
             {
-                b.UserUpdate += Module_UserUpdated;
+                b.Client.UserUpdated += Module_UserUpdated;
             }
 
             if (UserJoinGuild != null)
             {
-                b.UserJoin += Module_UserJoined;
+                b.Client.UserJoined += Module_UserJoined;
             }
 
             if (UserLeaveGuild != null)
             {
-                b.UserLeave += Module_UserLeft;
+                b.Client.UserLeft += Module_UserLeft;
             }
 
             if (JoinedGuild != null)
             {
-                b.GuildJoin += Module_JoinedGuild;
+                b.Client.JoinedGuild += Module_JoinedGuild;
             }
 
             if (LeftGuild != null)
             {
-                b.GuildLeave += Module_LeftGuild;
+                b.Client.LeftGuild += Module_LeftGuild;
             }
 
             EventSystem.CommandHandler.AddModule(this);
 
-            foreach (ICommandEvent e in Events)
+            foreach (CommandEvent e in Events)
             {
-                RuntimeCommandEvent ev = new RuntimeCommandEvent(e)
-                {
-                    eventSystem = EventSystem.Instance,
-                    Module = this
-                };
-                EventSystem.CommandHandler.AddCommand(ev);
+				e.eventSystem = EventSystem.Instance;
+				e.Module = this;
+
+				EventSystem.CommandHandler.AddCommand(e);
             }
 
             isInstalled = true;
         }
 
-        public RuntimeModule AddCommand(ICommandEvent command)
+        public Module AddCommand(CommandEvent command)
         {
             Events.Add(command);
             return this;
@@ -135,40 +123,40 @@ namespace Miki.Framework.Events
             EventSystem.Modules.Remove(Name);
             EventSystem.CommandHandler.AddModule(this);
 
-            if (MessageRecieved != null)
-            {
-                b.MessageReceived -= Module_MessageReceived;
-            }
+             if (MessageRecieved != null)
+             {
+                 b.Client.MessageReceived -= Module_MessageReceived;
+             }
 
-            if (UserUpdated != null)
-            {
-                b.UserUpdate -= Module_UserUpdated;
-            }
+             if (UserUpdated != null)
+             {
+                 b.Client.UserUpdated -= Module_UserUpdated;
+             }
 
-            if (UserJoinGuild != null)
-            {
-                b.UserJoin -= Module_UserJoined;
-            }
+             if (UserJoinGuild != null)
+             {
+                 b.Client.UserJoined -= Module_UserJoined;
+             }
 
-            if (UserLeaveGuild != null)
-            {
-                b.UserLeave -= Module_UserLeft;
-            }
+             if (UserLeaveGuild != null)
+			 {
+                 b.Client.UserLeft -= Module_UserLeft;
+             }
 
-            if (JoinedGuild != null)
-            {
-                b.GuildJoin -= Module_JoinedGuild;
-            }
+             if (JoinedGuild != null)
+             {
+				b.Client.JoinedGuild -= Module_JoinedGuild;
+             }
 
-            if (LeftGuild != null)
-            {
-                b.GuildLeave -= Module_LeftGuild;
-            }
+             if (LeftGuild != null)
+             {
+                 b.Client.LeftGuild -= Module_LeftGuild;
+             }
 
             isInstalled = false;
         }
 
-        private async Task Module_JoinedGuild(IDiscordGuild arg)
+        private async Task Module_JoinedGuild(IGuild arg)
         {
             if (await IsEnabled(arg.Id))
             {
@@ -176,17 +164,20 @@ namespace Miki.Framework.Events
 				{
 					await JoinedGuild(arg);
 				}
-				catch { }
+				catch(Exception e)
+				{
+					Log.Error(e.ToString());
+				}
             }
         }
 
-        public RuntimeModule SetNsfw(bool val)
+        public Module SetNsfw(bool val)
         {
             Nsfw = val;
             return this;
         }
 
-        private async Task Module_LeftGuild(IDiscordGuild arg)
+        private async Task Module_LeftGuild(IGuild arg)
         {
 			if (await IsEnabled(arg.Id))
 			{
@@ -194,54 +185,74 @@ namespace Miki.Framework.Events
 				{
 					await LeftGuild(arg);
 				}
-				catch { }
+				catch (Exception e)
+				{
+					Log.Error(e.ToString());
+				}
 			}
 		}
 
-        private async Task Module_UserJoined(IDiscordUser arg)
+        private async Task Module_UserJoined(IUser arg)
         {
-            if (await IsEnabled(arg.Guild.Id))
-            {
-				try
+			if (arg is IGuildUser guildUser)
+			{
+				if (await IsEnabled(guildUser.Guild.Id))
 				{
-					await UserJoinGuild(arg.Guild, arg);
+					try
+					{
+						await UserJoinGuild(arg);
+					}
+					catch (Exception e)
+					{
+						Log.Error(e);
+					}
 				}
-				catch(Exception e)
-				{
-					Log.ErrorAt("userjoin", e.Message + "\n" + e.StackTrace);
-				}
-            }
+			}
         }
 
-        private async Task Module_UserLeft(IDiscordUser arg)
+        private async Task Module_UserLeft(IUser arg)
         {
-            if (await IsEnabled(arg.Guild.Id))
-            {
-				try
+			if (arg is IGuildUser guildUser)
+			{
+				if (await IsEnabled(guildUser.Guild.Id))
 				{
-					await UserLeaveGuild(arg.Guild, arg);
+					try
+					{
+						await UserLeaveGuild(arg);
+					}
+					catch (Exception e)
+					{
+						Log.Error(e.ToString());
+					}
 				}
-				catch { }
-            }
+			}
         }
 
-        private async Task Module_UserUpdated(IDiscordUser arg1, IDiscordUser arg2)
+        private async Task Module_UserUpdated(IUser arg1, IUser arg2)
         {
-            if (arg1.Guild != null)
-            {
-                if (await IsEnabled(arg1.Guild.Id))
+			if (arg1 is IGuildUser guildUser)
+			{
+				if (await IsEnabled(guildUser.GuildId))
                 {
 					try {
-						await UserUpdated(arg1, arg2);
+						await UserUpdated(guildUser, arg2);
 					}
-					catch { }
-                }
+					catch (Exception e)
+					{
+						Log.Error(e.ToString());
+					}
+				}
             }
         }
 
-        private async Task Module_MessageReceived(IDiscordMessage message)
+        private async Task Module_MessageReceived(SocketMessage message)
         {
-            if (await IsEnabled(message.Guild.Id))
+			IGuildChannel guildChannel = (message.Channel as IGuildChannel);
+
+			if (guildChannel == null)
+				return;
+
+            if (await IsEnabled(guildChannel.Guild.Id))
             {
 				await MessageRecieved(message);
             }

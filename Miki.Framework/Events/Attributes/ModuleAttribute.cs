@@ -4,7 +4,7 @@ namespace Miki.Framework.Events.Attributes
 {
     public class ModuleAttribute : Attribute
     {
-        internal RuntimeModule module = new RuntimeModule();
+        internal Module module = new Module();
 
         public bool CanBeDisabled
         {

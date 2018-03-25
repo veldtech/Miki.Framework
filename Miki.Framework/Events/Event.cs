@@ -1,16 +1,15 @@
 ﻿using Miki.Framework.Models;
 using Miki.Framework.Models.Context;
 using Miki.Common;
-using Miki.Common.Events;
-using Miki.Common.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Discord;
 
 namespace Miki.Framework.Events
 {
-    public class Event : IEvent
+    public class Event
     {
         public string Name { get; set; } = "$command-not-named";
 
@@ -20,7 +19,7 @@ namespace Miki.Framework.Events
         public bool CanBeDisabled { get; set; } = true;
         public bool DefaultEnabled { get; set; } = true;
 
-        public IModule Module { get; set; }
+        public Module Module { get; set; }
 
         public int TimesUsed { get; set; } = 0;
 
@@ -32,7 +31,7 @@ namespace Miki.Framework.Events
         public Event()
         {
         }
-        public Event(IEvent eventObject)
+        public Event(Event eventObject)
         {
             Name = eventObject.Name;
             Accessibility = eventObject.Accessibility;
@@ -67,10 +66,10 @@ namespace Miki.Framework.Events
             }
         }
 
-        public async Task SetEnabledAll(IDiscordGuild guildId, bool enabled)
+        public async Task SetEnabledAll(IGuild guildId, bool enabled)
         {
-            List<IDiscordMessageChannel> channels = await guildId.GetChannelsAsync();
-            foreach (IDiscordMessageChannel c in channels)
+            var channels = await guildId.GetChannelsAsync();
+            foreach (IMessageChannel c in channels)
             {
                 await SetEnabled(c.Id, enabled);
             }
@@ -100,13 +99,13 @@ namespace Miki.Framework.Events
             }
         }
 
-        public IEvent SetName(string name)
+        public Event SetName(string name)
         {
             Name = name;
             return this;
         }
 
-        public IEvent SetAccessibility(EventAccessibility accessibility)
+        public Event SetAccessibility(EventAccessibility accessibility)
         {
             Accessibility = accessibility;
             return this;

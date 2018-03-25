@@ -1,11 +1,10 @@
 ﻿using Miki.Common;
-using Miki.Common.Interfaces;
 
 namespace Miki.Framework.Events
 {
-    public class BaseService : Event, IService
+    public class BaseService : Event
     {
-        public virtual void Install(IModule m)
+        public virtual void Install(Module m)
         {
             if (Module == null)
             {
@@ -15,7 +14,7 @@ namespace Miki.Framework.Events
             m.Services.Add(this);
         }
 
-        public virtual void Uninstall(IModule m)
+        public virtual void Uninstall(Module m)
         {
             m.Services.Remove(this);
         }
