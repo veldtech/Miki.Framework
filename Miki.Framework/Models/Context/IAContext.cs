@@ -6,6 +6,7 @@ namespace Miki.Framework.Models.Context
     {
         public DbSet<Identifier> Identifiers { get; set; }
         public DbSet<CommandState> CommandStates { get; set; }
+		public DbSet<ChannelLanguage> Languages { get; set; }
         public DbSet<ModuleState> ModuleStates { get; set; }
 
         public IAContext()

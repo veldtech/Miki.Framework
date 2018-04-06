@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Miki.Common;
+using Miki.Framework.Exceptions;
+using Miki.Framework.Languages;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -52,7 +54,7 @@ namespace Miki.Framework.Events
 			{
 				if (Module.Nsfw && !(e.Channel as ITextChannel).IsNsfw)
 				{
-					return;
+					throw new ChannelNotNsfwException();
 				}
 			}
 
@@ -100,18 +102,16 @@ namespace Miki.Framework.Events
 			context.message = e;
 			context.EventSystem = eventSystem ?? EventSystem.Instance;
 
+			bool success = await TryProcessCommand(targetCommand, context);
+			await eventSystem.OnCommandDone(e, this, success, sw.ElapsedMilliseconds);
 
-			if (await TryProcessCommand(targetCommand, context))
+			if (success)
 			{
 				long elapsedMilliseconds = sw.ElapsedMilliseconds;
-				await eventSystem.OnCommandDone(e, this, true, sw.ElapsedMilliseconds);
 				TimesUsed++;
 				Log.Message($"{Name} called by {e.Author.Username}#{e.Author.Discriminator} [{e.Author.Id}] from {(e.Channel as IGuildChannel).Guild.Name} in {elapsedMilliseconds}ms (+events: {sw.ElapsedMilliseconds}ms)");
 			}
-			else
-			{
-				await eventSystem.OnCommandDone(e, this, false, sw.ElapsedMilliseconds);
-			}
+
 			sw.Stop();
 		}
 
@@ -136,14 +136,35 @@ namespace Miki.Framework.Events
 		private async Task<bool> TryProcessCommand(ProcessCommandDelegate cmd, EventContext context)
 		{
 			bool success = false;
+
 			try
 			{
 				await cmd(context);
 				success = true;
 			}
+			catch (BotException botex)
+			{
+				await context.Channel.SendMessageAsync("", false, 
+					new EmbedBuilder()
+					{
+						Title = $"🚫 {Locale.GetString(context.Channel.Id, LocaleTags.ErrorMessageGeneric)}",
+						Description = Locale.GetString(context.Channel.Id, botex.Resource),
+						Color = new Color(255, 0, 0)
+					}.Build()
+				);
+				await eventSystem.OnCommandError(botex, this, context.message);
+			}
 			catch (Exception ex)
 			{
 				Log.Error(ex);
+				await context.Channel.SendMessageAsync("", false,
+					new EmbedBuilder()
+					{
+						Title = $"🚫 {Locale.GetString(context.Channel.Id, LocaleTags.ErrorMessageGeneric)}",
+						Description = ex.Message,
+						Color = new Color(255, 0, 0)
+					}.Build()
+				);
 				await eventSystem.OnCommandError(ex, this, context.message);
 			}
 			return success;
@@ -158,12 +179,6 @@ namespace Miki.Framework.Events
 		public CommandEvent SetPermissions(params GuildPermission[] permissions)
 		{
 			GuildPermissions.AddRange(permissions);
-			return this;
-		}
-
-		public CommandEvent On(string args, ProcessCommandDelegate command)
-		{
-			CommandPool.Add(args, command);
 			return this;
 		}
 

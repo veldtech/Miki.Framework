@@ -1,6 +1,4 @@
-﻿using Miki.Common;
-
-namespace Miki.Framework.Events
+﻿namespace Miki.Framework.Events
 {
     public class BaseService : Event
     {

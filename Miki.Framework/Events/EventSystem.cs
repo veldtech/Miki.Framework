@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Miki.Framework.Events
 {
@@ -117,9 +118,11 @@ namespace Miki.Framework.Events
             }
         }
 
-		public async Task<IMessage> ListenNextMessageAsync(ulong channelId, ulong userId)
+		public async Task<IMessage> ListenNextMessageAsync(ulong channelId, ulong userId, int timeout = 20000)
 		{
 			IMessage outputMessage = null;
+
+			await Task.Delay(100);
 
 			if (nextMessageRequests.TryAdd(new Tuple<ulong, ulong>(userId, channelId), (msg) =>
 			 {
@@ -127,9 +130,10 @@ namespace Miki.Framework.Events
 				 nextMessageRequests.TryRemove(new Tuple<ulong, ulong>(userId, channelId), out Action<IMessage> v);
 			 }))
 			{
-				while (outputMessage == null)
+				while (outputMessage == null && timeout > 0)
 				{
 					await Task.Delay(100);
+					timeout -= 100;
 				}
 			}
 			return outputMessage;
@@ -313,21 +317,14 @@ namespace Miki.Framework.Events
 
                     CommandEvent foundCommand = newModule.Events.Find(c => c.Name == newEvent.Name);
 
-                    if (foundCommand != null)
-                    {
-                        if (commandAttribute.on != "")
-                        {
-                            foundCommand.On(commandAttribute.On, newEvent.ProcessCommand);
-                        }
-                        else
-                        {
-                            foundCommand.Default(newEvent.ProcessCommand);
-                        }
-                    }
-                    else
-                    {
-                        newModule.AddCommand(newEvent);
-                    }
+					if (foundCommand != null)
+					{
+						foundCommand.Default(newEvent.ProcessCommand);
+					}
+					else
+					{
+						newModule.AddCommand(newEvent);
+					}
                 }
 
 				newModule.Install(bot);
@@ -379,8 +376,6 @@ namespace Miki.Framework.Events
                 return;
             }
 
-            await commandHandler.CheckAsync(msg);
-
             foreach (CommandHandler c in commandHandlers)
             {
 				if (c.ShouldBeDisposed && c.ShouldDispose())
@@ -409,9 +404,11 @@ namespace Miki.Framework.Events
 			{
 				action(msg);
 			}
-        }
 
-        private void AddPrivateCommandHandler(Tuple<ulong, ulong> key, CommandHandler value)
+			await commandHandler.CheckAsync(msg);
+		}
+
+		private void AddPrivateCommandHandler(Tuple<ulong, ulong> key, CommandHandler value)
         {
             privateCommandHandlers.AddOrUpdate(key, value,
                 (k, existingVal) =>

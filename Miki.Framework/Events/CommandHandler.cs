@@ -177,6 +177,7 @@ namespace Miki.Framework.Events
             return false;
         }
 
+		// TODO: rework this
         public EventAccessibility GetUserAccessibility(IMessage e)
         {
             if (e.Channel == null)

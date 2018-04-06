@@ -8,34 +8,83 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework
 {
-    public class DistributedShardClient : ShardClient
+	public class DistributedShardClient
 	{
-		public DistributedShardClient(ClientInformation info) : base(info)
-		{ }
+		List<DiscordSocketClient> socketClients = new List<DiscordSocketClient>();
 
-  		public async Task AddAsync(int shardId)
+		public event Func<SocketMessage, Task> MessageReceived;
+		public event Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task> MessageDeleted;
+		public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated;
+
+		public DistributedShardClient(DiscordSocketConfig config)
 		{
-			DiscordSocketClient socketClient = new DiscordSocketClient(new DiscordSocketConfig()
+			if (!config.ShardId.HasValue)
+				throw new ArgumentNullException("ShardId can not be lower null");
+
+			for (int i = config.ShardId.Value; i < config.TotalShards + config.ShardId.Value; i++)
 			{
-				ShardId = shardId,
-				ConnectionTimeout = 150000,
-			});
-
-			await socketClient.LoginAsync(TokenType.Bot, info.Token);
-			await socketClient.StartAsync();
-		}
-
-		public async Task RemoveAsync(int shardId)
-		{
-			var client = Shards.FirstOrDefault(x => x.ShardId == shardId);
-
-			if (client == null)
-			{
-				return;
+				config.ShardId = i;
+				socketClients.Add(new DiscordSocketClient(config));
 			}
 
-			await client.StopAsync();
-			Shards.Remove(client);
+			foreach(var client in socketClients)
+			{
+				client.MessageReceived += async (msg) =>
+				{
+					if (MessageReceived != null)
+					{
+						await MessageReceived(msg);
+					}
+				};
+
+				client.MessageDeleted += async (msg, channel) =>
+				{
+					if (MessageDeleted != null)
+					{
+						await MessageDeleted(msg, channel);
+					}
+				};
+
+				client.MessageUpdated += async (msg, newMsg, channel) =>
+				{
+					if (MessageUpdated != null)
+					{
+						await MessageUpdated(msg, newMsg, channel);
+					}
+				};
+			}
+		}
+
+		public async Task LoginAsync(string token, TokenType tokenType = TokenType.Bot)
+		{
+			foreach (var client in socketClients)
+			{
+				await client.LoginAsync(tokenType, token);
+			}
+		}
+
+		public async Task LogoutAsync()
+		{
+			foreach (var client in socketClients)
+			{
+				await client.LogoutAsync();
+			}
+		}
+
+		public async Task StartAsync()
+		{
+			foreach(var client in socketClients)
+			{
+				await client.StartAsync();
+			}
+		}
+
+		public async Task StopAsync()
+		{
+			foreach (var client in socketClients)
+			{
+				await client.StopAsync();
+			}
 		}
 	}
 }
