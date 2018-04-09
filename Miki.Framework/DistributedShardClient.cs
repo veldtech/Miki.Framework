@@ -53,6 +53,7 @@ namespace Miki.Framework
 			for (int i = config.ShardId.Value; i < config.AmountShards + config.ShardId.Value; i++)
 			{
 				Console.WriteLine(i);
+
 				var client = new DiscordSocketClient(new DiscordSocketConfig()
 				{
 					AlwaysDownloadUsers = config.AlwaysDownloadUsers,
@@ -69,6 +70,7 @@ namespace Miki.Framework
 					UdpSocketProvider = config.UdpSocketProvider,
 					WebSocketProvider = config.WebSocketProvider
 				});
+
 				socketClients.Add(client);
 
 				client.MessageReceived += async (msg) =>

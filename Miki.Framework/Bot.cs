@@ -20,12 +20,11 @@ namespace Miki.Framework
 
         public DistributedShardClient Client { private set; get; }
 
-		public ClientInformation Information { get; }
-		private ClientInformation information;
+		public ClientInformation Information { private set; get; }
 
 		public Bot(DistributedShardConfig info, ClientInformation cInfo)
         {
-			information = cInfo;
+			Information = cInfo;
 
 			if (Instance == null)
 				Instance = this;

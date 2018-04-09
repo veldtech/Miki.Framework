@@ -96,6 +96,7 @@ namespace Miki.Framework.Events
 				}
 				await context.SaveChangesAsync();
 			}
+
 			return identifier.Value;
 		}
 	}
