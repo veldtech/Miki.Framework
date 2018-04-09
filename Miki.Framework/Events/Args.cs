@@ -112,6 +112,26 @@ namespace Miki.Framework.Events
 			return null;
 		}
 
+		public IEnumerable<ArgObject> TakeWhile(Func<ArgObject, bool> func)
+		{
+			List<ArgObject> o = new List<ArgObject> { this };
+
+			for (int i = index; i < args.args.Count; i++)
+			{
+				var current = args.Get(i);
+				if (func(current))
+				{
+					o.Add(current);
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			return o;
+		}
+
 		public ArgObject TakeUntilEnd(int offset = 0)
 		{
 			ArgObject o = this;
@@ -120,6 +140,17 @@ namespace Miki.Framework.Events
 				o.Argument += " " + args.Get(i).Argument;
 			}
 			return o;
+		}
+
+		public bool TryParseInt(out int i)
+		{
+			if(int.TryParse(Argument, out int x))
+			{
+				i = x;
+				return true;
+			}
+			i = 0;
+			return false;
 		}
 
 		public async Task<IGuildUser> GetUserAsync(IGuild guild)

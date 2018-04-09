@@ -16,61 +16,39 @@ namespace Miki.Framework
 {
     public class Bot
     {
-		public Func<Exception, Task> OnError = null;
-
 		public static Bot Instance { get; private set; }
 
-        public DiscordShardedClient Client { private set; get; }
+        public DistributedShardClient Client { private set; get; }
 
-		public ClientInformation Information
-			=> clientInformation;
+		public ClientInformation Information { get; }
+		private ClientInformation information;
 
-		private ClientInformation clientInformation;
-
-		public Bot(ClientInformation info)
+		public Bot(DistributedShardConfig info, ClientInformation cInfo)
         {
-            clientInformation = info;
-            InitializeBot();
-        }
+			information = cInfo;
 
-        public async Task ConnectAsync()
-        {
-			if(clientInformation.Token == "")
-			{
-				Log.Error("Token wasn't defined.");
-			}
-
-            await Client.LoginAsync(TokenType.Bot, clientInformation.Token);
-
-			foreach(var shard in Client.Shards)
-			{
-				await shard.StartAsync();
-				await Task.Delay(6000);
-			}
-
-			await Task.Delay(-1);
-        }
-
-        private void InitializeBot()
-		{
-			if(Instance == null)
+			if (Instance == null)
 				Instance = this;
 
-            Client = new DiscordShardedClient(new DiscordSocketConfig()
-            {
-                TotalShards = clientInformation.ShardCount,
-				ConnectionTimeout = 150000,
-				AlwaysDownloadUsers = true
-			});
+			Client = new DistributedShardClient(info);
 
 			foreach (DiscordSocketClient c in Client.Shards)
-            {
-                c.Ready += async () =>
-                {
-                    Log.Message($"shard {c.ShardId} ready!");
-                    await c.SetGameAsync($"{c.ShardId + 1}/{Information.ShardCount} | >help");
-                };
-            }
+			{
+				c.Ready += async () =>
+				{
+					Log.Message($"shard {c.ShardId} ready!");
+					await c.SetGameAsync($"{c.ShardId + 1}/{info.TotalShards} | >help");
+				};
+			}
+		}
+
+        public async Task ConnectAsync(string token)
+        {
+            await Client.LoginAsync(token, TokenType.Bot);
+
+			await Client.StartAsync();
+
+			await Task.Delay(-1);
         }
 	}
 }
