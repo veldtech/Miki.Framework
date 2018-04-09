@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 
 namespace Miki.Framework.Models.Context
 {
@@ -11,9 +9,6 @@ namespace Miki.Framework.Models.Context
 		public DbSet<ChannelLanguage> Languages { get; set; }
         public DbSet<ModuleState> ModuleStates { get; set; }
 
-		public static readonly LoggerFactory logger
-			= new LoggerFactory(new[] { new ConsoleLoggerProvider((_, __) => __ > LogLevel.Information, false) });
-
 		public IAContext()
         {
         }
@@ -21,7 +16,6 @@ namespace Miki.Framework.Models.Context
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			optionsBuilder.UseNpgsql(Bot.Instance.Information.DatabaseConnectionString);
-			//optionsBuilder.UseLoggerFactory(logger);
 			base.OnConfiguring(optionsBuilder);
 		}
 
