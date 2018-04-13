@@ -18,18 +18,27 @@ namespace Miki.Framework
     {
 		public static Bot Instance { get; private set; }
 
-        public DistributedShardClient Client { private set; get; }
+        public DiscordShardedClient Client { private set; get; }
 
 		public ClientInformation Information { private set; get; }
 
-		public Bot(DistributedShardConfig info, ClientInformation cInfo)
+		public Bot(int amountShards, DiscordSocketConfig info, ClientInformation cInfo)
         {
 			Information = cInfo;
 
 			if (Instance == null)
 				Instance = this;
 
-			Client = new DistributedShardClient(info);
+			int[] shardIds = new int[amountShards];
+
+			for (int i = 0; i < amountShards; i++)
+			{
+				shardIds[i] = info.ShardId.GetValueOrDefault() + i;
+			}
+
+			info.ShardId = null;
+
+			Client = new DiscordShardedClient(shardIds, info);
 
 			foreach (DiscordSocketClient c in Client.Shards)
 			{
@@ -43,7 +52,7 @@ namespace Miki.Framework
 
         public async Task ConnectAsync(string token)
         {
-            await Client.LoginAsync(token, TokenType.Bot);
+            await Client.LoginAsync(TokenType.Bot, token);
 
 			await Client.StartAsync();
 
