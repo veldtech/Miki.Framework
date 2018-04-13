@@ -43,7 +43,6 @@ namespace Miki.Framework
 			{
 				c.Ready += async () =>
 				{
-					Log.Message($"shard {c.ShardId} ready!");
 					await c.SetGameAsync($"{c.ShardId + 1}/{info.TotalShards} | >help");
 				};
 			}
