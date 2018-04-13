@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-
 using Miki.Framework.Events;
 using Miki.Framework.FileHandling;
 using System;
