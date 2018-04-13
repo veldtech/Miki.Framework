@@ -52,7 +52,11 @@ namespace Miki.Framework
         {
             await Client.LoginAsync(TokenType.Bot, token);
 
-			await Client.StartAsync();
+			foreach(DiscordSocketClient c in Client.Shards)
+			{
+				await c.StartAsync();
+				await Task.Delay(5000);
+			}
 
 			await Task.Delay(-1);
         }
