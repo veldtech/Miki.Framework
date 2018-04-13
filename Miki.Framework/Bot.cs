@@ -50,14 +50,12 @@ namespace Miki.Framework
 
         public async Task ConnectAsync(string token)
         {
-            await Client.LoginAsync(TokenType.Bot, token);
-
 			foreach(DiscordSocketClient c in Client.Shards)
 			{
+				await c.LoginAsync(TokenType.Bot, token);
 				await c.StartAsync();
 				await Task.Delay(5000);
 			}
-
 			await Task.Delay(-1);
         }
 	}
