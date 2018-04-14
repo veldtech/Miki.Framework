@@ -103,7 +103,7 @@ namespace Miki.Framework.Events
 			context.EventSystem = eventSystem ?? EventSystem.Instance;
 
 			bool success = await TryProcessCommand(targetCommand, context);
-			await eventSystem.OnCommandDone(e, this, success, sw.ElapsedMilliseconds);
+			await eventSystem.CallCommandDone(e, this, success, sw.ElapsedMilliseconds);
 
 			if (success)
 			{

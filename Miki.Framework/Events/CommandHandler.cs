@@ -171,7 +171,7 @@ namespace Miki.Framework.Events
                 }
                 else
                 {
-                    await eventSystem.OnCommandDone(msg, eventInstance, false);
+                    await eventSystem.CallCommandDone(msg, eventInstance, false);
                 }
             }
             return false;

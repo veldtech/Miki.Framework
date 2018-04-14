@@ -8,8 +8,5 @@ namespace Miki.Framework.Exceptions
     public class BotException : Exception
     {
 		public virtual string Resource => "error_default";
-
-		public BotException() : base()
-		{ }
     }
 }

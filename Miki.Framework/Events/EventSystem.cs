@@ -22,6 +22,8 @@ namespace Miki.Framework.Events
 
         public delegate Task ExceptionDelegate(Exception ex, CommandEvent command, IMessage message);
 
+		public event ProcessCommandDoneEvent OnCommandDone;
+
 		public Dictionary<string, CommandEvent> Commands 
 			=> commandHandler.commands;
 
@@ -71,6 +73,7 @@ namespace Miki.Framework.Events
             bot.Client.MessageReceived += InternalMessageReceived;
         }
 
+		[Obsolete("Use OnCommandDone event instead")]
         public void AddCommandDoneEvent(Action<CommandDoneEvent> info)
         {
             CommandDoneEvent newEvent = new CommandDoneEvent();
@@ -339,7 +342,7 @@ namespace Miki.Framework.Events
 		}
 
 		public PrefixInstance RegisterPrefixInstance(string prefix, bool canBeChanged = true, bool forceExecuteCommands = false)
-        {
+        { 
             PrefixInstance newPrefix = new PrefixInstance(prefix.ToLower(), canBeChanged, forceExecuteCommands);
             commandHandler.Prefixes.Add(prefix, newPrefix);
             return newPrefix;
@@ -347,7 +350,7 @@ namespace Miki.Framework.Events
 
         #region events
 
-        internal async Task OnCommandDone(IMessage e, CommandEvent commandEvent, bool success = true, float time = 0.0f)
+        internal async Task CallCommandDone(IMessage e, CommandEvent commandEvent, bool success = true, float time = 0.0f)
         {
             foreach (CommandDoneEvent ev in events.CommandDoneEvents.Values)
             {
