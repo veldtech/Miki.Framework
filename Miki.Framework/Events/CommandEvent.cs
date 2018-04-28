@@ -145,10 +145,11 @@ namespace Miki.Framework.Events
 			catch (BotException botex)
 			{
 				await context.Channel.SendMessageAsync("", false, 
+					// TODO: make these customizable
 					new EmbedBuilder()
 					{
 						Title = $"🚫 {Locale.GetString(context.Channel.Id, LocaleTags.ErrorMessageGeneric)}",
-						Description = Locale.GetString(context.Channel.Id, botex.Resource),
+						Description = Locale.GetString(context.Channel.Id, botex.Resource, botex.Parameters),
 						Color = new Color(255, 0, 0)
 					}.Build()
 				);
@@ -158,6 +159,7 @@ namespace Miki.Framework.Events
 			{
 				Log.Error(ex);
 				await context.Channel.SendMessageAsync("", false,
+					// TODO: make these customizable
 					new EmbedBuilder()
 					{
 						Title = $"🚫 {Locale.GetString(context.Channel.Id, LocaleTags.ErrorMessageGeneric)}",

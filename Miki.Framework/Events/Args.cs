@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Miki.Framework.Exceptions;
 
 namespace Miki.Framework.Events
 {
@@ -34,7 +35,7 @@ namespace Miki.Framework.Events
 		public ArgObject Last()
 			=> Get(Count - 1);
 		public ArgObject LastOrDefault()
-			=> (Count > 0) ? First() : null;
+			=> (Count > 0) ? Last() : null;
 
 		public ArgObject Get(int index)
 		{
@@ -42,7 +43,7 @@ namespace Miki.Framework.Events
 			index = Math.Min(Math.Max(index, 0), args.Count);
 
 			if (index >= args.Count)
-				return null;
+				throw new ArgObjectNullException();
 
 			return new ArgObject(args[index], index, this);
 		}
@@ -95,13 +96,13 @@ namespace Miki.Framework.Events
 			args = a;
 		}
 
-		public int AsInt(int defaultValue = 0)
+		public int? AsInt()
 		{
 			if (int.TryParse(Argument, out int s))
 			{
 				return s;
 			}
-			return defaultValue;
+			return null;
 		}
 		public bool? AsBoolean()
 		{
