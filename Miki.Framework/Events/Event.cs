@@ -11,7 +11,7 @@ namespace Miki.Framework.Events
 {
     public class Event
     {
-        public string Name { get; set; } = "$command-not-named";
+        public string Name { get; set; }
 
         public EventAccessibility Accessibility { get; set; } = EventAccessibility.PUBLIC;
 

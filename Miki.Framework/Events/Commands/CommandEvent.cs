@@ -100,7 +100,7 @@ namespace Miki.Framework.Events
 			context.commandHandler = c;
 			context.Arguments = new Args(args);
 			context.message = e;
-			context.EventSystem = eventSystem ?? EventSystem.Instance;
+			context.EventSystem = eventSystem;
 
 			bool success = await TryProcessCommand(targetCommand, context);
 			await eventSystem.CallCommandDone(e, this, success, sw.ElapsedMilliseconds);

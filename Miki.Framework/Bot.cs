@@ -21,6 +21,8 @@ namespace Miki.Framework
 
 		public ClientInformation Information { private set; get; }
 
+		private List<IAttachable> attachables = new List<IAttachable>();
+
 		public Bot(int amountShards, DiscordSocketConfig info, ClientInformation cInfo)
         {
 			Information = cInfo;
@@ -58,5 +60,23 @@ namespace Miki.Framework
 			}
 			await Task.Delay(-1);
         }
+
+		public void Attach(IAttachable attachable)
+		{
+			attachables.Add(attachable);
+			attachable.AttachTo(this);
+		}
+
+		public T GetAttachedObject<T>() where T : IAttachable
+		{
+			for(int i = 0; i < attachables.Count; i++)
+			{
+				if(attachables[i] is T)
+				{
+					return (T)attachables[i];
+				}
+			}
+			return default(T);
+		}
 	}
 }
