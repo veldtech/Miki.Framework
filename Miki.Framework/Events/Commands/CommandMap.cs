@@ -28,9 +28,9 @@ namespace Miki.Framework.Events
 		{
 			foreach (string a in command.Aliases)
 			{
-				commandCache.Add(a, command);
+				commandCache.Add(a.ToLower(), command);
 			}
-			commandCache.Add(command.Name, command);
+			commandCache.Add(command.Name.ToLower(), command);
 		}
 
 		public void AddModule(Module module)
@@ -73,7 +73,7 @@ namespace Miki.Framework.Events
 				{
 					instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName), newModule);
 				}
-				catch
+				catch(MissingMethodException ex)
 				{
 					instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName));
 				}
@@ -116,6 +116,22 @@ namespace Miki.Framework.Events
 
 				modulesLoaded.Add(newModule);
 			}
+		}
+
+		public void RemoveCommand(CommandEvent command)
+		{
+			commandCache.Remove(command.Name.ToLower());
+			foreach(var c in command.Aliases)
+			{
+				commandCache.Remove(c.ToLower());
+			}
+		}
+
+		public static CommandMap CreateFromAssembly(Assembly assembly = null)
+		{
+			CommandMap map = new CommandMap();
+			map.RegisterAttributeCommands(assembly);
+			return map;
 		}
 	}
 }

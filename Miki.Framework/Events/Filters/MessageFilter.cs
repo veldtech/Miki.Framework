@@ -26,5 +26,17 @@ namespace Miki.Framework.Events.Filters
 			}
 			return true;
 		}
-    }
+
+		public T Get<T>() where T : IFilter
+		{
+			foreach(var f in filters)
+			{
+				if(f is T t)
+				{
+					return t;
+				}
+			}
+			return default(T);
+		}
+	}
 }

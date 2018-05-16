@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Miki.Common;
+using Miki.Framework.Events.Commands;
 using Miki.Framework.Exceptions;
 using Miki.Framework.Languages;
 using System;
@@ -34,16 +35,16 @@ namespace Miki.Framework.Events
 			info.Invoke(this);
 		}
 
-		public async Task Check(IMessage e, CommandHandler c, string identifier = "")
+		// TODO: clean up
+		public async Task Check(MessageContext e, string identifier = "")
 		{
-			string command = e.Content.Substring(identifier.Length).Split(' ')[0];
+			string command = e.message.Content.Substring(identifier.Length).Split(' ')[0];
 			string args = "";
-			List<string> allAliases = new List<string>();
 			List<string> arguments = new List<string>();
 
-			if (e.Content.Split(' ').Length > 1)
+			if (e.message.Content.Split(' ').Length > 1)
 			{
-				args = e.Content.Substring(e.Content.Split(' ')[0].Length + 1);
+				args = e.message.Content.Substring(e.message.Content.Split(' ')[0].Length + 1);
 				arguments.AddRange(args.Split(' '));
 				arguments = arguments
 					.Where(x => !string.IsNullOrWhiteSpace(x))
@@ -52,19 +53,13 @@ namespace Miki.Framework.Events
 
 			if (Module != null)
 			{
-				if (Module.Nsfw && !(e.Channel as ITextChannel).IsNsfw)
+				if (Module.Nsfw && !(e.message.Channel as ITextChannel).IsNsfw)
 				{
 					throw new ChannelNotNsfwException();
 				}
 			}
 
-			if (Aliases != null)
-			{
-				allAliases.AddRange(Aliases);
-				allAliases.Add(Name);
-			}
-
-			if (IsOnCooldown(e.Author.Id))
+			if (IsOnCooldown(e.message.Author.Id))
 			{
 				Log.WarningAt(Name, " is on cooldown");
 				return;
@@ -74,9 +69,9 @@ namespace Miki.Framework.Events
 			{
 				foreach (GuildPermission g in GuildPermissions)
 				{
-					if (!(e.Author as IGuildUser).GuildPermissions.Has(g))
+					if (!(e.message.Author as IGuildUser).GuildPermissions.Has(g))
 					{
-						await e.Channel.SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
+						await e.message.Channel.SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
 						return;
 					}
 				}
@@ -93,26 +88,13 @@ namespace Miki.Framework.Events
 				}
 			}
 
-			Stopwatch sw = new Stopwatch();
-			sw.Start();
-
 			EventContext context = new EventContext();
-			context.commandHandler = c;
+			context.commandHandler = e.commandHandler;
 			context.Arguments = new Args(args);
-			context.message = e;
-			context.EventSystem = eventSystem;
+			context.message = e.message;
+			context.EventSystem = e.eventSystem;
 
-			bool success = await TryProcessCommand(targetCommand, context);
-			await eventSystem.CallCommandDone(e, this, success, sw.ElapsedMilliseconds);
-
-			if (success)
-			{
-				long elapsedMilliseconds = sw.ElapsedMilliseconds;
-				TimesUsed++;
-				Log.Message($"{Name} called by {e.Author.Username}#{e.Author.Discriminator} [{e.Author.Id}] from {(e.Channel as IGuildChannel).Guild.Name} in {elapsedMilliseconds}ms (+events: {sw.ElapsedMilliseconds}ms)");
-			}
-
-			sw.Stop();
+			await targetCommand(context);
 		}
 
 		private bool IsOnCooldown(ulong id)
@@ -131,45 +113,6 @@ namespace Miki.Framework.Events
 				lastTimeUsed.Add(id, new EventCooldownObject(Cooldown));
 				return false;
 			}
-		}
-
-		private async Task<bool> TryProcessCommand(ProcessCommandDelegate cmd, EventContext context)
-		{
-			bool success = false;
-
-			try
-			{
-				await cmd(context);
-				success = true;
-			}
-			catch (BotException botex)
-			{
-				await context.Channel.SendMessageAsync("", false, 
-					// TODO: make these customizable
-					new EmbedBuilder()
-					{
-						Title = $"🚫 {Locale.GetString(context.Channel.Id, LocaleTags.ErrorMessageGeneric)}",
-						Description = Locale.GetString(context.Channel.Id, botex.Resource, botex.Parameters),
-						Color = new Color(255, 0, 0)
-					}.Build()
-				);
-				await eventSystem.OnCommandError(botex, this, context.message);
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex);
-				await context.Channel.SendMessageAsync("", false,
-					// TODO: make these customizable
-					new EmbedBuilder()
-					{
-						Title = $"🚫 {Locale.GetString(context.Channel.Id, LocaleTags.ErrorMessageGeneric)}",
-						Description = ex.Message,
-						Color = new Color(255, 0, 0)
-					}.Build()
-				);
-				await eventSystem.OnCommandError(ex, this, context.message);
-			}
-			return success;
 		}
 
 		public CommandEvent SetCooldown(int seconds)

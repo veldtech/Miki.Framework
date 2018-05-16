@@ -23,6 +23,7 @@ namespace Miki.Framework
 
 		private List<IAttachable> attachables = new List<IAttachable>();
 
+		// TODO: rework params
 		public Bot(int amountShards, DiscordSocketConfig info, ClientInformation cInfo)
         {
 			Information = cInfo;
@@ -67,13 +68,13 @@ namespace Miki.Framework
 			attachable.AttachTo(this);
 		}
 
-		public T GetAttachedObject<T>() where T : IAttachable
+		public T GetAttachedObject<T>() where T : class, IAttachable
 		{
 			for(int i = 0; i < attachables.Count; i++)
 			{
 				if(attachables[i] is T)
 				{
-					return (T)attachables[i];
+					return attachables[i] as T;
 				}
 			}
 			return default(T);

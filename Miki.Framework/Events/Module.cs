@@ -53,7 +53,6 @@ namespace Miki.Framework.Events
 
             foreach (CommandEvent e in Events)
             {
-				e.eventSystem = system;
 				e.Module = this;
             }
 
@@ -93,8 +92,6 @@ namespace Miki.Framework.Events
             {
                 return;
             }
-
-            EventSystem.CommandHandler.AddModule(this);
 
             isInstalled = false;
         }

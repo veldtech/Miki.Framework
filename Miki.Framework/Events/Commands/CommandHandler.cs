@@ -1,159 +1,55 @@
 ﻿using Discord;
-using Miki.Common;
-using Miki.Framework.Events.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Miki.Framework.Events
+namespace Miki.Framework.Events.Commands
 {
-    public class CommandHandlerBuilder
-    {
-		public MessageFilter messageFilter = new MessageFilter();
-
-        private CommandHandler commandHandler = null;
-
-        public CommandHandlerBuilder(EventSystem eventSystem)
-        {
-            commandHandler = new CommandHandler(eventSystem, new CommandMap());
-        }
-
-        public CommandHandlerBuilder AddCommand(CommandEvent cmd)
-        {
-			(cmd as CommandEvent).eventSystem = commandHandler.eventSystem;
-            commandHandler.AddCommand(cmd);
-            return this;
-        }
-
-        public CommandHandlerBuilder AddModule(Module module)
-        {
-            commandHandler.AddModule(module);
-            return this;
-        }
-
-        public CommandHandlerBuilder AddPrefix(string value)
-        {
-            if (!commandHandler.Prefixes.ContainsKey(value))
-            {
-                commandHandler.Prefixes.Add(value, new PrefixInstance(value, false, false));
-            }
-            return this;
-        }
-
-        public CommandHandler Build()
-        {
-            return commandHandler;
-        }
-    }
-
-	public class CommandHandler
+	public abstract class CommandHandler
 	{
-		public IReadOnlyList<CommandEvent> Commands => map.Commands;
-		public IReadOnlyList<Module> Modules => map.Modules;
+		protected Dictionary<string, PrefixInstance> Prefixes { get; private set; } = new Dictionary<string, PrefixInstance>();
+
+		protected CommandMap map = new CommandMap();
+
+		public void AddCommand(CommandEvent e)
+		{
+			map.AddCommand(e);
+		}
+
+		public void AddModule(Module module)
+		{
+			map.AddModule(module);
+		}
+
+		public void AddPrefix(string prefix, bool changable = false)
+		{
+			Prefixes.Add(prefix, new PrefixInstance(prefix, changable, false));
+		}
+
+		public virtual async Task CheckAsync(MessageContext message)
+		{
+			message.commandHandler = this;
+		}
 
 		public async Task<string> GetPrefixAsync(ulong guildId)
 			=> await Prefixes.FirstOrDefault(x => x.Value.IsDefault).Value.GetForGuildAsync(guildId);
 
-		public DateTime TimeCreated = DateTime.Now;
-		internal DateTime timeDisposed;
-
-		internal EventSystem eventSystem;
-
-		public Dictionary<string, PrefixInstance> Prefixes { get; private set; } = new Dictionary<string, PrefixInstance>();
-
-		private CommandMap map;
-
-		public CommandHandler(EventSystem eventSystem, CommandMap map)
+		public void RemoveCommand(string commandName)
 		{
-			this.eventSystem = eventSystem;
-			this.map = map;
-		}
+			var command = map.Commands.FirstOrDefault(x => x.Name == commandName.ToLower());
 
-		public bool ShouldDispose()
-		{
-			return (DateTime.Now > timeDisposed);
-		}
-
-		public async Task CheckAsync(IMessage msg)
-		{
-			foreach (PrefixInstance prefix in Prefixes.Values)
+			if(command == null)
 			{
-				string identifier = prefix.DefaultValue;
-
-				if (msg.Channel is IGuildChannel channel)
-				{
-					identifier = await prefix.GetForGuildAsync(channel.GuildId);
-				}
-
-				if (!msg.Content.StartsWith(identifier))
-				{
-					continue;
-				}
-
-				string command = Regex.Replace(msg.Content, @"\r\n?|\n", "")
-					.Substring(identifier.Length)
-					.Split(' ')
-					.First();
-
-				CommandEvent eventInstance = map.GetCommandEvent(command);
-
-				if (eventInstance == null)
-				{
-					return;
-				}
-
-				if (GetUserAccessibility(msg) >= eventInstance.Accessibility)
-				{
-					if (await eventInstance.IsEnabled(msg.Channel.Id))
-					{
-						await eventInstance.Check(msg, this, identifier);
-					}
-				}
+				throw new ArgumentNullException();
 			}
+
+			map.RemoveCommand(command);
 		}
-
-        public void AddCommand(CommandEvent cmd)
-        {
-			map.AddCommand(cmd);
-        }
-
-        public void AddModule(Module module)
-        {
-            map.AddModule(module);
-        }
-
-		// TODO: rework this
-        public EventAccessibility GetUserAccessibility(IMessage e)
-        {
-            if (e.Channel == null)
-				return EventAccessibility.PUBLIC;
-
-			//if (eventSystem.DeveloperIds.Contains(e.Author.Id))
-				//return EventAccessibility.DEVELOPERONLY;
-
-			if ((e.Author as IGuildUser).GuildPermissions.Has(GuildPermission.ManageRoles))
-				return EventAccessibility.ADMINONLY;
-
-			return EventAccessibility.PUBLIC;
-        }
-    }
-
-	public interface ICommandHandler
-	{
-		Task CheckAsync(IMessage message);
-	}
-	
-	public struct CommandSession
-	{
-		public ulong UserId;
-		public ulong ChannelId;
-
-		public CommandSession(ulong user, ulong channel)
+		public void RemoveCommand(CommandEvent e)
 		{
-			UserId = user;
-			ChannelId = channel;
+			map.RemoveCommand(e);
 		}
 	}
 }

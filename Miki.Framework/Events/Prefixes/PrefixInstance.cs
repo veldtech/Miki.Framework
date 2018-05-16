@@ -8,8 +8,6 @@ namespace Miki.Framework.Events
 {
 	public class PrefixInstance
 	{
-		public static PrefixInstance Default = null;
-
 		public short Id { get; internal set; }
 		public string Value { get; internal set; }
 		public string DefaultValue { get; internal set; }
@@ -17,28 +15,16 @@ namespace Miki.Framework.Events
 		public bool Changable { get; internal set; }
 		public bool ForceCommandExecution { get; internal set; }
 
-		public bool IsDefault => this == Default;
+		public bool IsDefault { get; internal set; }
 
 		private ConcurrentDictionary<ulong, string> cache = new ConcurrentDictionary<ulong, string>();
 
-		internal PrefixInstance(string value, bool changable, bool forceExec)
+		internal PrefixInstance(string value, bool isDefault, bool changable = false, bool forceExec = false)
 		{
 			Value = value;
 			DefaultValue = value;
 			Changable = changable;
 			ForceCommandExecution = forceExec;
-		}
-
-		public void RegisterAsDefault()
-		{
-			if (Default == null)
-			{
-				Default = this;
-			}
-			else
-			{
-				Log.WarningAt("SetDefaultPrefix", "Default prefix is already defined!");
-			}
 		}
 
 		public async Task ChangeForGuildAsync(ulong id, string prefix)

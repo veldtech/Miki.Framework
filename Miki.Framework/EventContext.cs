@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Miki.Framework.Events.Commands;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,5 +21,8 @@ namespace Miki.Framework.Events
 		public IGuild Guild => ((message as IUserMessage).Channel as IGuildChannel).Guild;
 
 		public EventSystem EventSystem;
+
+		public CommandSession CreateSession()
+			=> new CommandSession() { ChannelId = Channel.Id, UserId = Author.Id };
 	}
 }

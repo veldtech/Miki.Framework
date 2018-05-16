@@ -23,8 +23,6 @@ namespace Miki.Framework.Events
 
         public int TimesUsed { get; set; } = 0;
 
-        internal EventSystem eventSystem;
-
         public ConcurrentDictionary<ulong, bool> cache = new ConcurrentDictionary<ulong, bool>();
         protected Dictionary<ulong, EventCooldownObject> lastTimeUsed = new Dictionary<ulong, EventCooldownObject>();
 
