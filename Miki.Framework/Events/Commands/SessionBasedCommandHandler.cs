@@ -11,7 +11,7 @@ namespace Miki.Framework.Events.Commands
 	{
 		public Dictionary<CommandSession, Tuple<CommandHandler, DateTime>> Sessions { get; private set; } = new Dictionary<CommandSession, Tuple<CommandHandler, DateTime>>();
 
-		public void AddSession(CommandSession session, CommandHandler handler, TimeSpan expiration = default(TimeSpan))
+		public void AddSession(CommandSession session, CommandHandler handler, TimeSpan? expiration = null)
 		{
 			if(Sessions.TryGetValue(session, out var handlerTuple))
 			{
@@ -23,7 +23,7 @@ namespace Miki.Framework.Events.Commands
 				Sessions.Remove(session);
 			}
 
-			Sessions.Add(session, new Tuple<CommandHandler, DateTime>(handler, DateTime.Now + expiration));
+			Sessions.Add(session, new Tuple<CommandHandler, DateTime>(handler, DateTime.Now + (expiration ?? TimeSpan.FromSeconds(30))));
 		}
 
 		public override async Task CheckAsync(MessageContext context)
