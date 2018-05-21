@@ -156,6 +156,11 @@ namespace Miki.Framework.Events
 
 		public async Task<IGuildUser> GetUserAsync(IGuild guild)
 		{
+			if(string.IsNullOrWhiteSpace(Argument))
+			{
+				return null;
+			}
+
 			if (IsMention)
 			{
 				return await guild.GetUserAsync(ulong.Parse(Argument
