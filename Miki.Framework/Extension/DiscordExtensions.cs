@@ -1,5 +1,7 @@
 ﻿using Discord;
 using Miki.Common.Builders;
+using Miki.Framework;
+using Miki.Framework.Languages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,12 +9,13 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Miki.Framework.Extension
+namespace Discord
 {
     public static class DiscordExtensions
     {
-		public static Color Lerp(Color colorA, Color colorB, float t)
+		public static Color Lerp(this Color colorA, Color colorB, float t)
 		{
+			t = Mathm.Clamp(t, 0, 1);
 			return new Color(
 				(1 - t) * colorA.R + t * colorB.R,
 				(1 - t) * colorA.G + t * colorB.G,
@@ -31,10 +34,10 @@ namespace Miki.Framework.Extension
 			return b;
 		}
 		public static EmbedBuilder AddInlineField(this EmbedBuilder b, string header, object value)
-		{
-			b.AddField(header, value, true);
-			return b;
-		}
+			=>	b.AddField(header, value, true);
+
+		public static EmbedBuilder AddInlineField(this EmbedBuilder b, string resourceHeader, string resourceValue, ulong channelId)
+			=> b.AddInlineField(Locale.GetString(channelId, resourceHeader), Locale.GetString(channelId, resourceValue));
 
 		public static void QueueToChannel(this Embed embed, IMessageChannel channel)
 		{
