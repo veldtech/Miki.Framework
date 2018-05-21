@@ -2,19 +2,16 @@
 {
     public class BaseService : Event
     {
-        public virtual void Install(Module m)
+        public virtual void Install(Module m, Bot b)
         {
             if (Module == null)
             {
                 Module = m;
             }
+		}
 
-            m.Services.Add(this);
-        }
-
-        public virtual void Uninstall(Module m)
+        public virtual void Uninstall(Module m, Bot b)
         {
-            m.Services.Remove(this);
         }
     }
 }

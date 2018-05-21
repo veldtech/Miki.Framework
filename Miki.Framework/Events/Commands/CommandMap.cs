@@ -21,7 +21,6 @@ namespace Miki.Framework.Events
 
 		public CommandMap()
 		{
-
 		}
 
 		public void AddCommand(CommandEvent command)
@@ -55,6 +54,8 @@ namespace Miki.Framework.Events
 
 		public void RegisterAttributeCommands(Assembly assembly = null)
 		{
+			Bot b = Bot.Instance;
+
 			if(assembly == null)
 			{
 				assembly = Assembly.GetEntryAssembly();
@@ -71,11 +72,18 @@ namespace Miki.Framework.Events
 
 				try
 				{
-					instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName), newModule);
+					instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName), newModule, b);
 				}
-				catch(MissingMethodException ex)
+				catch (MissingMethodException ex)
 				{
-					instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName));
+					try
+					{
+						instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName), newModule);
+					}
+					catch (MissingMethodException exc)
+					{
+						instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName));
+					}
 				}
 
 				ModuleAttribute mAttrib = m.GetCustomAttribute<ModuleAttribute>();
@@ -84,8 +92,8 @@ namespace Miki.Framework.Events
 				newModule.CanBeDisabled = mAttrib.module.CanBeDisabled;
 
 				var methods = m.GetMethods()
-							   .Where(t => t.GetCustomAttributes<CommandAttribute>().Count() > 0)
-							   .ToArray();
+					.Where(t => t.GetCustomAttributes<CommandAttribute>().Count() > 0)
+					.ToArray();
 
 				foreach (var x in methods)
 				{
@@ -112,6 +120,17 @@ namespace Miki.Framework.Events
 						commandCache.Add(a.ToLower(), newEvent);
 					}
 					commandCache.Add(newEvent.Name.ToLower(), newEvent);
+				}
+
+				var services = m.GetProperties().Where(x => x.GetCustomAttributes<ServiceAttribute>().Count() > 0).ToArray();
+
+				foreach(var s in services)
+				{
+					BaseService service = Activator.CreateInstance(s.PropertyType, true) as BaseService;
+					var attrib = s.GetCustomAttribute<ServiceAttribute>();
+
+					service.Name = attrib.Name;
+					newModule.Services.Add(service);
 				}
 
 				modulesLoaded.Add(newModule);

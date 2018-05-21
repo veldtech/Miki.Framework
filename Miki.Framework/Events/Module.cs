@@ -56,6 +56,11 @@ namespace Miki.Framework.Events
 				e.Module = this;
             }
 
+			foreach(BaseService s in Services)
+			{
+				s.Install(this, bot);
+			}
+
             isInstalled = true;
         }
 
