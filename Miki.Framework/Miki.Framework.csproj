@@ -11,7 +11,12 @@
     <Description>Miki discord bot framework</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.2.2</Version>
-    <PackageReleaseNotes>Improved Logging</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageIconUrl>https://miki-cdn.nyc3.digitaloceanspaces.com/nuget/miki-framework-icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/mikibot/miki.framework</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mikibot/miki.framework</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Velddev</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
