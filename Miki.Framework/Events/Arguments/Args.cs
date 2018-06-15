@@ -39,10 +39,7 @@ namespace Miki.Framework.Events
 
 		public ArgObject Get(int index)
 		{
-			// TODO: implement Miki.Framework.Math in here
-			index = Math.Min(Math.Max(index, 0), args.Count);
-
-			if (index >= args.Count)
+			if (index >= args.Count || index < 0)
 				throw new ArgObjectNullException();
 
 			return new ArgObject(args[index], index, this);
@@ -181,9 +178,6 @@ namespace Miki.Framework.Events
 
 		public ArgObject Next()
 		{
-			if (IsLast)
-				return null;
-
 			return args.Get(index + 1);
 		}
 	}
