@@ -16,6 +16,8 @@ namespace Miki.Framework.Events
 		public IReadOnlyList<Module> Modules 
 			=> modulesLoaded;
 
+		public event Action<Module> OnModuleLoaded;
+
 		private List<Module> modulesLoaded = new List<Module>();
 		private Dictionary<string, CommandEvent> commandCache = new Dictionary<string, CommandEvent>();
 
@@ -67,8 +69,9 @@ namespace Miki.Framework.Events
 
 			foreach (var m in modules)
 			{
-				Module newModule = new Module();
 				object instance = null;
+
+				Module newModule = new Module(instance);
 
 				try
 				{
@@ -85,6 +88,8 @@ namespace Miki.Framework.Events
 						instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName));
 					}
 				}
+
+				newModule.SetInstance(instance);
 
 				ModuleAttribute mAttrib = m.GetCustomAttribute<ModuleAttribute>();
 				newModule.Name = mAttrib.module.Name.ToLower();
@@ -132,6 +137,8 @@ namespace Miki.Framework.Events
 					service.Name = attrib.Name;
 					newModule.Services.Add(service);
 				}
+
+				OnModuleLoaded?.Invoke(newModule);
 
 				modulesLoaded.Add(newModule);
 			}
