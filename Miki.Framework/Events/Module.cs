@@ -35,10 +35,14 @@ namespace Miki.Framework.Events
 
 		public string SqlName => "module:" + Name;
 
+		public object instanceOf { get; private set; }
+
 		private bool isInstalled = false;
 
-        internal Module()
-        { }
+        internal Module(object instanceOf = null)
+        {
+			this.instanceOf = instanceOf;
+		}
 
 		public Module AddCommand(CommandEvent command)
 		{
@@ -100,6 +104,16 @@ namespace Miki.Framework.Events
 
             isInstalled = false;
         }
+
+		public object GetReflectedInstance()
+		{
+			return instanceOf;
+		}
+
+		internal void SetInstance(object instance)
+		{
+			instanceOf = instance;
+		}
 
         public Module SetNsfw(bool val)
         {
