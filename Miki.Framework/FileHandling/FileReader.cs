@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Miki.Logging;
+using System;
 using System.IO;
 
 namespace Miki.Framework.FileHandling
