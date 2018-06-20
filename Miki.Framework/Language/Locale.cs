@@ -17,7 +17,9 @@ namespace Miki.Framework.Languages
 
 		private static ConcurrentDictionary<long, string> cache = new ConcurrentDictionary<long, string>();
 
-        private static string defaultResource = "en-us";
+        private const string defaultResource = "en-us";
+
+		private const string defaultResult = "error_resource_missing";
 
 		public static bool HasString(ulong channelId, string m)
         {
@@ -36,7 +38,7 @@ namespace Miki.Framework.Languages
         {
 			string language = GetLanguage(channelId.ToDbLong());
 			ResourceManager resources = Locales[language];
-			string output = "";
+			string output = null;
 
 			if (InternalStringAvailable(m, resources))
 			{
@@ -52,7 +54,7 @@ namespace Miki.Framework.Languages
 				output = InternalGetString(m, Locales[defaultResource], p);
 			}
 
-			return output;
+			return output ?? defaultResult;
 		}
 
 		public static string GetLanguage(long channelId)
@@ -117,7 +119,7 @@ namespace Miki.Framework.Languages
 
         private static string InternalGetString(string m, ResourceManager lang, params object[] p)
         {
-            return (p.Length == 0) ? lang.GetString(m) : string.Format(lang.GetString(m), p); ;
+            return (p.Length == 0) ? lang.GetString(m) : string.Format(lang.GetString(m) ?? defaultResult, p); ;
         }
     }
 

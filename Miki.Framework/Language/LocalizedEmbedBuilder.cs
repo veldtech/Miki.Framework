@@ -35,6 +35,12 @@ namespace Miki.Framework.Language
 			return this;
 		}
 
+		public LocalizedEmbedBuilder WithColor(Color color)
+		{
+			embedBuilder.Color = color;
+			return this;
+		}
+
 		public LocalizedEmbedBuilder WithDescription(string description, params object[] param)
 			=> WithDescription(new LanguageResource(description, param));
 		public LocalizedEmbedBuilder WithDescription(LanguageResource description)
@@ -45,13 +51,25 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithFooter(string text, string iconUrl = null, params object[] param)
 			=> WithFooter(new LanguageResource(text, param), iconUrl);
-		public LocalizedEmbedBuilder WithFooter(LanguageResource text, string iconUrl = null)
+		public LocalizedEmbedBuilder WithFooter(IResource text, string iconUrl = null)
 		{
 			embedBuilder.Footer = new EmbedFooterBuilder()
 			{
 				IconUrl = iconUrl,
 				Text = text.Get(channelId)
 			};
+			return this;
+		}
+
+		public LocalizedEmbedBuilder WithImageUrl(string imageUrl)
+		{
+			embedBuilder.ImageUrl = imageUrl;
+			return this;
+		}
+
+		public LocalizedEmbedBuilder WithThumbnailUrl(string thumbnailUrl)
+		{
+			embedBuilder.ThumbnailUrl = thumbnailUrl;
 			return this;
 		}
 
