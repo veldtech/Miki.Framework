@@ -61,7 +61,7 @@ namespace Miki.Framework.Events
 
 			if (IsOnCooldown(e.message.Author.Id))
 			{
-				Log.WarningAt(Name, " is on cooldown");
+				Logging.Log.WarningAt(Name, " is on cooldown");
 				return;
 			}
 
