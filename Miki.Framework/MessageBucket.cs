@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿using Miki.Discord.Common;
+using Miki.Discord;
+using Miki.Discord.Rest;
 using Miki.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -10,8 +12,8 @@ namespace Miki.Framework
 {
 	public class MessageBucketArgs
 	{
-		public MessageProperties properties;
-		public IMessageChannel channel;
+		public MessageArgs properties;
+		public IDiscordChannel channel;
 	}
 
 	public class MessageBucket
@@ -31,7 +33,7 @@ namespace Miki.Framework
 				{
 					try
 					{
-						await msg.channel.SendMessageAsync(msg.properties.Content.GetValueOrDefault() ?? "", false, msg.properties.Embed.GetValueOrDefault() ?? null);
+						await msg.channel.SendMessageAsync(msg.properties.content ?? "", false, msg.properties.embed ?? null);
 					}
 					catch (Exception e)
 					{

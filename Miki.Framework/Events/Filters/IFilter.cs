@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Miki.Discord.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,6 +8,6 @@ namespace Miki.Framework.Events.Filters
 {
     public interface IFilter
     {
-		Task<bool> FilterAsync(IMessage msg);
+		Task<bool> FilterAsync(IDiscordMessage msg);
     }
 }

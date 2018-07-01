@@ -1,5 +1,4 @@
-﻿using Discord;
-using Miki.Framework.Exceptions;
+﻿using Miki.Framework.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,7 +29,7 @@ namespace Miki.Framework.Events.Commands
 		{
 			CommandSession session;
 
-			session.ChannelId = context.message.Channel.Id;
+			session.ChannelId = context.message.ChannelId;
 			session.UserId = context.message.Author.Id;
 
 			if(Sessions.TryGetValue(session, out var commandHandler))

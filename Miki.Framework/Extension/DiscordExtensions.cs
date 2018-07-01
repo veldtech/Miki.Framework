@@ -1,5 +1,8 @@
-﻿using Discord;
-using Miki.Common.Builders;
+﻿using Miki.Common.Builders;
+using Miki.Discord;
+using Miki.Discord.Common;
+using Miki.Discord.Rest;
+using Miki.Discord.Rest.Entities;
 using Miki.Framework;
 using Miki.Framework.Languages;
 using System;
@@ -9,101 +12,72 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord
+namespace Miki.Discord
 {
     public static class DiscordExtensions
     {
-		public static Color Lerp(this Color colorA, Color colorB, float t)
-		{
-			t = Mathm.Clamp(t, 0, 1);
-			return new Color(
-				(1 - t) * colorA.R + t * colorB.R,
-				(1 - t) * colorA.G + t * colorB.G,
-				(1 - t) * colorA.B + t * colorB.B
-			);
-		}
-
-		public static EmbedBuilder SetAuthor(this EmbedBuilder b, string text, string iconurl, string url)
-		{
-			b.Author = new EmbedAuthorBuilder
-			{
-				Name = text,
-				IconUrl = iconurl,
-				Url = url
-			};
-			return b;
-		}
 		public static EmbedBuilder AddInlineField(this EmbedBuilder b, string header, object value)
-			=>	b.AddField(header, value, true);
+			=>	b.AddField(header, value.ToString(), true);
 
 		public static EmbedBuilder AddInlineField(this EmbedBuilder b, string resourceHeader, string resourceValue, ulong channelId)
 			=> b.AddInlineField(Locale.GetString(channelId, resourceHeader), Locale.GetString(channelId, resourceValue));
 
-		public static void QueueToChannel(this Embed embed, IMessageChannel channel)
+		public static void QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel)
 		{
 			MessageBucket.Add(new MessageBucketArgs()
 			{
-				properties = new MessageProperties()
+				properties = new MessageArgs()
 				{
-					Embed = embed
+					embed = embed
 				},
 				channel = channel
 			});
 		}
-		public static void QueueToUser(this Embed embed, IUser user)
-		{
-			MessageBucket.Add(new MessageBucketArgs()
-			{
-				properties = new MessageProperties()
-				{
-					Embed = embed
-				},
-				channel = user.GetOrCreateDMChannelAsync().GetAwaiter().GetResult()
-			});
-		}
-		public static async Task<IUserMessage> SendToChannel(this Embed embed, IMessageChannel channel)
-		{
-			if (!(await (channel as IGuildChannel).Guild.GetCurrentUserAsync()).GuildPermissions.Has(GuildPermission.EmbedLinks))
-			{
-				if (!embed.Image.HasValue)
-				{
-					return await channel.SendMessageAsync(embed.ToMessageBuilder().Build());
-				}
 
-				using (WebClient wc = new WebClient())
-				{
-					byte[] image = wc.DownloadData(embed.Image.Value.Url);
-					using (MemoryStream ms = new MemoryStream(image))
-					{
-						return await channel.SendFileAsync(ms, embed.ToMessageBuilder().Build());
-					}
-				}
-			}
+		public static async Task<IDiscordMessage> SendToChannel(this DiscordEmbed embed, IDiscordChannel channel)
+		{
+			//if (!(await (await (channel as IDiscordGuildChannel).GetGuildAsync()).GetSelfAsync())
+			//	.GuildPermissions.HasFlag (GuildPermission.EmbedLinks))
+			//{
+			//	if (!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
+			//	{
+			//		return await channel.SendMessageAsync(embed.ToMessageBuilder().Build());
+			//	}
+
+			//	using (WebClient wc = new WebClient())
+			//	{
+			//		byte[] image = wc.DownloadData(embed.Image.Url);
+			//		using (MemoryStream ms = new MemoryStream(image))
+			//		{
+			//			return await channel.SendFileAsync(ms, embed.ToMessageBuilder().Build());
+			//		}
+			//	}
+			//}
 			return await channel.SendMessageAsync("", false, embed);
 		}
-		public static async Task<IMessage> SendToUser(this Embed embed, IUser user)
+		public static async Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
 		{
 			await Task.Yield();
-			return await user.SendMessageAsync("", false, embed);
+			return await (await user.GetDMChannel()).SendMessageAsync("", false, embed);
 		}
 
-		public static void QueueMessageAsync(this IMessageChannel channel, string message)
+		public static void QueueMessageAsync(this IDiscordChannel channel, string message)
 			=> MessageBucket.Add(new MessageBucketArgs()
 			{
-				properties = new MessageProperties()
+				properties = new MessageArgs()
 				{
-					Content = message
+					content = message
 				},
 				channel = channel
 			});
 
-		public static MessageBuilder ToMessageBuilder(this Embed embed)
+		public static MessageBuilder ToMessageBuilder(this DiscordEmbed embed)
 		{
 			MessageBuilder b = new MessageBuilder();
 
-			if (embed.Author.HasValue)
+			if (embed.Author != null)
 			{
-				b.AppendText(embed.Author.Value.Name, MessageFormatting.Bold);
+				b.AppendText(embed.Author.Name, MessageFormatting.Bold);
 			}
 
 			b.AppendText(embed.Title, MessageFormatting.Bold)
@@ -111,14 +85,14 @@ namespace Discord
 
 			foreach (EmbedField f in embed.Fields)
 			{
-				b.AppendText(f.Name, MessageFormatting.Underlined)
-				 .AppendText(f.Value)
+				b.AppendText(f.Title, MessageFormatting.Underlined)
+				 .AppendText(f.Content)
 				 .NewLine();
 			}
 
-			if (embed.Footer.HasValue)
+			if (embed.Footer != null)
 			{
-				b.AppendText(embed.Footer.Value.Text, MessageFormatting.Italic);
+				b.AppendText(embed.Footer.Text, MessageFormatting.Italic);
 			}
 
 			return b;

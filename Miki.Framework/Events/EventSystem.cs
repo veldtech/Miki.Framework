@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 using System.Diagnostics;
 using System.Threading;
 using Miki.Framework.Events.Filters;
@@ -17,13 +15,17 @@ using Miki.Framework.Events.Commands;
 using Miki.Framework.Exceptions;
 using Miki.Framework.Extension;
 using Miki.Framework.Languages;
+using Miki.Discord.Rest.Entities;
+using Miki.Discord.Common;
+using Miki.Discord;
+using Miki.Discord.Internal;
 
 namespace Miki.Framework.Events
 {
 	public class EventSystem : IAttachable
 	{
-		public event Func<Exception, CommandEvent, IMessage, int, Task> OnCommandDone;
-
+		public event Func<Exception, CommandEvent, IDiscordMessage, int, Task> OnCommandDone;
+		
 		private Bot bot;
 
 		private Dictionary<Guid, CommandHandler> commandHandlers = new Dictionary<Guid, CommandHandler>();
@@ -45,7 +47,7 @@ namespace Miki.Framework.Events
 		public void AttachTo(Bot bot)
 		{
 			this.bot = bot;
-			bot.Client.MessageReceived += OnMessageReceivedAsync;
+			bot.Client.MessageCreate += OnMessageReceivedAsync;
 		}
 
 		public T GetCommandHandler<T>() where T : CommandHandler
@@ -57,7 +59,7 @@ namespace Miki.Framework.Events
 			return null;
 		}
 
-		public async Task OnMessageReceivedAsync(IMessage msg)
+		public async Task OnMessageReceivedAsync(IDiscordMessage msg)
 		{
 			if (!await MessageFilter.Run(msg))
 			{
@@ -82,16 +84,16 @@ namespace Miki.Framework.Events
 				catch(BotException botEx)
 				{
 					config.ErrorEmbedBuilder
-						.WithDescription(Locale.GetString(msg.Channel.Id, botEx.Resource))
-						.Build()
-						.QueueToChannel(msg.Channel);
+						.SetDescription(Locale.GetString(msg.ChannelId, botEx.Resource))
+						.ToEmbed()
+						.QueueToChannel(await msg.GetChannelAsync());
 				}
 				catch (Exception ex)
 				{
 					config.ErrorEmbedBuilder
-						.WithDescription(ex.Message)
-						.Build()
-						.QueueToChannel(msg.Channel);
+						.SetDescription(ex.Message)
+						.ToEmbed()
+						.QueueToChannel(await msg.GetChannelAsync());
 				}
 
 				stopwatch.Stop();

@@ -6,8 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
+using Miki.Discord.Common;
 
 namespace Miki.Framework.Events
 {
@@ -19,12 +18,12 @@ namespace Miki.Framework.Events
         public bool Enabled { get; set; } = true;
         public bool CanBeDisabled { get; set; } = true;
 
-        public Func<SocketMessage, Task> MessageRecieved { get; set; }
-        public Func<IUser, IUser, Task> UserUpdated { get; set; }
-        public Func<IUser, Task> UserJoinGuild { get; set; }
-        public Func<IUser, Task> UserLeaveGuild { get; set; }
-		public Func<IGuild, Task> JoinedGuild { get; set; } 
-        public Func<IGuild, Task> LeftGuild { get; set; }
+        public Func<IDiscordMessage, Task> MessageRecieved { get; set; }
+        public Func<IDiscordUser, IDiscordUser, Task> UserUpdated { get; set; }
+        public Func<IDiscordUser, Task> UserJoinGuild { get; set; }
+        public Func<IDiscordUser, Task> UserLeaveGuild { get; set; }
+		public Func<IDiscordGuild, Task> JoinedGuild { get; set; } 
+        public Func<IDiscordGuild, Task> LeftGuild { get; set; }
 
         public List<CommandEvent> Events { get; set; } = new List<CommandEvent>();
         public List<BaseService> Services { get; set; } = new List<BaseService>();
@@ -35,13 +34,13 @@ namespace Miki.Framework.Events
 
 		public string SqlName => "module:" + Name;
 
-		public object instanceOf { get; private set; }
+		public object InstanceOf { get; private set; }
 
 		private bool isInstalled = false;
 
         internal Module(object instanceOf = null)
         {
-			this.instanceOf = instanceOf;
+			InstanceOf = instanceOf;
 		}
 
 		public Module AddCommand(CommandEvent command)
@@ -107,12 +106,12 @@ namespace Miki.Framework.Events
 
 		public object GetReflectedInstance()
 		{
-			return instanceOf;
+			return InstanceOf;
 		}
 
 		internal void SetInstance(object instance)
 		{
-			instanceOf = instance;
+			InstanceOf = instance;
 		}
 
         public Module SetNsfw(bool val)

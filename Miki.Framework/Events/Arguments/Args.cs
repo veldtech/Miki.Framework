@@ -1,11 +1,11 @@
-﻿using Discord;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Miki.Framework.Exceptions;
+using Miki.Discord.Common;
 
 namespace Miki.Framework.Events
 {
@@ -151,7 +151,7 @@ namespace Miki.Framework.Events
 			return false;
 		}
 
-		public async Task<IGuildUser> GetUserAsync(IGuild guild)
+		public async Task<IDiscordGuildUser> GetUserAsync(IDiscordGuild guild)
 		{
 			if(string.IsNullOrWhiteSpace(Argument))
 			{
@@ -171,9 +171,10 @@ namespace Miki.Framework.Events
 				return await guild.GetUserAsync(id);
 			}
 			return (await guild.GetUsersAsync())
-				.Where(x => x.Username.ToLower() == Argument.ToLower() || 
-					   (x.Nickname?.ToLower() ?? "") == Argument.ToLower() || 
-					   x.Username.ToLower() + "#" + x.Discriminator == Argument.ToLower()).FirstOrDefault();
+				.Where(x => x.Username.ToLower() == Argument.ToLower() 
+					|| (x.Nickname?.ToLower() ?? "") == Argument.ToLower() 
+					|| x.Username.ToLower() + "#" + x.Discriminator == Argument.ToLower())
+				.FirstOrDefault();
 		}
 
 		public ArgObject Next()

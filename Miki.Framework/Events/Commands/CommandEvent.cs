@@ -1,5 +1,5 @@
-﻿using Discord;
-using Miki.Common;
+﻿using Miki.Common;
+using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
 using Miki.Framework.Exceptions;
 using Miki.Framework.Languages;
@@ -54,7 +54,7 @@ namespace Miki.Framework.Events
 
 			if (Module != null)
 			{
-				if (Module.Nsfw && !(e.message.Channel as ITextChannel).IsNsfw)
+				if (Module.Nsfw && !(await e.message.GetChannelAsync()).IsNsfw)
 				{
 					throw new ChannelNotNsfwException();
 				}
@@ -70,9 +70,9 @@ namespace Miki.Framework.Events
 			{
 				foreach (GuildPermission g in GuildPermissions)
 				{
-					if (!(e.message.Author as IGuildUser).GuildPermissions.Has(g))
+					if (!(await (await e.message.GetChannelAsync() as IDiscordGuildChannel).GetPermissionsAsync(e.message.Author as IDiscordGuildUser)).HasFlag(g))
 					{
-						await e.message.Channel.SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
+						await (await e.message.GetChannelAsync()).SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
 						return;
 					}
 				}
@@ -89,10 +89,9 @@ namespace Miki.Framework.Events
 				}
 			}
 
-			EventContext context = new EventContext();
+			EventContext context = new EventContext(e.message);
 			context.commandHandler = e.commandHandler;
 			context.Arguments = new Args(args);
-			context.message = e.message;
 			context.EventSystem = e.eventSystem;
 
 			await targetCommand(context);

@@ -1,5 +1,5 @@
-﻿using Discord;
-using Miki.Common;
+﻿using Miki.Common;
+using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
 using Miki.Framework.Events.Filters;
 using System;
@@ -28,7 +28,7 @@ namespace Miki.Framework.Events
 			{
 				string identifier = prefix.DefaultValue;
 
-				if (context.message.Channel is IGuildChannel channel)
+				if ((await context.message.GetChannelAsync()) is IDiscordGuildChannel channel)
 				{
 					identifier = await prefix.GetForGuildAsync(channel.GuildId);
 				}
@@ -50,9 +50,9 @@ namespace Miki.Framework.Events
 					return;
 				}
 
-				if (GetUserAccessibility(context.message) >= eventInstance.Accessibility)
+				if ((await GetUserAccessibility(context.message)) >= eventInstance.Accessibility)
 				{
-					if (await eventInstance.IsEnabled(context.message.Channel.Id))
+					if (await eventInstance.IsEnabled((await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(context, identifier);
 					}
@@ -61,14 +61,18 @@ namespace Miki.Framework.Events
 		}
 
 		// TODO: rework this
-        public EventAccessibility GetUserAccessibility(IMessage e)
+        public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage e)
         {
-            if (e.Channel == null)
-				return EventAccessibility.PUBLIC;
+			IDiscordChannel channel = await e.GetChannelAsync();
 
-			if ((e.Author as IGuildUser).GuildPermissions.Has(GuildPermission.ManageRoles))
-				return EventAccessibility.ADMINONLY;
-
+			if (channel is IDiscordGuildChannel guildChannel)
+			{
+				IDiscordGuildUser u = await (await guildChannel.GetGuildAsync()).GetUserAsync(e.Author.Id);
+				if ((await guildChannel.GetPermissionsAsync(u)).HasFlag(GuildPermission.ManageRoles))
+				{
+					return EventAccessibility.ADMINONLY;
+				}
+			}
 			return EventAccessibility.PUBLIC;
         }
     }

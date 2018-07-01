@@ -3,19 +3,19 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Discord;
+using Miki.Discord.Common;
 
 namespace Miki.Framework.Events.Commands
 {
 	public class MessageListener : CommandHandler
 	{
-		ConcurrentDictionary<CommandSession, Action<IMessage>> sessionCache = new ConcurrentDictionary<CommandSession, Action<IMessage>>();
+		ConcurrentDictionary<CommandSession, Action<IDiscordMessage>> sessionCache = new ConcurrentDictionary<CommandSession, Action<IDiscordMessage>>();
 
-		public async Task<IMessage> WaitForNextMessage(ulong userId, ulong channelId, int timeOutInMilliseconds = 10000)
+		public async Task<IDiscordMessage> WaitForNextMessage(ulong userId, ulong channelId, int timeOutInMilliseconds = 10000)
 			=> await WaitForNextMessage(new CommandSession { ChannelId = channelId, UserId = userId }, timeOutInMilliseconds);
-		public async Task<IMessage> WaitForNextMessage(CommandSession session, int timeOutInMilliseconds = 10000)
+		public async Task<IDiscordMessage> WaitForNextMessage(CommandSession session, int timeOutInMilliseconds = 10000)
 		{
-			IMessage nextMessage = null;
+			IDiscordMessage nextMessage = null;
 
 			if (sessionCache.TryAdd(session, (msg) =>
 			 {
@@ -41,12 +41,12 @@ namespace Miki.Framework.Events.Commands
 		public override async Task CheckAsync(MessageContext context)
 		{
 			CommandSession session;
-			session.ChannelId = context.message.Channel.Id;
+			session.ChannelId = (await context.message.GetChannelAsync()).Id;
 			session.UserId = context.message.Author.Id;
 
 			if (sessionCache.ContainsKey(session))
 			{
-				if (sessionCache.TryGetValue(session, out Action<IMessage> a))
+				if (sessionCache.TryGetValue(session, out Action<IDiscordMessage> a))
 				{
 					a(context.message);
 				}

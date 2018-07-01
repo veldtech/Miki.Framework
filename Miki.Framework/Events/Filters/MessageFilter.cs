@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Miki.Discord.Common;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +15,7 @@ namespace Miki.Framework.Events.Filters
 			filters.Add(filter);
 		}
 
-		public async Task<bool> Run(IMessage msg)
+		public async Task<bool> Run(IDiscordMessage msg)
 		{
 			foreach(IFilter f in filters)
 			{

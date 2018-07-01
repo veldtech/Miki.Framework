@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Miki.Discord.Common;
 
 namespace Miki.Framework.Events.Commands
 {
@@ -6,6 +6,6 @@ namespace Miki.Framework.Events.Commands
     {
 		public CommandHandler commandHandler;
 		public EventSystem eventSystem;
-		public IMessage message;
+		public IDiscordMessage message;
     }
 }

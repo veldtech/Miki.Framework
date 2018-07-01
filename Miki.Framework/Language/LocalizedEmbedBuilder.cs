@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿using Miki.Discord;
+using Miki.Discord.Common;
+using Miki.Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +9,7 @@ namespace Miki.Framework.Language
 {
     public class LocalizedEmbedBuilder
 	{
-		public EmbedBuilder embedBuilder { get; private set; } = new EmbedBuilder();
+		public EmbedBuilder EmbedBuilder { get; private set; } = new EmbedBuilder();
 		private ulong channelId;
 
 		public LocalizedEmbedBuilder(ulong channelId)
@@ -17,27 +19,22 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder AddField(IResource title, IResource content, bool inline = false)
 		{
-			embedBuilder.AddField(title.Get(channelId), content.Get(channelId), inline);
+			EmbedBuilder.AddField(title.Get(channelId), content.Get(channelId), inline);
 			return this;
 		}
 
-		public Embed Build()
-			=> embedBuilder.Build();
+		public DiscordEmbed Build()
+			=> EmbedBuilder.ToEmbed();
 
 		public LocalizedEmbedBuilder WithAuthor(IResource title, string iconUrl = null, string url = null)
 		{
-			embedBuilder.Author = new EmbedAuthorBuilder()
-			{
-				IconUrl = iconUrl,
-				Url = url,
-				Name = title.Get(channelId)
-			};
+			EmbedBuilder.SetAuthor(title.Get(channelId), iconUrl, url);
 			return this;
 		}
 
 		public LocalizedEmbedBuilder WithColor(Color color)
 		{
-			embedBuilder.Color = color;
+			EmbedBuilder.SetColor(color);
 			return this;
 		}
 
@@ -45,7 +42,7 @@ namespace Miki.Framework.Language
 			=> WithDescription(new LanguageResource(description, param));
 		public LocalizedEmbedBuilder WithDescription(LanguageResource description)
 		{
-			embedBuilder.WithDescription(description.Get(channelId));
+			EmbedBuilder.SetDescription(description.Get(channelId));
 			return this;
 		}
 
@@ -53,23 +50,19 @@ namespace Miki.Framework.Language
 			=> WithFooter(new LanguageResource(text, param), iconUrl);
 		public LocalizedEmbedBuilder WithFooter(IResource text, string iconUrl = null)
 		{
-			embedBuilder.Footer = new EmbedFooterBuilder()
-			{
-				IconUrl = iconUrl,
-				Text = text.Get(channelId)
-			};
+			EmbedBuilder.SetFooter(text.Get(channelId), iconUrl);
 			return this;
 		}
 
 		public LocalizedEmbedBuilder WithImageUrl(string imageUrl)
 		{
-			embedBuilder.ImageUrl = imageUrl;
+			EmbedBuilder.SetImage(imageUrl);
 			return this;
 		}
 
 		public LocalizedEmbedBuilder WithThumbnailUrl(string thumbnailUrl)
 		{
-			embedBuilder.ThumbnailUrl = thumbnailUrl;
+			EmbedBuilder.SetThumbnail(thumbnailUrl);
 			return this;
 		}
 
@@ -77,7 +70,7 @@ namespace Miki.Framework.Language
 			=> WithTitle(new LanguageResource(resource, param));
 		public LocalizedEmbedBuilder WithTitle(IResource title)
 		{
-			embedBuilder.WithTitle(title.Get(channelId));
+			EmbedBuilder.SetTitle(title.Get(channelId));
 			return this;
 		}
     }

@@ -1,4 +1,4 @@
-﻿using Discord;
+﻿using Miki.Discord;
 using System;
 using System.Collections.Generic;
 using System.Text;

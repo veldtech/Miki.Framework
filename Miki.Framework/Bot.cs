@@ -1,6 +1,4 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Miki.Framework.Events;
+﻿using Miki.Framework.Events;
 using Miki.Framework.FileHandling;
 using System;
 using System.IO;
@@ -10,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis.Extensions.Core;
+using Miki.Discord;
+using Miki.Discord.Caching;
 
 namespace Miki.Framework
 {
@@ -17,50 +18,35 @@ namespace Miki.Framework
     {
 		public static Bot Instance { get; private set; }
 
-        public DiscordShardedClient Client { private set; get; }
+		public DiscordClient Client { get; private set; }
+		public CacheClient CacheClient { get; private set; }
 
 		public ClientInformation Information { private set; get; }
 
 		private List<IAttachable> attachables = new List<IAttachable>();
 
 		// TODO: rework params
-		public Bot(int amountShards, DiscordSocketConfig info, ClientInformation cInfo)
+		public Bot(int amountShards, ClientInformation cInfo, ICacheClient client, string rabbitUrl)
         {
 			Information = cInfo;
 
+			Client = new DiscordClient(new DiscordClientConfigurations
+			{
+				CacheClient = client,
+				RabbitMQExchangeName = "consumer",
+				RabbitMQQueueName = "bot-miki",
+				RabbitMQUri = rabbitUrl,
+				Token = cInfo.Token
+			});
+
+			CacheClient = new CacheClient(
+				Client._websocketClient,
+				client, Client._apiClient
+			);
+
 			if (Instance == null)
 				Instance = this;
-
-			int[] shardIds = new int[amountShards];
-
-			for (int i = 0; i < amountShards; i++)
-			{
-				shardIds[i] = info.ShardId.GetValueOrDefault() + i;
-			}
-
-			info.ShardId = null;
-
-			Client = new DiscordShardedClient(shardIds, info);
-
-			foreach (DiscordSocketClient c in Client.Shards)
-			{
-				c.Ready += async () =>
-				{
-					await c.SetGameAsync($"{c.ShardId + 1}/{info.TotalShards} | >help");
-				};
-			}
 		}
-
-        public async Task ConnectAsync(string token)
-        {
-			foreach(DiscordSocketClient c in Client.Shards)
-			{
-				await c.LoginAsync(TokenType.Bot, token);
-				await c.StartAsync();
-				await Task.Delay(5000);
-			}
-			await Task.Delay(-1);
-        }
 
 		public void Attach(IAttachable attachable)
 		{

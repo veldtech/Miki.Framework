@@ -5,7 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord;
+using Miki.Discord.Common;
 
 namespace Miki.Framework.Events
 {
@@ -64,10 +64,10 @@ namespace Miki.Framework.Events
             }
         }
 
-        public async Task SetEnabledAll(IGuild guildId, bool enabled)
+        public async Task SetEnabledAll(IDiscordGuild guildId, bool enabled)
         {
             var channels = await guildId.GetChannelsAsync();
-            foreach (IMessageChannel c in channels)
+            foreach (IDiscordChannel c in channels)
             {
                 await SetEnabled(c.Id, enabled);
             }
