@@ -91,7 +91,7 @@ namespace Miki.Framework.Events
 				catch (Exception ex)
 				{
 					config.ErrorEmbedBuilder
-						.SetDescription(ex.Message)
+						.SetDescription(ex.ToString())
 						.ToEmbed()
 						.QueueToChannel(await msg.GetChannelAsync());
 				}
