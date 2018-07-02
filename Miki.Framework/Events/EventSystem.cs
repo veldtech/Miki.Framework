@@ -61,7 +61,7 @@ namespace Miki.Framework.Events
 
 		public async Task OnMessageReceivedAsync(IDiscordMessage msg)
 		{
-			if (!await MessageFilter.Run(msg))
+			if (!await MessageFilter.IsAllowedAsync(msg))
 			{
 				return;
 			}

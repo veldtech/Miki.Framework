@@ -15,11 +15,11 @@ namespace Miki.Framework.Events.Filters
 			filters.Add(filter);
 		}
 
-		public async Task<bool> Run(IDiscordMessage msg)
+		public async Task<bool> IsAllowedAsync(IDiscordMessage msg)
 		{
 			foreach(IFilter f in filters)
 			{
-				if(!await f.FilterAsync(msg))
+				if(await f.FilterAsync(msg))
 				{
 					return false;
 				}
