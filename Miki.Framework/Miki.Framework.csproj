@@ -30,6 +30,7 @@
     <PackageReference Include="Miki.Common" Version="1.2.0" />
     <PackageReference Include="Miki.Discord" Version="1.0.2" />
     <PackageReference Include="Miki.Discord.Caching" Version="1.0.1" />
+    <PackageReference Include="Miki.Discord.Messaging" Version="1.0.2" />
     <PackageReference Include="Miki.Logging" Version="1.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.1" />
   </ItemGroup>

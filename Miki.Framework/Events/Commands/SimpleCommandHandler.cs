@@ -4,6 +4,7 @@ using Miki.Framework.Events.Commands;
 using Miki.Framework.Events.Filters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -22,6 +23,8 @@ namespace Miki.Framework.Events
 
 		public override async Task CheckAsync(MessageContext context)
 		{
+			Stopwatch sw = Stopwatch.StartNew();
+
 			await base.CheckAsync(context);
 
 			foreach (PrefixInstance prefix in Prefixes.Values)
@@ -55,6 +58,7 @@ namespace Miki.Framework.Events
 					if (await eventInstance.IsEnabled((await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(context, identifier);
+						await OnMessageProcessed(eventInstance, context.message, sw.ElapsedMilliseconds);
 					}
 				}
 			}

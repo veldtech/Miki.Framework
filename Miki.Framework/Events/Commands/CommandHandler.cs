@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Miki.Discord.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace Miki.Framework.Events.Commands
 {
 	public abstract class CommandHandler
 	{
+		public Func<CommandEvent, IDiscordMessage, long, Task> OnMessageProcessed;
+
 		protected Dictionary<string, PrefixInstance> Prefixes { get; private set; } = new Dictionary<string, PrefixInstance>();
 
 		protected CommandMap map = new CommandMap();

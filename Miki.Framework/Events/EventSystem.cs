@@ -24,8 +24,6 @@ namespace Miki.Framework.Events
 {
 	public class EventSystem : IAttachable
 	{
-		public event Func<Exception, CommandEvent, IDiscordMessage, int, Task> OnCommandDone;
-		
 		private Bot bot;
 
 		private Dictionary<Guid, CommandHandler> commandHandlers = new Dictionary<Guid, CommandHandler>();
