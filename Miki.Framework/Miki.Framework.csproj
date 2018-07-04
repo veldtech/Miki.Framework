@@ -29,8 +29,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
     <PackageReference Include="Miki.Common" Version="1.2.0" />
     <PackageReference Include="Miki.Discord" Version="1.0.4" />
-    <PackageReference Include="Miki.Discord.Caching" Version="1.0.5" />
+    <PackageReference Include="Miki.Discord.Caching" Version="1.0.6" />
     <PackageReference Include="Miki.Logging" Version="1.0.0" />
+    <PackageReference Include="Miki.Rest" Version="1.5.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.1" />
   </ItemGroup>
   
