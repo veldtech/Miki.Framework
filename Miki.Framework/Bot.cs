@@ -34,7 +34,7 @@ namespace Miki.Framework
 			{
 				CacheClient = client,
 				RabbitMQExchangeName = "consumer",
-				RabbitMQQueueName = "bot-miki",
+				RabbitMQQueueName = "gateway",
 				RabbitMQUri = rabbitUrl,
 				Token = cInfo.Token
 			});
