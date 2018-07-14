@@ -44,6 +44,13 @@ namespace Miki.Framework.Events
 
 			return new ArgObject(args[index], index, this);
 		}
+		public ArgObject GetOrDefault(int index)
+		{
+			if (index >= args.Count || index < 0)
+				return null;
+
+			return Get(index);
+		}
 
 		public ArgObject Join()
 			=> new ArgObject(string.Join(" ", args), 0, this);
@@ -179,7 +186,7 @@ namespace Miki.Framework.Events
 
 		public ArgObject Next()
 		{
-			return args.Get(index + 1);
+			return args.GetOrDefault(index + 1);
 		}
 	}
 }
