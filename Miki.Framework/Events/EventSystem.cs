@@ -79,7 +79,7 @@ namespace Miki.Framework.Events
 						await handler.CheckAsync(context);
 					}
 				}
-				catch(BotException botEx)
+				catch (BotException botEx)
 				{
 					config.ErrorEmbedBuilder
 						.SetDescription(Locale.GetString(msg.ChannelId, botEx.Resource))
@@ -88,10 +88,19 @@ namespace Miki.Framework.Events
 				}
 				catch (Exception ex)
 				{
-					config.ErrorEmbedBuilder
-						.SetDescription(ex.ToString())
-						.ToEmbed()
-						.QueueToChannel(await msg.GetChannelAsync());
+					var embed = config.ErrorEmbedBuilder
+						.SetDescription("Something went wrong internally. This could be due to the very new system. Please report this issue to the miki developer. This message will only appear until the developer thinks the system is good enough to run without major issues.")
+						.AddInlineField("Error code", ex.Message)
+						.AddInlineField("Source", ex.Source)
+						.ToEmbed();
+
+					await bot.Client._apiClient.SendMessageAsync(
+						msg.ChannelId,
+						new MessageArgs
+						{
+							content = "discord invite url: https://discord.gg/veUGD9t",
+							embed = embed
+						});
 				}
 
 				stopwatch.Stop();
