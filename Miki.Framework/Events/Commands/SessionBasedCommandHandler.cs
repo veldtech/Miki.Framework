@@ -1,5 +1,7 @@
 ﻿using Miki.Framework.Exceptions;
+using Miki.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,9 +10,9 @@ namespace Miki.Framework.Events.Commands
 {
 	public class SessionBasedCommandHandler : CommandHandler
 	{
-		public Dictionary<CommandSession, Tuple<CommandHandler, DateTime>> Sessions { get; private set; } = new Dictionary<CommandSession, Tuple<CommandHandler, DateTime>>();
+		public ConcurrentDictionary<CommandSession, Tuple<CommandHandler, DateTime>> Sessions { get; private set; } = new ConcurrentDictionary<CommandSession, Tuple<CommandHandler, DateTime>>();
 
-		public void AddSession(CommandSession session, CommandHandler handler, TimeSpan? expiration = null)
+		public async Task AddSessionAsync(CommandSession session, CommandHandler handler, TimeSpan? expiration = null)
 		{
 			if(Sessions.TryGetValue(session, out var handlerTuple))
 			{
@@ -19,40 +21,53 @@ namespace Miki.Framework.Events.Commands
 					throw new SessionInUseException();
 				}
 
-				Sessions.Remove(session);
+				await RemoveSessionAsync(session);
 			}
 
-			Sessions.Add(session, new Tuple<CommandHandler, DateTime>(handler, DateTime.Now + (expiration ?? TimeSpan.FromSeconds(30))));
+			while(!Sessions.TryAdd(session, new Tuple<CommandHandler, DateTime>(handler, DateTime.Now + (expiration ?? TimeSpan.FromSeconds(30)))))
+			{
+				await Task.Delay(100);
+			}
 		}
 
 		public override async Task CheckAsync(MessageContext context)
 		{
-			CommandSession session;
-
-			session.ChannelId = context.message.ChannelId;
-			session.UserId = context.message.Author.Id;
-
-			if(Sessions.TryGetValue(session, out var commandHandler))
+			try
 			{
-				if(commandHandler.Item2 < DateTime.Now)
-				{
-					Sessions.Remove(session);
-				}
+				CommandSession session;
 
-				await commandHandler.Item1.CheckAsync(context);
+				session.ChannelId = context.message.ChannelId;
+				session.UserId = context.message.Author.Id;
+
+				if (Sessions.TryGetValue(session, out var commandHandler))
+				{
+					if (commandHandler.Item2 < DateTime.Now)
+					{
+						await RemoveSessionAsync(session);
+					}
+
+					await commandHandler.Item1.CheckAsync(context);
+				}
+			}
+			catch(Exception e)
+			{
+				Log.Error(e);
 			}
 		}
 
-		public void RemoveSession(ulong userId, ulong channelId)
+		public async Task RemoveSessionAsync(ulong userId, ulong channelId)
 		{
 			CommandSession s;
 			s.ChannelId = channelId;
 			s.UserId = userId;
-			RemoveSession(s);
+			await RemoveSessionAsync(s);
 		}
-		public void RemoveSession(CommandSession session)
+		public async Task RemoveSessionAsync(CommandSession session)
 		{
-			Sessions.Remove(session);
+			while (!Sessions.TryRemove(session, out var x))
+			{
+				await Task.Delay(100);
+			}
 		}
 	}
 }
