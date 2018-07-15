@@ -86,6 +86,8 @@ namespace Miki.Framework.Events
 						.SetDescription(Locale.GetString(msg.ChannelId, botEx.Resource))
 						.ToEmbed()
 						.QueueToChannel(await msg.GetChannelAsync());
+
+					Log.Error(botEx);
 				}
 				catch (Exception ex)
 				{
