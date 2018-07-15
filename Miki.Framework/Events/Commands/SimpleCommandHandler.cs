@@ -60,7 +60,7 @@ namespace Miki.Framework.Events
 						return;
 					}
 
-					Log.Message("command found!");
+					Log.Message($"command '{eventInstance.Name}' found!");
 
 					if ((await GetUserAccessibility(context.message)) >= eventInstance.Accessibility)
 					{
