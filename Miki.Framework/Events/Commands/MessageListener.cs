@@ -40,8 +40,9 @@ namespace Miki.Framework.Events.Commands
 
 		public override async Task CheckAsync(MessageContext context)
 		{
+			await Task.Yield();
 			CommandSession session;
-			session.ChannelId = (await context.message.GetChannelAsync()).Id;
+			session.ChannelId = context.message.ChannelId;
 			session.UserId = context.message.Author.Id;
 
 			if (sessionCache.ContainsKey(session))
