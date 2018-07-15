@@ -34,6 +34,8 @@ namespace Miki.Framework.Events
 				{
 					string identifier = prefix.DefaultValue;
 
+					Log.Message("checking channel...");
+
 					if ((await context.message.GetChannelAsync()) is IDiscordGuildChannel channel)
 					{
 						identifier = await prefix.GetForGuildAsync(channel.GuildId);
