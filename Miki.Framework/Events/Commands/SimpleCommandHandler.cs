@@ -67,6 +67,11 @@ namespace Miki.Framework.Events
 		// TODO: rework this
         public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage e)
         {
+			if (e.Author.Id == 121919449996460033)
+			{
+				return EventAccessibility.DEVELOPERONLY;
+			}
+
 			IDiscordChannel channel = await e.GetChannelAsync();
 
 			if (channel is IDiscordGuildChannel guildChannel)
@@ -76,11 +81,6 @@ namespace Miki.Framework.Events
 				{
 					return EventAccessibility.ADMINONLY;
 				}
-			}
-
-			if (e.Author.Id == 121919449996460033)
-			{
-				return EventAccessibility.DEVELOPERONLY;
 			}
 
 			return EventAccessibility.PUBLIC;
