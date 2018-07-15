@@ -78,7 +78,6 @@ namespace Miki.Framework.Events
 					foreach (var handler in commandHandlers.Values)
 					{
 						await handler.CheckAsync(context);
-						Log.Message($"{handler.GetType().Name} completed checking...");
 					}
 				}
 				catch (BotException botEx)
