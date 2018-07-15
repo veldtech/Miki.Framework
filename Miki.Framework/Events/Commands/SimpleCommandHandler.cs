@@ -44,6 +44,8 @@ namespace Miki.Framework.Events
 						continue;
 					}
 
+					Log.Message("prefix ok!");
+
 					string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
 						.Substring(identifier.Length)
 						.Split(' ')
@@ -56,11 +58,20 @@ namespace Miki.Framework.Events
 						return;
 					}
 
+					Log.Message("command found!");
+
 					if ((await GetUserAccessibility(context.message)) >= eventInstance.Accessibility)
 					{
+						Log.Message("permissions ok!");
+
 						if (await eventInstance.IsEnabled((await context.message.GetChannelAsync()).Id))
 						{
+							Log.Message("command enabled!");
+
 							await eventInstance.Check(context, identifier);
+
+							Log.Message("command success!");
+
 							await OnMessageProcessed(eventInstance, context.message, sw.ElapsedMilliseconds);
 						}
 					}
