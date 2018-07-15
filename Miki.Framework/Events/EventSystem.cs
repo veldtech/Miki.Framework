@@ -65,6 +65,8 @@ namespace Miki.Framework.Events
 				return;
 			}
 
+			Log.Trace("message received in EventSystem");
+
 			Task task = Task.Run(async () =>
 			{
 				var stopwatch = Stopwatch.StartNew();
@@ -79,6 +81,8 @@ namespace Miki.Framework.Events
 					{
 						await handler.CheckAsync(context);
 					}
+
+					Log.Trace("message completed in EventSystem");
 				}
 				catch (BotException botEx)
 				{
