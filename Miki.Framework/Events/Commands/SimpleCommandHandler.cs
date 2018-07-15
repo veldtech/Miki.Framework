@@ -77,6 +77,12 @@ namespace Miki.Framework.Events
 					return EventAccessibility.ADMINONLY;
 				}
 			}
+
+			if (e.Author.Id == 121919449996460033)
+			{
+				return EventAccessibility.DEVELOPERONLY;
+			}
+
 			return EventAccessibility.PUBLIC;
         }
     }
