@@ -2,6 +2,7 @@
 using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
 using Miki.Framework.Events.Filters;
+using Miki.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,44 +24,51 @@ namespace Miki.Framework.Events
 
 		public override async Task CheckAsync(MessageContext context)
 		{
-			Stopwatch sw = Stopwatch.StartNew();
-
-			await base.CheckAsync(context);
-
-			foreach (PrefixInstance prefix in Prefixes.Values)
+			try
 			{
-				string identifier = prefix.DefaultValue;
+				Stopwatch sw = Stopwatch.StartNew();
 
-				if ((await context.message.GetChannelAsync()) is IDiscordGuildChannel channel)
+				await base.CheckAsync(context);
+
+				foreach (PrefixInstance prefix in Prefixes.Values)
 				{
-					identifier = await prefix.GetForGuildAsync(channel.GuildId);
-				}
+					string identifier = prefix.DefaultValue;
 
-				if (!context.message.Content.StartsWith(identifier))
-				{
-					continue;
-				}
-
-				string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
-					.Substring(identifier.Length)
-					.Split(' ')
-					.First();
-
-				CommandEvent eventInstance = map.GetCommandEvent(command);
-
-				if (eventInstance == null)
-				{
-					return;
-				}
-
-				if ((await GetUserAccessibility(context.message)) >= eventInstance.Accessibility)
-				{
-					if (await eventInstance.IsEnabled((await context.message.GetChannelAsync()).Id))
+					if ((await context.message.GetChannelAsync()) is IDiscordGuildChannel channel)
 					{
-						await eventInstance.Check(context, identifier);
-						await OnMessageProcessed(eventInstance, context.message, sw.ElapsedMilliseconds);
+						identifier = await prefix.GetForGuildAsync(channel.GuildId);
+					}
+
+					if (!context.message.Content.StartsWith(identifier))
+					{
+						continue;
+					}
+
+					string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
+						.Substring(identifier.Length)
+						.Split(' ')
+						.First();
+
+					CommandEvent eventInstance = map.GetCommandEvent(command);
+
+					if (eventInstance == null)
+					{
+						return;
+					}
+
+					if ((await GetUserAccessibility(context.message)) >= eventInstance.Accessibility)
+					{
+						if (await eventInstance.IsEnabled((await context.message.GetChannelAsync()).Id))
+						{
+							await eventInstance.Check(context, identifier);
+							await OnMessageProcessed(eventInstance, context.message, sw.ElapsedMilliseconds);
+						}
 					}
 				}
+			}
+			catch(Exception e)
+			{
+				Log.Error(e);
 			}
 		}
 
