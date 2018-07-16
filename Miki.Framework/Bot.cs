@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis.Extensions.Core;
 using Miki.Discord;
 using Miki.Discord.Caching;
+using Miki.Cache;
 
 namespace Miki.Framework
 {
@@ -26,13 +26,13 @@ namespace Miki.Framework
 		private List<IAttachable> attachables = new List<IAttachable>();
 
 		// TODO: rework params
-		public Bot(int amountShards, ClientInformation cInfo, ICacheClient client, string rabbitUrl)
+		public Bot(int amountShards, ICachePool client, ClientInformation cInfo, string rabbitUrl)
         {
 			Information = cInfo;
 
 			Client = new DiscordClient(new DiscordClientConfigurations
 			{
-				CacheClient = client,
+				Pool = client,
 				RabbitMQExchangeName = "consumer",
 				RabbitMQQueueName = "gateway",
 				RabbitMQUri = rabbitUrl,
