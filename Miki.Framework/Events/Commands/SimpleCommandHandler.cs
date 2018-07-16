@@ -34,7 +34,7 @@ namespace Miki.Framework.Events
 				{
 					string identifier = prefix.DefaultValue;
 
-					Log.Message("checking channel...");
+					Log.Message($"checking channel with id {context.message.ChannelId}...");
 
 					IDiscordChannel channel = await context.message.GetChannelAsync();
 
