@@ -36,11 +36,11 @@ namespace Miki.Framework.Events
 
 					Log.Message($"checking channel with id {context.message.ChannelId}...");
 
-					IDiscordChannel channel = await context.message.GetChannelAsync();
-
+					context.channel = await context.message.GetChannelAsync();
+				
 					Log.Message("channel ok!");
 
-					if (channel is IDiscordGuildChannel guildChannel)
+					if (context.channel is IDiscordGuildChannel guildChannel)
 					{
 						identifier = await prefix.GetForGuildAsync(guildChannel.GuildId);
 					}
@@ -66,7 +66,7 @@ namespace Miki.Framework.Events
 
 					Log.Message($"command '{eventInstance.Name}' found!");
 
-					if ((await GetUserAccessibility(context.message)) >= eventInstance.Accessibility)
+					if ((await GetUserAccessibility(context.message, context.channel)) >= eventInstance.Accessibility)
 					{
 						Log.Message("permissions ok!");
 
@@ -90,14 +90,12 @@ namespace Miki.Framework.Events
 		}
 
 		// TODO: rework this
-        public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage e)
+        public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage e, IDiscordChannel channel)
         {
 			if (e.Author.Id == 121919449996460033)
 			{
 				return EventAccessibility.DEVELOPERONLY;
 			}
-
-			IDiscordChannel channel = await e.GetChannelAsync();
 
 			if (channel is IDiscordGuildChannel guildChannel)
 			{

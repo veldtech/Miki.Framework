@@ -9,18 +9,6 @@ namespace Miki.Framework.Events
 {
 	public class EventContext
 	{
-		public EventContext(IDiscordMessage message)
-		{
-			this.message = message;
-
-			_channel = new ValueTask<IDiscordChannel>(message.GetChannelAsync());
-
-			if (Channel is IDiscordGuildChannel gc)
-			{
-				_guild = new ValueTask<IDiscordGuild>(gc.GetGuildAsync());
-			}
-		}
-
 		public Args Arguments;
 
 		public CommandHandler commandHandler;
@@ -29,16 +17,13 @@ namespace Miki.Framework.Events
 
 		public IDiscordUser Author => message.Author;
 
-		public IDiscordChannel Channel => _channel.Result;
+		public IDiscordChannel Channel { get; internal set; }
 
-		public IDiscordGuild Guild => _guild.Result;
+		public IDiscordGuild Guild { get; internal set; }
 
 		public EventSystem EventSystem;
 
 		public CommandSession CreateSession()
 			=> new CommandSession() { ChannelId = Channel.Id, UserId = Author.Id };
-
-		private ValueTask<IDiscordChannel> _channel;
-		private ValueTask<IDiscordGuild> _guild;
 	}
 }

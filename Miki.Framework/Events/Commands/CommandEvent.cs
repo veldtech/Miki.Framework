@@ -89,7 +89,15 @@ namespace Miki.Framework.Events
 				}
 			}
 
-			EventContext context = new EventContext(e.message);
+			EventContext context = new EventContext();
+			context.message = e.message;
+			context.Channel = e.channel;
+
+			if(context.Channel is IDiscordGuildChannel c)
+			{
+				context.Guild = await c.GetGuildAsync();
+			}
+
 			context.commandHandler = e.commandHandler;
 			context.Arguments = new Args(args);
 			context.EventSystem = e.eventSystem;

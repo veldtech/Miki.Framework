@@ -7,5 +7,6 @@ namespace Miki.Framework.Events.Commands
 		public CommandHandler commandHandler;
 		public EventSystem eventSystem;
 		public IDiscordMessage message;
+		public IDiscordChannel channel;
     }
 }
