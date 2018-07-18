@@ -28,8 +28,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
     <PackageReference Include="Miki.Common" Version="1.2.0" />
-    <PackageReference Include="Miki.Discord" Version="1.0.8" />
-    <PackageReference Include="Miki.Discord.Caching" Version="1.0.9" />
+    <PackageReference Include="Miki.Discord" Version="2.0.2" />
+    <PackageReference Include="Miki.Discord.Caching" Version="2.0.1" />
     <PackageReference Include="Miki.Logging" Version="1.1.2" />
     <PackageReference Include="Miki.Rest" Version="1.5.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.1" />
