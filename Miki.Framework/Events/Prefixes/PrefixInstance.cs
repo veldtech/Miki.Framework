@@ -1,4 +1,5 @@
-﻿using Miki.Framework.Models;
+﻿using Miki.Cache;
+using Miki.Framework.Models;
 using Miki.Framework.Models.Context;
 using System;
 using System.Collections.Concurrent;
@@ -17,8 +18,6 @@ namespace Miki.Framework.Events
 
 		public bool IsDefault { get; internal set; }
 
-		private ConcurrentDictionary<ulong, string> cache = new ConcurrentDictionary<ulong, string>();
-
 		internal PrefixInstance(string value, bool isDefault, bool changable = false, bool forceExec = false)
 		{
 			Value = value;
@@ -27,7 +26,7 @@ namespace Miki.Framework.Events
 			ForceCommandExecution = forceExec;
 		}
 
-		public async Task ChangeForGuildAsync(ulong id, string prefix)
+		public async Task ChangeForGuildAsync(ICacheClient cache, ulong id, string prefix)
 		{
 			if (Changable)
 			{
@@ -46,7 +45,7 @@ namespace Miki.Framework.Events
 					}
 					await context.SaveChangesAsync();
 				}
-				cache.AddOrUpdate(id, (x) => prefix, (x, y) => prefix);
+				await cache.UpsertAsync(GetCacheKey(id), prefix);
 			}
 		}
 
@@ -55,15 +54,20 @@ namespace Miki.Framework.Events
 			return (await context.Identifiers.AddAsync(new Identifier() { GuildId = id, DefaultValue = DefaultValue, Value = DefaultValue })).Entity;
 		}
 
-		public async Task<string> GetForGuildAsync(ulong id)
+		string GetCacheKey(ulong id)
+			=> $"framework:prefix:{id}";
+
+		public async Task<string> GetForGuildAsync(ICacheClient cache, ulong id)
 		{
 			if (Changable)
 			{
-				if (cache.TryGetValue(id, out string value))
+				if (await cache.ExistsAsync(GetCacheKey(id)))
 				{
-					return value;
+					return await cache.GetAsync<string>(GetCacheKey(id));
 				}
-				return cache.GetOrAdd(id, await LoadFromDatabase(id));
+				string dbPrefix = await LoadFromDatabase(id);
+				await cache.UpsertAsync(GetCacheKey(id), dbPrefix);
+				return dbPrefix;
 			}
 			return DefaultValue;
 		}
@@ -82,7 +86,6 @@ namespace Miki.Framework.Events
 				}
 				await context.SaveChangesAsync();
 			}
-
 			return identifier.Value;
 		}
 	}
