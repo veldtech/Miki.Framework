@@ -77,13 +77,13 @@ namespace Miki.Framework.Events
 				{
 					instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName), newModule, b);
 				}
-				catch (MissingMethodException ex)
+				catch
 				{
 					try
 					{
 						instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName), newModule);
 					}
-					catch (MissingMethodException exc)
+					catch
 					{
 						instance = Activator.CreateInstance(Type.GetType(m.AssemblyQualifiedName));
 					}

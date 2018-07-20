@@ -10,7 +10,6 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Miki.Discord;
 using Miki.Discord.Caching;
-using StackExchange.Redis.Extensions.Core;
 using Miki.Cache;
 
 namespace Miki.Framework
