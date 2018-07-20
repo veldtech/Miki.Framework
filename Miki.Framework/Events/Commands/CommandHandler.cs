@@ -36,7 +36,7 @@ namespace Miki.Framework.Events.Commands
 		}
 
 		public async Task<string> GetPrefixAsync(ulong guildId)
-			=> await Prefixes.FirstOrDefault().Value.GetForGuildAsync(guildId);
+			=> await Prefixes.FirstOrDefault().Value.GetForGuildAsync(Bot.Instance.CachePool.Get, guildId);
 
 		public void RemoveCommand(string commandName)
 		{

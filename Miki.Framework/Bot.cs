@@ -22,6 +22,7 @@ namespace Miki.Framework
 		public CacheClient CacheClient { get; private set; }
 
 		public ClientInformation Information { private set; get; }
+		public ICachePool CachePool { private set; get; }
 
 		private List<IAttachable> attachables = new List<IAttachable>();
 
@@ -29,6 +30,7 @@ namespace Miki.Framework
 		public Bot(int amountShards, ICachePool client, ClientInformation cInfo, string rabbitUrl)
         {
 			Information = cInfo;
+			CachePool = client;
 
 			Client = new DiscordClient(new DiscordClientConfigurations
 			{

@@ -42,7 +42,7 @@ namespace Miki.Framework.Events
 
 					if (context.channel is IDiscordGuildChannel guildChannel)
 					{
-						identifier = await prefix.GetForGuildAsync(, guildChannel.GuildId);
+						identifier = await prefix.GetForGuildAsync(Bot.Instance.CachePool.Get, guildChannel.GuildId);
 					}
 
 					if (!context.message.Content.StartsWith(identifier))
