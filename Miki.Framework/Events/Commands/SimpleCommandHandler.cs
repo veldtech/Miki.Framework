@@ -88,9 +88,12 @@ namespace Miki.Framework.Events
 			if (channel is IDiscordGuildChannel guildChannel)
 			{
 				IDiscordGuildUser u = await (await guildChannel.GetGuildAsync()).GetUserAsync(e.Author.Id);
-				if ((await guildChannel.GetPermissionsAsync(u)).HasFlag(GuildPermission.ManageRoles))
+				if (u != null)
 				{
-					return EventAccessibility.ADMINONLY;
+					if ((await guildChannel.GetPermissionsAsync(u)).HasFlag(GuildPermission.ManageRoles))
+					{
+						return EventAccessibility.ADMINONLY;
+					}
 				}
 			}
 
