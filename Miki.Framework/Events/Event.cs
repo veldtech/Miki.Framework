@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Miki.Discord.Common;
+using Miki.Cache;
 
 namespace Miki.Framework.Events
 {
@@ -23,7 +24,6 @@ namespace Miki.Framework.Events
 
         public int TimesUsed { get; set; } = 0;
 
-        public ConcurrentDictionary<ulong, bool> cache = new ConcurrentDictionary<ulong, bool>();
         protected Dictionary<ulong, EventCooldownObject> lastTimeUsed = new Dictionary<ulong, EventCooldownObject>();
 
         public Event()
@@ -44,7 +44,10 @@ namespace Miki.Framework.Events
             info.Invoke(this);
         }
 
-        public async Task SetEnabled(ulong channelId, bool enabled)
+		public string GetCacheKey(ulong channelId)
+			=> $"event:{Name}:enabled:{channelId}";
+
+        public async Task SetEnabled(ICacheClient client, ulong channelId, bool enabled)
         {
             using (var context = new IAContext())
             {
@@ -55,34 +58,22 @@ namespace Miki.Framework.Events
                 }
                 state.State = enabled;
 
-                cache.AddOrUpdate(channelId, enabled, (x, y) =>
-                {
-                    return enabled;
-                });
+				await client.UpsertAsync(GetCacheKey(channelId), enabled);
 
                 await context.SaveChangesAsync();
             }
         }
 
-        public async Task SetEnabledAll(IDiscordGuild guildId, bool enabled)
-        {
-            var channels = await guildId.GetChannelsAsync();
-            foreach (IDiscordChannel c in channels)
-            {
-                await SetEnabled(c.Id, enabled);
-            }
-        }
-
-        public async Task<bool> IsEnabled(ulong id)
+        public async Task<bool> IsEnabled(ICacheClient client, ulong id)
         {
             if (Module != null)
             {
-                if (!await Module.IsEnabled(id)) return false;
+                if (!await Module.IsEnabled(client, id)) return false;
             }
 
-            if (cache.TryGetValue(id, out bool value))
+            if (await client.ExistsAsync(GetCacheKey(id)))
             {
-				return value;
+				return await client.GetAsync<bool>(GetCacheKey(id));
             }
             else
             {
@@ -93,8 +84,11 @@ namespace Miki.Framework.Events
 					long guildId = id.ToDbLong();
 					state = await context.CommandStates.FindAsync(Name, guildId);
 				}
-                return cache.GetOrAdd(id, state?.State ?? DefaultEnabled);
-            }
+
+				bool currentState = state?.State ?? DefaultEnabled;
+				await client.UpsertAsync(GetCacheKey(id), currentState);
+				return currentState;
+			}
         }
 
         public Event SetName(string name)

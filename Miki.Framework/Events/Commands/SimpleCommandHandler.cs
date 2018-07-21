@@ -24,68 +24,56 @@ namespace Miki.Framework.Events
 
 		public override async Task CheckAsync(MessageContext context)
 		{
-			try
+			EventContext e = new EventContext();
+			e.commandHandler = this;
+			e.message = context.message;
+			e.EventSystem = context.eventSystem;
+
+			Stopwatch sw = Stopwatch.StartNew();
+
+			e.Channel = await context.message.GetChannelAsync();
+
+			if (e.Channel is IDiscordGuildChannel guildChannel)
 			{
-				Stopwatch sw = Stopwatch.StartNew();
+				e.Guild = await guildChannel.GetGuildAsync();
+			}
 
-				await base.CheckAsync(context);
+			foreach (PrefixInstance prefix in Prefixes.Values)
+			{
+				string identifier = prefix.DefaultValue;
 
-				foreach (PrefixInstance prefix in Prefixes.Values)
+				if (e.Guild != null)
 				{
-					string identifier = prefix.DefaultValue;
+					identifier = await prefix.GetForGuildAsync(Bot.Instance.CachePool.Get, e.Guild.Id);
+				}
 
-					Log.Message($"checking channel with id {context.message.ChannelId}...");
+				if (!context.message.Content.StartsWith(identifier))
+				{
+					continue;
+				}
 
-					context.channel = await context.message.GetChannelAsync();
-				
-					Log.Message("channel ok!");
+				e.Prefix = prefix;
 
-					if (context.channel is IDiscordGuildChannel guildChannel)
+				string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
+					.Substring(identifier.Length)
+					.Split(' ')
+					.First();
+
+				CommandEvent eventInstance = map.GetCommandEvent(command);
+
+				if (eventInstance == null)
+				{
+					return;
+				}
+
+				if ((await GetUserAccessibility(context.message, e.Channel)) >= eventInstance.Accessibility)
+				{
+					if (await eventInstance.IsEnabled(Bot.Instance.CachePool.Get, (await context.message.GetChannelAsync()).Id))
 					{
-						identifier = await prefix.GetForGuildAsync(Bot.Instance.CachePool.Get, guildChannel.GuildId);
-					}
-
-					if (!context.message.Content.StartsWith(identifier))
-					{
-						continue;
-					}
-
-					Log.Message("prefix ok!");
-
-					string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
-						.Substring(identifier.Length)
-						.Split(' ')
-						.First();
-
-					CommandEvent eventInstance = map.GetCommandEvent(command);
-
-					if (eventInstance == null)
-					{
-						return;
-					}
-
-					Log.Message($"command '{eventInstance.Name}' found!");
-
-					if ((await GetUserAccessibility(context.message, context.channel)) >= eventInstance.Accessibility)
-					{
-						Log.Message("permissions ok!");
-
-						if (await eventInstance.IsEnabled((await context.message.GetChannelAsync()).Id))
-						{
-							Log.Message("command enabled!");
-
-							await eventInstance.Check(context, identifier);
-
-							Log.Message("command success!");
-
-							await OnMessageProcessed(eventInstance, context.message, sw.ElapsedMilliseconds);
-						}
+						await eventInstance.Check(e, identifier);
+						await OnMessageProcessed(eventInstance, context.message, sw.ElapsedMilliseconds);
 					}
 				}
-			}
-			catch(Exception e)
-			{
-				Log.Error(e);
 			}
 		}
 

@@ -25,15 +25,17 @@ namespace Miki.Framework.Events.Commands
 			map.AddModule(module);
 		}
 
-		public void AddPrefix(string prefix, bool changable = false)
+		public void AddPrefix(string prefix, bool? isDefault = null, bool changable = false)
 		{
-			Prefixes.Add(prefix, new PrefixInstance(prefix, changable, false));
+			Prefixes.Add(prefix, new PrefixInstance(
+				prefix, 
+				isDefault ?? !Prefixes.Any(x => x.Value.IsDefault), 
+				changable, 
+				false
+			));
 		}
 
-		public virtual async Task CheckAsync(MessageContext message)
-		{
-			message.commandHandler = this;
-		}
+		public abstract Task CheckAsync(MessageContext message);
 
 		public async Task<string> GetPrefixAsync(ulong guildId)
 			=> await Prefixes.FirstOrDefault().Value.GetForGuildAsync(Bot.Instance.CachePool.Get, guildId);

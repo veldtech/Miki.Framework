@@ -37,7 +37,7 @@ namespace Miki.Framework.Events
 		}
 
 		// TODO: clean up
-		public async Task Check(MessageContext e, string identifier = "")
+		public async Task Check(EventContext e, string identifier = "")
 		{
 			string command = e.message.Content.Substring(identifier.Length).Split(' ')[0];
 			string args = "";
@@ -62,7 +62,7 @@ namespace Miki.Framework.Events
 
 			if (IsOnCooldown(e.message.Author.Id))
 			{
-				Logging.Log.WarningAt(Name, " is on cooldown");
+				Log.WarningAt(Name, " is on cooldown");
 				return;
 			}
 
@@ -89,20 +89,14 @@ namespace Miki.Framework.Events
 				}
 			}
 
-			EventContext context = new EventContext();
-			context.message = e.message;
-			context.Channel = e.channel;
-
-			if(context.Channel is IDiscordGuildChannel c)
+			if(e.Channel is IDiscordGuildChannel c)
 			{
-				context.Guild = await c.GetGuildAsync();
+				e.Guild = await c.GetGuildAsync();
 			}
 
-			context.commandHandler = e.commandHandler;
-			context.Arguments = new Args(args);
-			context.EventSystem = e.eventSystem;
+			e.Arguments = new Args(args);
 
-			await targetCommand(context);
+			await targetCommand(e);
 		}
 
 		private bool IsOnCooldown(ulong id)

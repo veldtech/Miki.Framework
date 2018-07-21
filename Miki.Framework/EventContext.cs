@@ -23,6 +23,8 @@ namespace Miki.Framework.Events
 
 		public EventSystem EventSystem;
 
+		public PrefixInstance Prefix;
+
 		public CommandSession CreateSession()
 			=> new CommandSession() { ChannelId = Channel.Id, UserId = Author.Id };
 	}

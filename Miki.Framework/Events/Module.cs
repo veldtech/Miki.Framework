@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Miki.Discord.Common;
+using Miki.Cache;
 
 namespace Miki.Framework.Events
 {
@@ -28,8 +29,6 @@ namespace Miki.Framework.Events
         public List<CommandEvent> Events { get; set; } = new List<CommandEvent>();
         public List<BaseService> Services { get; set; } = new List<BaseService>();
 
-        private ConcurrentDictionary<ulong, bool> cache = new ConcurrentDictionary<ulong, bool>();
-
         internal EventSystem EventSystem;
 
 		public string SqlName => "module:" + Name;
@@ -49,6 +48,9 @@ namespace Miki.Framework.Events
 			return this;
 		}
 
+		public string GetCacheKey(ulong id)
+			=> $"module:{Name}:enabled:{id}";
+
 		public void Install(Bot bot, EventSystem system)
         {
 			this.EventSystem = system;
@@ -67,16 +69,16 @@ namespace Miki.Framework.Events
             isInstalled = true;
         }
 
-		public async Task<bool> IsEnabled(ulong id)
+		public async Task<bool> IsEnabled(ICacheClient cache, ulong id)
 		{
-			ModuleState state = null;
-
-			if (cache.ContainsKey(id))
+			if (await cache.ExistsAsync(GetCacheKey(id)))
 			{
-				return cache.GetOrAdd(id, Enabled);
+				return await cache.GetAsync<bool>(GetCacheKey(id));
 			}
 			else
 			{
+				ModuleState state = null;
+
 				using (var context = new IAContext())
 				{
 					long guildId = id.ToDbLong();
@@ -85,10 +87,12 @@ namespace Miki.Framework.Events
 
 				if (state == null)
 				{
-					return cache.GetOrAdd(id, Enabled);
+					await cache.UpsertAsync(GetCacheKey(id), Enabled);
+					return Enabled;
 				}
 
-				return cache.GetOrAdd(id, state.State);
+				await cache.UpsertAsync(GetCacheKey(id), state.State);
+				return state.State;
 			}
 		}
 
@@ -120,22 +124,23 @@ namespace Miki.Framework.Events
             return this;
         }
 
-        public async Task SetEnabled(ulong serverId, bool enabled)
+        public async Task SetEnabled(ICacheClient cache, ulong channelId, bool enabled)
         {
             using (var context = new IAContext())
             {
-                ModuleState state = await context.ModuleStates.FindAsync(SqlName, serverId.ToDbLong());
+                ModuleState state = await context.ModuleStates.FindAsync(SqlName, channelId.ToDbLong());
                 if (state == null)
                 {
-                    state = context.ModuleStates.Add(new ModuleState() { ChannelId = serverId.ToDbLong(), ModuleName = SqlName, State = Enabled }).Entity;
+                    state = context.ModuleStates.Add(new ModuleState()
+					{
+						ChannelId = channelId.ToDbLong(),
+						ModuleName = SqlName,
+						State = Enabled
+					}).Entity;
                 }
                 state.State = enabled;
 
-                cache.AddOrUpdate(serverId, enabled, (x, y) =>
-                {
-                    return enabled;
-                });
-
+                await cache.UpsertAsync(GetCacheKey(channelId), enabled);
                 await context.SaveChangesAsync();
             }
         }
