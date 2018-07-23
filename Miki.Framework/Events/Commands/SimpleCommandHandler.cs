@@ -54,10 +54,11 @@ namespace Miki.Framework.Events
 
 				e.Prefix = prefix;
 
-				string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
-					.Substring(identifier.Length)
-					.Split(' ')
-					.First();
+                string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
+                    .Substring(identifier.Length)
+                    .Split(' ')
+                    .First()
+                    .ToLower();
 
 				CommandEvent eventInstance = map.GetCommandEvent(command);
 
