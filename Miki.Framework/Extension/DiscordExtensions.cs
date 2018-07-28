@@ -20,7 +20,7 @@ namespace Miki.Discord
 			=>	b.AddField(header, value.ToString(), true);
 
 		public static EmbedBuilder AddInlineField(this EmbedBuilder b, string resourceHeader, string resourceValue, ulong channelId)
-			=> b.AddInlineField(Locale.GetString(channelId, resourceHeader), Locale.GetString(channelId, resourceValue));
+			=> b.AddInlineField(Locale.GetStringAsync(channelId, resourceHeader).Result, Locale.GetStringAsync(channelId, resourceValue).Result);
 
 		public static void QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel)
 		{
@@ -58,7 +58,7 @@ namespace Miki.Discord
 		public static async Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
 		{
 			await Task.Yield();
-			return await (await user.GetDMChannel()).SendMessageAsync("", false, embed);
+			return await (await user.GetDMChannelAsync()).SendMessageAsync("", false, embed);
 		}
 
 		public static void QueueMessageAsync(this IDiscordChannel channel, string message)

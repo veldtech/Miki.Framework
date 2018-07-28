@@ -15,15 +15,13 @@ namespace Miki.Framework.Languages
 		// TODO: add resource based locale names
         public static Dictionary<string, string> LocaleNames = new Dictionary<string, string>();
 
-		private static ConcurrentDictionary<long, string> cache = new ConcurrentDictionary<long, string>();
-
         private const string defaultResource = "en-us";
 
 		private const string defaultResult = "error_resource_missing";
 
-		public static bool HasString(ulong channelId, string m)
+		public static async Task<bool> HasStringAsync(ulong channelId, string m)
         {
-			string lang = GetLanguage(channelId.ToDbLong());
+			string lang = await GetLanguageAsync(channelId.ToDbLong());
 			string output = Locales[lang].GetString(m);
 
 			if (string.IsNullOrWhiteSpace(output))
@@ -34,9 +32,9 @@ namespace Miki.Framework.Languages
 			return !string.IsNullOrWhiteSpace(output);
 		}
 
-        public static string GetString(ulong channelId, string m, params object[] p)
+        public static async Task<string> GetStringAsync(ulong channelId, string m, params object[] p)
         {
-			string language = GetLanguage(channelId.ToDbLong());
+			string language = await GetLanguageAsync(channelId.ToDbLong());
 			ResourceManager resources = Locales[language];
 			string output = null;
 
@@ -57,11 +55,14 @@ namespace Miki.Framework.Languages
 			return output ?? defaultResult;
 		}
 
-		public static string GetLanguage(long channelId)
+		public static async Task<string> GetLanguageAsync(long channelId)
 		{
-			if (cache.TryGetValue(channelId, out string language))
+			var cache = Bot.Instance.CachePool.Get;
+			var cacheKey = $"miki:language:{channelId}";
+
+			if (await cache.ExistsAsync(cacheKey))
 			{
-				return language;
+				return await cache.GetAsync<string>(cacheKey);
 			}
 			else
 			{
@@ -70,12 +71,13 @@ namespace Miki.Framework.Languages
 					ChannelLanguage l = context.Languages.Find(channelId);
 					if (l != null)
 					{
-						cache.TryAdd(channelId, l.Language);
+						await cache.UpsertAsync(cacheKey, l.Language);
 						return l.Language;
 					}
 				}
 			}
-			return cache.GetOrAdd(channelId, defaultResource);
+			await cache.UpsertAsync(cacheKey, defaultResource);
+			return defaultResource;
 		}
 
 		public static void LoadLanguage(string languageId, string languageName, ResourceManager language)
@@ -86,6 +88,9 @@ namespace Miki.Framework.Languages
 
 		public static async Task SetLanguageAsync(long id, string language)
 		{
+			var cache = Bot.Instance.CachePool.Get;
+			var cacheKey = $"miki:language:{id}";
+
 			using (var context = new IAContext())
 			{
 				ChannelLanguage lang = await context.Languages.FindAsync(id);
@@ -106,7 +111,7 @@ namespace Miki.Framework.Languages
 
 				lang.Language = language;
 
-				cache.AddOrUpdate(id, lang.Language, (x, y) => lang.Language);
+				await cache.UpsertAsync(cacheKey, lang.Language);
 
 				await context.SaveChangesAsync();
 			}

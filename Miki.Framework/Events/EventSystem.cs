@@ -83,7 +83,7 @@ namespace Miki.Framework.Events
 				catch (BotException botEx)
 				{
 					config.ErrorEmbedBuilder
-						.SetDescription(Locale.GetString(msg.ChannelId, botEx.Resource))
+						.SetDescription(await Locale.GetStringAsync(msg.ChannelId, botEx.Resource))
 						.ToEmbed()
 						.QueueToChannel(await msg.GetChannelAsync());
 

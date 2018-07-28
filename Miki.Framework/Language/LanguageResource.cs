@@ -35,6 +35,6 @@ namespace Miki.Framework.Language
 		}
 
 		public string Get(ulong channelId)
-			=> Locale.GetString(channelId, Resource, Parameters);
+			=> Locale.GetStringAsync(channelId, Resource, Parameters).Result;
     }
 }
