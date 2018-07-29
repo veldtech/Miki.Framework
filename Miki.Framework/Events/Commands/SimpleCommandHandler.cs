@@ -2,6 +2,7 @@
 using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
 using Miki.Framework.Events.Filters;
+using Miki.Framework.Languages;
 using Miki.Logging;
 using System;
 using System.Collections.Generic;
@@ -28,9 +29,6 @@ namespace Miki.Framework.Events
 			e.commandHandler = this;
 			e.message = context.message;
 			e.EventSystem = context.eventSystem;
-
-			Stopwatch sw = Stopwatch.StartNew();
-
 			e.Channel = await context.message.GetChannelAsync();
 
 			if (e.Channel is IDiscordGuildChannel guildChannel)
@@ -53,6 +51,7 @@ namespace Miki.Framework.Events
 				}
 
 				e.Prefix = prefix;
+				e.Locale = await Locale.GetLanguageInstanceAsync(e.Channel.Id);
 
                 string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
                     .Substring(identifier.Length)
@@ -72,7 +71,7 @@ namespace Miki.Framework.Events
 					if (await eventInstance.IsEnabled(Bot.Instance.CachePool.Get, (await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(e, identifier);
-						await OnMessageProcessed(eventInstance, context.message, sw.ElapsedMilliseconds);
+						await OnMessageProcessed(eventInstance, context.message, (e.message.Timestamp - DateTime.UtcNow).Milliseconds);
 					}
 				}
 			}

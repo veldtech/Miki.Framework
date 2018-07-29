@@ -11,6 +11,6 @@ namespace Miki.Framework.Language
 			=> new LanguageResource(resource, parameters);
 
 		public static LocalizedEmbedBuilder CreateEmbedBuilder(this EventContext context)
-			=> new LocalizedEmbedBuilder(context.Channel.Id);
+			=> new LocalizedEmbedBuilder(context.Locale);
     }
 }

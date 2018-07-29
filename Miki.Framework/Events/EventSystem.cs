@@ -33,6 +33,8 @@ namespace Miki.Framework.Events
 
 		public MessageFilter MessageFilter { get; private set; } = new MessageFilter();
 
+		public Func<Exception, IDiscordMessage, Task> OnError;
+
 		public EventSystem(EventSystemConfig config)
 		{
 			this.config = config;
@@ -67,8 +69,6 @@ namespace Miki.Framework.Events
 
 			Task task = Task.Run(async () =>
 			{
-				var stopwatch = Stopwatch.StartNew();
-
 				try
 				{
 					MessageContext context = new MessageContext();
@@ -80,21 +80,13 @@ namespace Miki.Framework.Events
 						await handler.CheckAsync(context);
 					}
 				}
-				catch (BotException botEx)
-				{
-					config.ErrorEmbedBuilder
-						.SetDescription(await Locale.GetStringAsync(msg.ChannelId, botEx.Resource))
-						.ToEmbed()
-						.QueueToChannel(await msg.GetChannelAsync());
-
-					Log.Error(botEx);
-				}
 				catch (Exception ex)
 				{
-					Log.Error(ex);
+					if(OnError != null)
+					{
+						await OnError(ex, msg);
+					}
 				}
-
-				stopwatch.Stop();
 			});
 		}
 	}

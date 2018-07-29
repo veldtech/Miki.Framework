@@ -1,4 +1,5 @@
 ﻿using Miki.Framework;
+using Miki.Framework.Language;
 using Miki.Framework.Models;
 using Miki.Framework.Models.Context;
 using System.Collections.Concurrent;
@@ -15,69 +16,29 @@ namespace Miki.Framework.Languages
 		// TODO: add resource based locale names
         public static Dictionary<string, string> LocaleNames = new Dictionary<string, string>();
 
-        private const string defaultResource = "en-us";
-
-		private const string defaultResult = "error_resource_missing";
-
-		public static async Task<bool> HasStringAsync(ulong channelId, string m)
-        {
-			string lang = await GetLanguageAsync(channelId.ToDbLong());
-			string output = Locales[lang].GetString(m);
-
-			if (string.IsNullOrWhiteSpace(output))
-			{
-				output = Locales[defaultResource].GetString(m);
-			}
-
-			return !string.IsNullOrWhiteSpace(output);
-		}
-
-        public static async Task<string> GetStringAsync(ulong channelId, string m, params object[] p)
-        {
-			string language = await GetLanguageAsync(channelId.ToDbLong());
-			ResourceManager resources = Locales[language];
-			string output = null;
-
-			if (InternalStringAvailable(m, resources))
-			{
-				output = InternalGetString(m, resources, p);
-
-				if (string.IsNullOrWhiteSpace(output))
-				{
-					output = InternalGetString(m, Locales[defaultResource], p);
-				}
-			}
-			else
-			{
-				output = InternalGetString(m, Locales[defaultResource], p);
-			}
-
-			return output ?? defaultResult;
-		}
-
-		public static async Task<string> GetLanguageAsync(long channelId)
+		public static async Task<LocaleInstance> GetLanguageInstanceAsync(ulong channelId)
 		{
 			var cache = Bot.Instance.CachePool.Get;
 			var cacheKey = $"miki:language:{channelId}";
 
 			if (await cache.ExistsAsync(cacheKey))
 			{
-				return await cache.GetAsync<string>(cacheKey);
+				return new LocaleInstance(await cache.GetAsync<string>(cacheKey));
 			}
 			else
 			{
 				using (var context = new IAContext())
 				{
-					ChannelLanguage l = context.Languages.Find(channelId);
+					ChannelLanguage l = await context.Languages.FindAsync(channelId.ToDbLong());
 					if (l != null)
 					{
 						await cache.UpsertAsync(cacheKey, l.Language);
-						return l.Language;
+						return new LocaleInstance(l.Language);
 					}
 				}
 			}
-			await cache.UpsertAsync(cacheKey, defaultResource);
-			return defaultResource;
+			await cache.UpsertAsync(cacheKey, LocaleInstance.defaultResource);
+			return new LocaleInstance(LocaleInstance.defaultResource);
 		}
 
 		public static void LoadLanguage(string languageId, string languageName, ResourceManager language)
@@ -85,47 +46,6 @@ namespace Miki.Framework.Languages
 			Locales.Add(languageId, language);
 			LocaleNames.Add(languageName, languageId);
 		}
-
-		public static async Task SetLanguageAsync(long id, string language)
-		{
-			var cache = Bot.Instance.CachePool.Get;
-			var cacheKey = $"miki:language:{id}";
-
-			using (var context = new IAContext())
-			{
-				ChannelLanguage lang = await context.Languages.FindAsync(id);
-
-				if(LocaleNames.TryGetValue(language, out string val))
-				{
-					language = val;
-				}
-
-				if (lang == null)
-				{
-					lang = context.Languages.Add(new ChannelLanguage()
-					{
-						EntityId = id,
-						Language = language
-					}).Entity;
-				}
-
-				lang.Language = language;
-
-				await cache.UpsertAsync(cacheKey, lang.Language);
-
-				await context.SaveChangesAsync();
-			}
-		}
-
-		private static bool InternalStringAvailable(string m, ResourceManager lang)
-		{
-			return lang.GetString(m) != null;
-		}
-
-        private static string InternalGetString(string m, ResourceManager lang, params object[] p)
-        {
-            return (p.Length == 0) ? lang.GetString(m) : string.Format(lang.GetString(m) ?? defaultResult, p); ;
-        }
     }
 
 	// TODO: shouldn't be here, remove or rework system.

@@ -7,7 +7,7 @@ namespace Miki.Framework.Language
 {
 	public interface IResource
 	{
-		string Get(ulong channelId);
+		string Get(LocaleInstance instance);
 	}
 
 	public class StringResource : IResource
@@ -19,7 +19,7 @@ namespace Miki.Framework.Language
 			Value = value;
 		}
 
-		public string Get(ulong channelId)
+		public string Get(LocaleInstance instance)
 			=> Value;
 	}
 
@@ -34,7 +34,7 @@ namespace Miki.Framework.Language
 			Parameters = param;
 		}
 
-		public string Get(ulong channelId)
-			=> Locale.GetStringAsync(channelId, Resource, Parameters).Result;
+		public string Get(LocaleInstance instance)
+			=> instance.GetString(Resource, Parameters);
     }
 }

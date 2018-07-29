@@ -16,12 +16,6 @@ namespace Miki.Discord
 {
     public static class DiscordExtensions
     {
-		public static EmbedBuilder AddInlineField(this EmbedBuilder b, string header, object value)
-			=>	b.AddField(header, value.ToString(), true);
-
-		public static EmbedBuilder AddInlineField(this EmbedBuilder b, string resourceHeader, string resourceValue, ulong channelId)
-			=> b.AddInlineField(Locale.GetStringAsync(channelId, resourceHeader).Result, Locale.GetStringAsync(channelId, resourceValue).Result);
-
 		public static void QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel)
 		{
 			MessageBucket.Add(new MessageBucketArgs()

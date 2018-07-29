@@ -10,16 +10,17 @@ namespace Miki.Framework.Language
     public class LocalizedEmbedBuilder
 	{
 		public EmbedBuilder EmbedBuilder { get; private set; } = new EmbedBuilder();
-		private ulong channelId;
 
-		public LocalizedEmbedBuilder(ulong channelId)
+		private readonly LocaleInstance _instance;
+
+		public LocalizedEmbedBuilder(LocaleInstance instance)
 		{
-			this.channelId = channelId;
+			this._instance = instance;
 		}
 
 		public LocalizedEmbedBuilder AddField(IResource title, IResource content, bool inline = false)
 		{
-			EmbedBuilder.AddField(title.Get(channelId), content.Get(channelId), inline);
+			EmbedBuilder.AddField(title.Get(_instance), content.Get(_instance), inline);
 			return this;
 		}
 
@@ -28,7 +29,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithAuthor(IResource title, string iconUrl = null, string url = null)
 		{
-			EmbedBuilder.SetAuthor(title.Get(channelId), iconUrl, url);
+			EmbedBuilder.SetAuthor(title.Get(_instance), iconUrl, url);
 			return this;
 		}
 
@@ -42,7 +43,7 @@ namespace Miki.Framework.Language
 			=> WithDescription(new LanguageResource(description, param));
 		public LocalizedEmbedBuilder WithDescription(LanguageResource description)
 		{
-			EmbedBuilder.SetDescription(description.Get(channelId));
+			EmbedBuilder.SetDescription(description.Get(_instance));
 			return this;
 		}
 
@@ -50,7 +51,7 @@ namespace Miki.Framework.Language
 			=> WithFooter(new LanguageResource(text, param), iconUrl);
 		public LocalizedEmbedBuilder WithFooter(IResource text, string iconUrl = null)
 		{
-			EmbedBuilder.SetFooter(text.Get(channelId), iconUrl);
+			EmbedBuilder.SetFooter(text.Get(_instance), iconUrl);
 			return this;
 		}
 
@@ -70,7 +71,7 @@ namespace Miki.Framework.Language
 			=> WithTitle(new LanguageResource(resource, param));
 		public LocalizedEmbedBuilder WithTitle(IResource title)
 		{
-			EmbedBuilder.SetTitle(title.Get(channelId));
+			EmbedBuilder.SetTitle(title.Get(_instance));
 			return this;
 		}
     }
