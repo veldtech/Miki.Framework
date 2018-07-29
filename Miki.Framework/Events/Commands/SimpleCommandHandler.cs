@@ -71,7 +71,7 @@ namespace Miki.Framework.Events
 					if (await eventInstance.IsEnabled(Bot.Instance.CachePool.Get, (await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(e, identifier);
-						await OnMessageProcessed(eventInstance, context.message, (e.message.Timestamp - DateTime.UtcNow).Milliseconds);
+						await OnMessageProcessed(eventInstance, context.message, (DateTime.UtcNow - e.message.Timestamp).Milliseconds);
 					}
 				}
 			}
