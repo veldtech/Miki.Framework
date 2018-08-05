@@ -35,7 +35,7 @@ namespace Miki.Framework.Events.Commands
 			));
 		}
 
-		public abstract Task CheckAsync(MessageContext message);
+		public abstract Task CheckAsync(EventContext message);
 
 		public async Task<string> GetPrefixAsync(ulong guildId)
 			=> await Prefixes.FirstOrDefault().Value.GetForGuildAsync(Bot.Instance.CachePool.Get, guildId);

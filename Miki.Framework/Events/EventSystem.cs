@@ -33,7 +33,7 @@ namespace Miki.Framework.Events
 
 		public MessageFilter MessageFilter { get; private set; } = new MessageFilter();
 
-		public Func<Exception, IDiscordMessage, Task> OnError;
+		public Func<Exception, EventContext, Task> OnError;
 
 		public EventSystem(EventSystemConfig config)
 		{
@@ -69,12 +69,12 @@ namespace Miki.Framework.Events
 
 			Task task = Task.Run(async () =>
 			{
+				EventContext context = new EventContext();
+				context.message = msg;
+				context.EventSystem = this;
+
 				try
 				{
-					MessageContext context = new MessageContext();
-					context.message = msg;
-					context.eventSystem = this;
-
 					foreach (var handler in commandHandlers.Values)
 					{
 						await handler.CheckAsync(context);
@@ -84,7 +84,7 @@ namespace Miki.Framework.Events
 				{
 					if(OnError != null)
 					{
-						await OnError(ex, msg);
+						await OnError(ex, context);
 					}
 				}
 			});

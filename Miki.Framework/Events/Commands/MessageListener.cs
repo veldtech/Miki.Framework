@@ -37,9 +37,9 @@ namespace Miki.Framework.Events.Commands
 			}
 
 			return nextMessage;
-		}
+		}	
 
-		public override async Task CheckAsync(MessageContext context)
+		public override async Task CheckAsync(EventContext context)
 		{
 			await Task.Yield();
 			CommandSession session;

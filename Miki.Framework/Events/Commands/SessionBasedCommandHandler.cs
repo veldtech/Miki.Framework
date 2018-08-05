@@ -30,7 +30,7 @@ namespace Miki.Framework.Events.Commands
 			}
 		}
 
-		public override async Task CheckAsync(MessageContext context)
+		public override async Task CheckAsync(EventContext context)
 		{
 			try
 			{

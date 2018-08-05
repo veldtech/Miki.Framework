@@ -41,11 +41,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\miki\Miki.Framework.Commands\Miki.Framework.Commands.csproj" />
-    <ProjectReference Include="..\..\miki\Miki\Miki.Framework.Common\Miki.Framework.Common.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <Folder Include="Legacy\Events\Groups\" />
   </ItemGroup>
   

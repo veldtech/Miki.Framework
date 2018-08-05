@@ -7,7 +7,19 @@ namespace Miki.Framework.Exceptions
 {
 	public class BotException : Exception
 	{
-		public virtual string Resource => "error_default";
-		public virtual object[] Parameters => new object[] { };
-    }
+		private string _resource;
+		private object[] _parameters;
+
+		public virtual string Resource => _resource;
+		public virtual object[] Parameters => _parameters;
+
+		public static BotException CreateCustom(string resource, params object[] parameters)
+		{
+			return new BotException()
+			{
+				_resource = resource,
+				_parameters = parameters
+			};
+		}
+	}
 }

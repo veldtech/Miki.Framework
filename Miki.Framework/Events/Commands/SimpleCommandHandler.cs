@@ -23,26 +23,23 @@ namespace Miki.Framework.Events
 			this.map = map;
 		}
 
-		public override async Task CheckAsync(MessageContext context)
+		public override async Task CheckAsync(EventContext context)
 		{
-			EventContext e = new EventContext();
-			e.commandHandler = this;
-			e.message = context.message;
-			e.EventSystem = context.eventSystem;
-			e.Channel = await context.message.GetChannelAsync();
+			context.commandHandler = this;
+			context.Channel = await context.message.GetChannelAsync();
 
-			if (e.Channel is IDiscordGuildChannel guildChannel)
+			if (context.Channel is IDiscordGuildChannel guildChannel)
 			{
-				e.Guild = await guildChannel.GetGuildAsync();
+				context.Guild = await guildChannel.GetGuildAsync();
 			}
 
 			foreach (PrefixInstance prefix in Prefixes.Values)
 			{
 				string identifier = prefix.DefaultValue;
 
-				if (e.Guild != null)
+				if (context.Guild != null)
 				{
-					identifier = await prefix.GetForGuildAsync(Bot.Instance.CachePool.Get, e.Guild.Id);
+					identifier = await prefix.GetForGuildAsync(Bot.Instance.CachePool.Get, context.Guild.Id);
 				}
 
 				if (!context.message.Content.StartsWith(identifier))
@@ -50,8 +47,8 @@ namespace Miki.Framework.Events
 					continue;
 				}
 
-				e.Prefix = prefix;
-				e.Locale = await Locale.GetLanguageInstanceAsync(e.Channel.Id);
+				context.Prefix = prefix;
+				context.Locale = await Locale.GetLanguageInstanceAsync(context.Channel.Id);
 
                 string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
                     .Substring(identifier.Length)
@@ -66,12 +63,12 @@ namespace Miki.Framework.Events
 					return;
 				}
 
-				if ((await GetUserAccessibility(context.message, e.Channel)) >= eventInstance.Accessibility)
+				if ((await GetUserAccessibility(context.message, context.Channel)) >= eventInstance.Accessibility)
 				{
 					if (await eventInstance.IsEnabled(Bot.Instance.CachePool.Get, (await context.message.GetChannelAsync()).Id))
 					{
-						await eventInstance.Check(e, identifier);
-						await OnMessageProcessed(eventInstance, context.message, (DateTime.UtcNow - e.message.Timestamp).Milliseconds);
+						await eventInstance.Check(context, identifier);
+						await OnMessageProcessed(eventInstance, context.message, (DateTime.UtcNow - context.message.Timestamp).Milliseconds);
 					}
 				}
 			}
