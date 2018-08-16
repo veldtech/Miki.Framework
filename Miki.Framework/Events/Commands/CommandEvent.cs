@@ -112,7 +112,7 @@ namespace Miki.Framework.Events
 			}
 			else
 			{
-				lastTimeUsed.Add(id, new EventCooldownObject(Cooldown));
+				lastTimeUsed.TryAdd(id, new EventCooldownObject(Cooldown));
 				return false;
 			}
 		}

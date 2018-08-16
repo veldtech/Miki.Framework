@@ -24,7 +24,7 @@ namespace Miki.Framework.Events
 
         public int TimesUsed { get; set; } = 0;
 
-        protected Dictionary<ulong, EventCooldownObject> lastTimeUsed = new Dictionary<ulong, EventCooldownObject>();
+        protected ConcurrentDictionary<ulong, EventCooldownObject> lastTimeUsed = new ConcurrentDictionary<ulong, EventCooldownObject>();
 
         public Event()
         {

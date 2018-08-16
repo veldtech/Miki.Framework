@@ -15,7 +15,6 @@ using Miki.Framework.Events.Commands;
 using Miki.Framework.Exceptions;
 using Miki.Framework.Extension;
 using Miki.Framework.Languages;
-using Miki.Discord.Rest.Entities;
 using Miki.Discord.Common;
 using Miki.Discord;
 using Miki.Discord.Internal;

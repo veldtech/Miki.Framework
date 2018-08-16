@@ -20,6 +20,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Legacy\**" />
+    <EmbeddedResource Remove="Legacy\**" />
+    <None Remove="Legacy\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Language\LanguageResource.cs~RF1bf05be.TMP" />
   </ItemGroup>
 
@@ -41,7 +47,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Folder Include="Legacy\Events\Groups\" />
+    <ProjectReference Include="..\..\Miki.Discord\Miki.Discord.Caching\Miki.Discord.Caching.csproj" />
+    <ProjectReference Include="..\..\Miki.Discord\Miki.Discord\Miki.Discord.csproj" />
   </ItemGroup>
   
 </Project>

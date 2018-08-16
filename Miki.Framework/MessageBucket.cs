@@ -47,6 +47,7 @@ namespace Miki.Framework
 		{
 			queuedMessages.Enqueue(properties);
 		}
+
 		public static void AddWorker()
 		{
 			Task.Run(async () => await Tick());

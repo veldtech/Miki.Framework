@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Miki.Discord;
 using Miki.Discord.Caching;
 using Miki.Cache;
+using Miki.Discord.Common;
 
 namespace Miki.Framework
 {
@@ -27,7 +28,7 @@ namespace Miki.Framework
 		private List<IAttachable> attachables = new List<IAttachable>();
 
 		// TODO: rework params
-		public Bot(int amountShards, ICachePool client, ClientInformation cInfo, string rabbitUrl)
+		public Bot(IGateway gateway, ICachePool client, ClientInformation cInfo)
         {
 			Information = cInfo;
 			CachePool = client;
@@ -35,14 +36,12 @@ namespace Miki.Framework
 			Client = new DiscordClient(new DiscordClientConfigurations
 			{
 				Pool = client,
-				RabbitMQExchangeName = "consumer",
-				RabbitMQQueueName = "gateway",
-				RabbitMQUri = rabbitUrl,
+				Gateway = gateway,
 				Token = cInfo.Token
 			});
 
 			CacheClient = new CacheClient(
-				Client._websocketClient,
+				gateway,
 				client, Client._apiClient
 			);
 
@@ -66,6 +65,11 @@ namespace Miki.Framework
 				}
 			}
 			return default(T);
+		}
+
+		public async Task StartAsync()
+		{
+			await Client._gateway.StartAsync();
 		}
 	}
 }
