@@ -22,6 +22,7 @@ namespace Miki.Framework.Events
 		{
 			Value = value;
 			DefaultValue = value;
+			IsDefault = isDefault;
 			Changable = changable;
 			ForceCommandExecution = forceExec;
 		}

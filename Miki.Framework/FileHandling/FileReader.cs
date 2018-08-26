@@ -8,7 +8,7 @@ namespace Miki.Framework.FileHandling
     {
         private StreamReader file;
 
-        private string filePath;
+        private readonly string filePath;
 
         public FileReader(string fileName)
         {

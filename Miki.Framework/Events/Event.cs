@@ -111,7 +111,7 @@ namespace Miki.Framework.Events
 
         DateTime canBeUsedWhen;
 
-        int coolDown = 1;
+		readonly int coolDown = 1;
 
         public EventCooldownObject(int Cooldown)
         {

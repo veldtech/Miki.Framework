@@ -21,15 +21,15 @@ namespace Miki.Framework.Events
 
         public Func<IDiscordMessage, Task> MessageRecieved { get; set; }
         public Func<IDiscordUser, IDiscordUser, Task> UserUpdated { get; set; }
-        public Func<IDiscordUser, Task> UserJoinGuild { get; set; }
-        public Func<IDiscordUser, Task> UserLeaveGuild { get; set; }
+        public Func<IDiscordGuildUser, Task> UserJoinGuild { get; set; }
+        public Func<IDiscordGuildUser, Task> UserLeaveGuild { get; set; }
 		public Func<IDiscordGuild, Task> JoinedGuild { get; set; } 
         public Func<IDiscordGuild, Task> LeftGuild { get; set; }
 
         public List<CommandEvent> Events { get; set; } = new List<CommandEvent>();
         public List<BaseService> Services { get; set; } = new List<BaseService>();
 
-        internal EventSystem EventSystem;
+        public EventSystem EventSystem;
 
 		public string SqlName => "module:" + Name;
 
@@ -51,29 +51,69 @@ namespace Miki.Framework.Events
 		public string GetCacheKey(ulong id)
 			=> $"module:{Name}:enabled:{id}";
 
-		public void Install(Bot bot, EventSystem system)
+		public void Install(EventSystem system)
         {
-			this.EventSystem = system;
+			EventSystem = system;
 			Name = Name.ToLower();
 
-            foreach (CommandEvent e in Events)
+			if(MessageRecieved != null)
+			{
+				system.bot.Client.MessageCreate += async (message) =>
+				{
+					await HandleEvent(MessageRecieved(message), message.ChannelId);
+				};
+			}
+
+			if (UserJoinGuild != null)
+			{
+				system.bot.Client.GuildMemberCreate += async (guildMember) =>
+				{
+					await UserJoinGuild(guildMember);
+				};
+			}
+
+			if (UserLeaveGuild != null)
+			{
+				system.bot.Client.GuildMemberDelete += async (guildMember) =>
+				{
+					await UserLeaveGuild(guildMember);
+				};
+			}
+
+			if (UserUpdated != null)
+			{
+				system.bot.Client.UserUpdate += async (oldUser, newUser) =>
+				{
+					await UserUpdated(oldUser, newUser);
+				};
+			}
+
+			foreach (CommandEvent e in Events)
             {
 				e.Module = this;
             }
 
 			foreach(BaseService s in Services)
 			{
-				s.Install(this, bot);
+				s.Install(this);
 			}
 
             isInstalled = true;
         }
-
-		public async Task<bool> IsEnabled(ICacheClient cache, ulong id)
+		
+		private async Task HandleEvent(Task runnableEvent, ulong channelId)
 		{
-			if (await cache.ExistsAsync(GetCacheKey(id)))
+			if (await IsEnabled(EventSystem.bot.CachePool.Get, channelId))
 			{
-				return await cache.GetAsync<bool>(GetCacheKey(id));
+				await runnableEvent;
+			}
+		}
+
+		public async Task<bool> IsEnabled(ICacheClient cache, ulong channelId)
+		{
+			if (await cache.ExistsAsync(GetCacheKey(channelId)))
+			{
+				return await cache.GetAsync<bool>(GetCacheKey(channelId));
 			}
 			else
 			{
@@ -81,17 +121,17 @@ namespace Miki.Framework.Events
 
 				using (var context = new IAContext())
 				{
-					long guildId = id.ToDbLong();
-					state = await context.ModuleStates.FindAsync(SqlName, guildId);
+					long id = channelId.ToDbLong();
+					state = await context.ModuleStates.FindAsync(SqlName, id);
 				}
 
 				if (state == null)
 				{
-					await cache.UpsertAsync(GetCacheKey(id), Enabled);
+					await cache.UpsertAsync(GetCacheKey(channelId), Enabled);
 					return Enabled;
 				}
 
-				await cache.UpsertAsync(GetCacheKey(id), state.State);
+				await cache.UpsertAsync(GetCacheKey(channelId), state.State);
 				return state.State;
 			}
 		}
@@ -145,5 +185,6 @@ namespace Miki.Framework.Events
             }
         }
 
+		
     }
 }

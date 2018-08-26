@@ -24,11 +24,11 @@ namespace Miki.Framework.Events
 {
 	public class EventSystem : IAttachable
 	{
-		private Bot bot;
+		internal Bot bot;
 
 		private Dictionary<Guid, CommandHandler> commandHandlers = new Dictionary<Guid, CommandHandler>();
 
-		private EventSystemConfig config;
+		private readonly EventSystemConfig config;
 
 		public MessageFilter MessageFilter { get; private set; } = new MessageFilter();
 

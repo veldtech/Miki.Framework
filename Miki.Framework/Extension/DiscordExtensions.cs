@@ -2,7 +2,6 @@
 using Miki.Discord;
 using Miki.Discord.Common;
 using Miki.Discord.Rest;
-using Miki.Discord.Rest.Entities;
 using Miki.Framework;
 using Miki.Framework.Languages;
 using System;

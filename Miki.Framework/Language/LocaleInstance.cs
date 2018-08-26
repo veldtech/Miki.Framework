@@ -11,7 +11,7 @@ namespace Miki.Framework.Language
 {
     public class LocaleInstance
     {
-		string _language;
+		readonly string _language;
 
 		public const string defaultResource = "en-us";
 

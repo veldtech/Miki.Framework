@@ -84,8 +84,7 @@ namespace Miki.Framework.Events
 		public string Argument { get; private set; }
 
 		Args args;
-
-		int index;
+		readonly int index;
 
 		public bool IsLast
 			=> (args.Count - 1 == index);
@@ -167,7 +166,7 @@ namespace Miki.Framework.Events
 
 			if (IsMention)
 			{
-				return await guild.GetMemberAsync(ulong.Parse(Argument
+				return guild.GetMember(ulong.Parse(Argument
 					.TrimStart('<')
 					.TrimStart('@')
 					.TrimStart('!')
@@ -175,7 +174,7 @@ namespace Miki.Framework.Events
 			}
 			else if (ulong.TryParse(Argument, out ulong id))
 			{
-				return await guild.GetMemberAsync(id);
+				return guild.GetMember(id);
 			}
 			return guild.Members
 				.Where(x => x.Username.ToLower() == Argument.ToLower() 

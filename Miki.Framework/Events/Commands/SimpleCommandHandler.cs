@@ -1,4 +1,5 @@
-﻿using Miki.Common;
+﻿using Miki.Cache;
+using Miki.Common;
 using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
 using Miki.Framework.Events.Filters;
@@ -15,12 +16,13 @@ namespace Miki.Framework.Events
 {
 	public class SimpleCommandHandler : CommandHandler
 	{
-		public IReadOnlyList<CommandEvent> Commands => map.Commands;
-		public IReadOnlyList<Module> Modules => map.Modules;
+		public IReadOnlyList<CommandEvent> Commands => _map.Commands;
+		public IReadOnlyList<Module> Modules => _map.Modules;
 
-		public SimpleCommandHandler(CommandMap map)
+		public SimpleCommandHandler(ICachePool pool, CommandMap map)
+			: base(pool)
 		{
-			this.map = map;
+			this._map = map;
 		}
 
 		public override async Task CheckAsync(EventContext context)
@@ -33,7 +35,7 @@ namespace Miki.Framework.Events
 				context.Guild = await guildChannel.GetGuildAsync();
 			}
 
-			foreach (PrefixInstance prefix in Prefixes.Values)
+			foreach (PrefixInstance prefix in Prefixes)
 			{
 				string identifier = prefix.DefaultValue;
 
@@ -56,7 +58,7 @@ namespace Miki.Framework.Events
                     .First()
                     .ToLower();
 
-				CommandEvent eventInstance = map.GetCommandEvent(command);
+				CommandEvent eventInstance = _map.GetCommandEvent(command);
 
 				if (eventInstance == null)
 				{
@@ -93,7 +95,7 @@ namespace Miki.Framework.Events
 
 			if (e.Channel is IDiscordGuildChannel guildChannel)
 			{
-				IDiscordGuildUser u = await e.Guild.GetMemberAsync(e.Author.Id);
+				IDiscordGuildUser u = e.Guild.GetMember(e.Author.Id);
 
 				if (u != null)
 				{

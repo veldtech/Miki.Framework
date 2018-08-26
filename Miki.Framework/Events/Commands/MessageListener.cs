@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Miki.Cache;
 using Miki.Discord.Common;
 using Miki.Logging;
 
@@ -11,6 +12,11 @@ namespace Miki.Framework.Events.Commands
 	public class MessageListener : CommandHandler
 	{
 		ConcurrentDictionary<CommandSession, Action<IDiscordMessage>> sessionCache = new ConcurrentDictionary<CommandSession, Action<IDiscordMessage>>();
+
+		public MessageListener(ICachePool cachePool)
+			: base(cachePool)
+		{
+		}
 
 		public async Task<IDiscordMessage> WaitForNextMessage(ulong userId, ulong channelId, int timeOutInMilliseconds = 10000)
 			=> await WaitForNextMessage(new CommandSession { ChannelId = channelId, UserId = userId }, timeOutInMilliseconds);

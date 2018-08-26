@@ -46,11 +46,11 @@ namespace Miki.Framework.Events
 			return null;
 		}
 
-		public void Install(EventSystem system, Bot bot)
+		public void Install(EventSystem system)
 		{
 			foreach (var m in modulesLoaded)
 			{
-				m.Install(bot, system);
+				m.Install(system);
 			}
 		}
 

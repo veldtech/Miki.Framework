@@ -1,4 +1,5 @@
-﻿using Miki.Discord.Common;
+﻿using Miki.Cache;
+using Miki.Discord.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,25 +12,32 @@ namespace Miki.Framework.Events.Commands
 	{
 		public Func<CommandEvent, IDiscordMessage, long, Task> OnMessageProcessed;
 
-		protected Dictionary<string, PrefixInstance> Prefixes { get; private set; } = new Dictionary<string, PrefixInstance>();
+		public List<PrefixInstance> Prefixes { get; private set; } = new List<PrefixInstance>();
 
-		protected CommandMap map = new CommandMap();
+		protected ICachePool _cachePool = null;
+
+		protected CommandMap _map = new CommandMap();
+
+		public CommandHandler(ICachePool cachePool)
+		{
+			_cachePool = cachePool;
+		}
 
 		public void AddCommand(CommandEvent e)
 		{
-			map.AddCommand(e);
+			_map.AddCommand(e);
 		}
 
 		public void AddModule(Module module)
 		{
-			map.AddModule(module);
+			_map.AddModule(module);
 		}
 
 		public void AddPrefix(string prefix, bool? isDefault = null, bool changable = false)
 		{
-			Prefixes.Add(prefix, new PrefixInstance(
+			Prefixes.Add(new PrefixInstance(
 				prefix, 
-				isDefault ?? !Prefixes.Any(x => x.Value.IsDefault), 
+				isDefault ?? !Prefixes.Any(x => x.IsDefault), 
 				changable, 
 				false
 			));
@@ -37,23 +45,30 @@ namespace Miki.Framework.Events.Commands
 
 		public abstract Task CheckAsync(EventContext message);
 
-		public async Task<string> GetPrefixAsync(ulong guildId)
-			=> await Prefixes.FirstOrDefault().Value.GetForGuildAsync(Bot.Instance.CachePool.Get, guildId);
+		public PrefixInstance GetDefaultPrefix()
+		{
+			return Prefixes.FirstOrDefault(x => x.IsDefault);
+		}
+
+		public async Task<string> GetDefaultPrefixValueAsync(ulong guildId)
+		{
+			return await GetDefaultPrefix().GetForGuildAsync(_cachePool.Get, guildId);
+		}
 
 		public void RemoveCommand(string commandName)
 		{
-			var command = map.Commands.FirstOrDefault(x => x.Name == commandName.ToLower());
+			var command = _map.Commands.FirstOrDefault(x => x.Name == commandName.ToLower());
 
 			if(command == null)
 			{
 				throw new ArgumentNullException();
 			}
 
-			map.RemoveCommand(command);
+			_map.RemoveCommand(command);
 		}
 		public void RemoveCommand(CommandEvent e)
 		{
-			map.RemoveCommand(e);
+			_map.RemoveCommand(e);
 		}
 	}
 }

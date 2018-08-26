@@ -1,4 +1,5 @@
-﻿using Miki.Framework.Exceptions;
+﻿using Miki.Cache;
+using Miki.Framework.Exceptions;
 using Miki.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -11,6 +12,11 @@ namespace Miki.Framework.Events.Commands
 	public class SessionBasedCommandHandler : CommandHandler
 	{
 		public ConcurrentDictionary<CommandSession, Tuple<CommandHandler, DateTime>> Sessions { get; private set; } = new ConcurrentDictionary<CommandSession, Tuple<CommandHandler, DateTime>>();
+
+		public SessionBasedCommandHandler(ICachePool cachePool)
+			: base(cachePool)
+		{
+		}
 
 		public async Task AddSessionAsync(CommandSession session, CommandHandler handler, TimeSpan? expiration = null)
 		{
