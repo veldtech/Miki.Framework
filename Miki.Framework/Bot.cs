@@ -65,7 +65,7 @@ namespace Miki.Framework
 					return attachables[i] as T;
 				}
 			}
-			return default;
+			return default(T);
 		}
 
 		public async Task StartAsync()
