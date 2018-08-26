@@ -95,7 +95,7 @@ namespace Miki.Framework.Events
 
 			if (e.Channel is IDiscordGuildChannel guildChannel)
 			{
-				IDiscordGuildUser u = e.Guild.GetMember(e.Author.Id);
+				IDiscordGuildUser u = await e.Guild.GetMemberAsync(e.Author.Id);
 
 				if (u != null)
 				{

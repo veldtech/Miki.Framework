@@ -166,7 +166,7 @@ namespace Miki.Framework.Events
 
 			if (IsMention)
 			{
-				return guild.GetMember(ulong.Parse(Argument
+				return await guild.GetMemberAsync(ulong.Parse(Argument
 					.TrimStart('<')
 					.TrimStart('@')
 					.TrimStart('!')
@@ -174,9 +174,10 @@ namespace Miki.Framework.Events
 			}
 			else if (ulong.TryParse(Argument, out ulong id))
 			{
-				return guild.GetMember(id);
+				return await guild.GetMemberAsync(id);
 			}
-			return guild.Members
+			return (await guild.GetMembersAsync())
+				.Where(x => x != null)
 				.Where(x => x.Username.ToLower() == Argument.ToLower() 
 					|| (x.Nickname?.ToLower() ?? "") == Argument.ToLower() 
 					|| x.Username.ToLower() + "#" + x.Discriminator == Argument.ToLower())

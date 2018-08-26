@@ -41,7 +41,7 @@ namespace Miki.Framework
 			});
 
 			CacheClient = new CacheClient(
-				gateway, client, Client._apiClient
+				gateway, client, Client.ApiClient
 			);
 
 			if (Instance == null)
@@ -70,7 +70,7 @@ namespace Miki.Framework
 
 		public async Task StartAsync()
 		{
-			await Client._gateway.StartAsync();
+			await Client.Gateway.StartAsync();
 		}
 	}
 }
