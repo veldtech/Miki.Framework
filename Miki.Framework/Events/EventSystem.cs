@@ -66,27 +66,24 @@ namespace Miki.Framework.Events
 				return;
 			}
 
-			Task task = Task.Run(async () =>
-			{
-				EventContext context = new EventContext();
-				context.message = msg;
-				context.EventSystem = this;
+			EventContext context = new EventContext();
+			context.message = msg;
+			context.EventSystem = this;
 
-				try
+			try
+			{
+				foreach (var handler in commandHandlers.Values)
 				{
-					foreach (var handler in commandHandlers.Values)
-					{
-						await handler.CheckAsync(context);
-					}
+					await handler.CheckAsync(context);
 				}
-				catch (Exception ex)
+			}
+			catch (Exception ex)
+			{
+				if (OnError != null)
 				{
-					if(OnError != null)
-					{
-						await OnError(ex, context);
-					}
+					await OnError(ex, context);
 				}
-			});
+			}
 		}
 	}
 }

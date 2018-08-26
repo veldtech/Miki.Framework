@@ -18,7 +18,7 @@ namespace Miki.Framework.Languages
 
 		public static async Task<LocaleInstance> GetLanguageInstanceAsync(ulong channelId)
 		{
-			var cache = Bot.Instance.CachePool.Get;
+			var cache = await Bot.Instance.CachePool.GetAsync();
 			var cacheKey = $"miki:language:{channelId}";
 
 			if (await cache.ExistsAsync(cacheKey))

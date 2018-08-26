@@ -29,7 +29,7 @@ namespace Miki.Framework
 
 		// TODO: rework params
 		public Bot(IGateway gateway, ICachePool client, ClientInformation cInfo)
-        {
+		{
 			Information = cInfo;
 			CachePool = client;
 
@@ -41,12 +41,13 @@ namespace Miki.Framework
 			});
 
 			CacheClient = new CacheClient(
-				gateway,
-				client, Client._apiClient
+				gateway, client, Client._apiClient
 			);
 
 			if (Instance == null)
+			{
 				Instance = this;
+			}
 		}
 
 		public void Attach(IAttachable attachable)
@@ -64,7 +65,7 @@ namespace Miki.Framework
 					return attachables[i] as T;
 				}
 			}
-			return default(T);
+			return default;
 		}
 
 		public async Task StartAsync()

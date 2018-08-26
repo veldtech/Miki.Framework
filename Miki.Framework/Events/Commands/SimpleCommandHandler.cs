@@ -41,7 +41,7 @@ namespace Miki.Framework.Events
 
 				if (context.Guild != null)
 				{
-					identifier = await prefix.GetForGuildAsync(Bot.Instance.CachePool.Get, context.Guild.Id);
+					identifier = await prefix.GetForGuildAsync(await Bot.Instance.CachePool.GetAsync(), context.Guild.Id);
 				}
 
 				if (!context.message.Content.StartsWith(identifier))
@@ -67,7 +67,7 @@ namespace Miki.Framework.Events
 
 				if ((await GetUserAccessibility(context)) >= eventInstance.Accessibility)
 				{
-					if (await eventInstance.IsEnabled(Bot.Instance.CachePool.Get, (await context.message.GetChannelAsync()).Id))
+					if (await eventInstance.IsEnabled(await Bot.Instance.CachePool.GetAsync(), (await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(context, identifier);
 						await OnMessageProcessed(eventInstance, context.message, (DateTime.UtcNow - context.message.Timestamp).Milliseconds);

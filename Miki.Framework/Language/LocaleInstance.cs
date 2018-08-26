@@ -63,7 +63,7 @@ namespace Miki.Framework.Language
 
 		public async Task SetLanguageAsync(long id, string language)
 		{
-			var cache = Bot.Instance.CachePool.Get;
+			var cache = await Bot.Instance.CachePool.GetAsync();
 			var cacheKey = $"miki:language:{id}";
 
 			using (var context = new IAContext())

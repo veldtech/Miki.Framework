@@ -103,7 +103,7 @@ namespace Miki.Framework.Events
 		
 		private async Task HandleEvent(Task runnableEvent, ulong channelId)
 		{
-			if (await IsEnabled(EventSystem.bot.CachePool.Get, channelId))
+			if (await IsEnabled(await EventSystem.bot.CachePool.GetAsync(), channelId))
 			{
 				await runnableEvent;
 			}

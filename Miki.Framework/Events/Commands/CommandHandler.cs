@@ -52,7 +52,7 @@ namespace Miki.Framework.Events.Commands
 
 		public async Task<string> GetDefaultPrefixValueAsync(ulong guildId)
 		{
-			return await GetDefaultPrefix().GetForGuildAsync(_cachePool.Get, guildId);
+			return await GetDefaultPrefix().GetForGuildAsync(await _cachePool.GetAsync(), guildId);
 		}
 
 		public void RemoveCommand(string commandName)
