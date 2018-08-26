@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Configurations>Debug;Release;Debug Production;Prod</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,6 +24,10 @@
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Prod|AnyCPU'">
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Legacy\**" />
     <EmbeddedResource Remove="Legacy\**" />
@@ -39,7 +44,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
     <PackageReference Include="Miki.Common" Version="1.2.0" />
     <PackageReference Include="Miki.Discord" Version="2.3.0" />
-    <PackageReference Include="Miki.Discord.Caching" Version="2.2.5" />
+    <PackageReference Include="Miki.Discord.Caching" Version="2.2.6" />
     <PackageReference Include="Miki.Logging" Version="1.1.2" />
     <PackageReference Include="Miki.Rest" Version="1.6.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.1" />
