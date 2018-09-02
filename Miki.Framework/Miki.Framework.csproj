@@ -35,10 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Language\LanguageResource.cs~RF1bf05be.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="DogStatsD-CSharp-Client" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
@@ -52,6 +48,11 @@
   
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Miki.Discord\Miki.Discord.Caching\Miki.Discord.Caching.csproj" />
+    <ProjectReference Include="..\..\Miki.Discord\Miki.Discord\Miki.Discord.csproj" />
   </ItemGroup>
   
 </Project>

@@ -35,13 +35,13 @@ namespace Miki.Framework
 
 			Client = new DiscordClient(new DiscordClientConfigurations
 			{
-				Pool = client,
+				CacheClient = client.GetAsync().Result as IExtendedCacheClient,
 				Gateway = gateway,
 				Token = cInfo.Token
 			});
 
 			CacheClient = new CacheClient(
-				gateway, client, Client.ApiClient
+				gateway, (client.GetAsync().Result as IExtendedCacheClient), Client.ApiClient
 			);
 
 			if (Instance == null)
