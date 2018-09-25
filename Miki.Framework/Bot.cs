@@ -41,7 +41,7 @@ namespace Miki.Framework
 			});
 
 			CacheClient = new CacheClient(
-				gateway, client.GetAsync().Result as IExtendedCacheClient, Client.ApiClient
+				gateway, (client.GetAsync().Result as IExtendedCacheClient), Client.ApiClient
 			);
 
 			if (Instance == null)

@@ -23,7 +23,7 @@ namespace Miki.Framework.Events.Commands
 		}
 		public static bool operator !=(CommandSession c1, CommandSession c2)
 		{
-			return !(c1 == c2);
+			return c1.ChannelId != c2.ChannelId || c1.UserId != c2.UserId;
 		}
 	}
 }
