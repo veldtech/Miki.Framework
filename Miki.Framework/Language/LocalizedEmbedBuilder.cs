@@ -1,6 +1,7 @@
 ﻿using Miki.Discord;
 using Miki.Discord.Common;
 using Miki.Discord.Rest;
+using Miki.Localization;
 using System;
 using System.Collections.Generic;
 using System.Text;

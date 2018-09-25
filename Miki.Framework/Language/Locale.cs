@@ -1,9 +1,10 @@
-﻿using Miki.Framework;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Framework;
 using Miki.Framework.Language;
 using Miki.Framework.Models;
-using Miki.Framework.Models.Context;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Resources;
 using System.Threading.Tasks;
 
@@ -11,42 +12,81 @@ namespace Miki.Framework.Languages
 {
     public static class Locale
     {
-        public static Dictionary<string, ResourceManager> Locales = new Dictionary<string, ResourceManager>();
-
 		// TODO: add resource based locale names
         public static Dictionary<string, string> LocaleNames = new Dictionary<string, string>();
+		public static Dictionary<string, string> CompatibilityLayer = new Dictionary<string, string>()
+		{
+			{ "en-us", "eng" }
+		};
+
+		public static string DefaultResource = "eng";
 
 		public static async Task<LocaleInstance> GetLanguageInstanceAsync(ulong channelId)
 		{
 			var cache = await Bot.Instance.CachePool.GetAsync();
 			var cacheKey = $"miki:language:{channelId}";
 
+			string resource = null;
+
 			if (await cache.ExistsAsync(cacheKey))
 			{
-				return new LocaleInstance(await cache.GetAsync<string>(cacheKey));
+				resource = await cache.GetAsync<string>(cacheKey);
 			}
 			else
 			{
-				using (var context = new IAContext())
+				using (var context = Bot.Instance.Information.DatabaseContextFactory())
 				{
-					ChannelLanguage l = await context.Languages.FindAsync(channelId.ToDbLong());
+					ChannelLanguage l = await context.Set<ChannelLanguage>().FindAsync(channelId.ToDbLong());
 					if (l != null)
 					{
 						await cache.UpsertAsync(cacheKey, l.Language);
-						return new LocaleInstance(l.Language);
+						resource = l.Language;
 					}
 				}
 			}
-			await cache.UpsertAsync(cacheKey, LocaleInstance.defaultResource);
-			return new LocaleInstance(LocaleInstance.defaultResource);
+
+			if (resource == null)
+			{
+				await cache.UpsertAsync(cacheKey, DefaultResource);
+			}
+
+			if(CompatibilityLayer.ContainsKey(resource))
+			{
+				resource = CompatibilityLayer[resource];
+			}
+
+			return new LocaleInstance(resource);
 		}
 
-		public static void LoadLanguage(string languageId, string languageName, ResourceManager language)
+		public static void LoadLanguage(string languageId, ResourceManager language)
 		{
-			Locales.Add(languageId, language);
-			LocaleNames.Add(languageName, languageId);
+			LanguageDatabase.AddLanguage(languageId, language);
+			// TODO: fix this
+			//LocaleNames.Add(language.GetString(language, languageId.ThreeLetterISOLanguageName);
 		}
-    }
+
+		public static async Task SetLanguageAsync(DbContext context, ulong channelId, string language)
+		{
+			var cache = await Bot.Instance.CachePool.GetAsync();
+
+			ChannelLanguage l = await context.Set<ChannelLanguage>().FindAsync(channelId.ToDbLong());
+
+			if (l == null)
+			{
+				await context.Set<ChannelLanguage>().AddAsync(new ChannelLanguage()
+				{
+					EntityId = channelId.ToDbLong(),
+					Language = language
+				});
+			}
+			else
+			{
+				l.Language = language;
+			}
+
+			await context.SaveChangesAsync();
+		}
+	}
 
 	// TODO: shouldn't be here, remove or rework system.
     public class LocaleTags

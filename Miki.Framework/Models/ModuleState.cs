@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Miki.Framework.Models
 {
 	[ProtoContract]
-	internal class ModuleState
+	public class ModuleState
 	{
 		[ProtoMember(1)]
 		public string ModuleName { get; set; }

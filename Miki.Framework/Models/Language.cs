@@ -12,6 +12,6 @@ namespace Miki.Framework.Models
         public long EntityId { get; set; }
 
         [Column("Language")]
-        public string Language { get; set; } = "en-us";
+        public string Language { get; set; } = "eng";
     }
-}
+} 

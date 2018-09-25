@@ -1,5 +1,4 @@
 ﻿using Miki.Framework.Models;
-using Miki.Framework.Models.Context;
 using Miki.Common;
 using System;
 using System.Collections.Concurrent;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Miki.Discord.Common;
 using Miki.Cache;
+using Microsoft.EntityFrameworkCore;
 
 namespace Miki.Framework.Events
 {
@@ -47,22 +47,21 @@ namespace Miki.Framework.Events
 		public string GetCacheKey(ulong channelId)
 			=> $"event:{Name}:enabled:{channelId}";
 
-        public async Task SetEnabled(ICacheClient client, ulong channelId, bool enabled)
-        {
-            using (var context = new IAContext())
-            {
-                CommandState state = await context.CommandStates.FindAsync(Name, channelId.ToDbLong());
-                if (state == null)
-                {
-                    state = context.CommandStates.Add(new CommandState() { ChannelId = channelId.ToDbLong(), CommandName = Name, State = DefaultEnabled }).Entity;
-                }
-                state.State = enabled;
+		public async Task SetEnabled(DbContext context, ICacheClient client, ulong channelId, bool enabled)
+		{
+			CommandState state = await context.Set<CommandState>().FindAsync(Name, channelId.ToDbLong());
+			if (state == null)
+			{
+				state = (await context.Set<CommandState>()
+					.AddAsync(new CommandState() { ChannelId = channelId.ToDbLong(), CommandName = Name, State = DefaultEnabled })).Entity;
+			}
 
-				await client.UpsertAsync(GetCacheKey(channelId), enabled);
+			state.State = enabled;
 
-                await context.SaveChangesAsync();
-            }
-        }
+			await client.UpsertAsync(GetCacheKey(channelId), enabled);
+
+			await context.SaveChangesAsync();
+		}
 
         public async Task<bool> IsEnabled(ICacheClient client, ulong id)
         {
@@ -71,18 +70,20 @@ namespace Miki.Framework.Events
                 if (!await Module.IsEnabled(client, id)) return false;
             }
 
-            if (await client.ExistsAsync(GetCacheKey(id)))
-            {
+			if (await client.ExistsAsync(GetCacheKey(id)))
+			{
 				return await client.GetAsync<bool>(GetCacheKey(id));
-            }
-            else
-            {
-                CommandState state = null;
+			}
+			else
+			{
+				
+				CommandState state = null;
 
-				using (var context = new IAContext())
+				long guildId = id.ToDbLong();
+
+				using (var context = Bot.Instance.Information.DatabaseContextFactory())
 				{
-					long guildId = id.ToDbLong();
-					state = await context.CommandStates.FindAsync(Name, guildId);
+					state = await context.Set<CommandState>().FindAsync(Name, guildId);
 				}
 
 				bool currentState = state?.State ?? DefaultEnabled;

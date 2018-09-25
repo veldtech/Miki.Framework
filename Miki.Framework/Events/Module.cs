@@ -1,5 +1,4 @@
 ﻿using Miki.Framework.Models;
-using Miki.Framework.Models.Context;
 using Miki.Common;
 using System;
 using System.Collections.Concurrent;
@@ -8,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Miki.Discord.Common;
 using Miki.Cache;
+using Microsoft.EntityFrameworkCore;
 
 namespace Miki.Framework.Events
 {
@@ -119,10 +119,11 @@ namespace Miki.Framework.Events
 			{
 				ModuleState state = null;
 
-				using (var context = new IAContext())
+				long id = channelId.ToDbLong();
+
+				using (var context = Bot.Instance.Information.DatabaseContextFactory())
 				{
-					long id = channelId.ToDbLong();
-					state = await context.ModuleStates.FindAsync(SqlName, id);
+					state = await context.Set<ModuleState>().FindAsync(SqlName, id);
 				}
 
 				if (state == null)
@@ -166,17 +167,17 @@ namespace Miki.Framework.Events
 
         public async Task SetEnabled(ICacheClient cache, ulong channelId, bool enabled)
         {
-            using (var context = new IAContext())
+            using (var context = Bot.Instance.Information.DatabaseContextFactory())
             {
-                ModuleState state = await context.ModuleStates.FindAsync(SqlName, channelId.ToDbLong());
+                ModuleState state = await context.Set<ModuleState>().FindAsync(SqlName, channelId.ToDbLong());
                 if (state == null)
                 {
-                    state = context.ModuleStates.Add(new ModuleState()
+                    state = (await context.Set<ModuleState>().AddAsync(new ModuleState()
 					{
 						ChannelId = channelId.ToDbLong(),
 						ModuleName = SqlName,
 						State = Enabled
-					}).Entity;
+					})).Entity;
                 }
                 state.State = enabled;
 

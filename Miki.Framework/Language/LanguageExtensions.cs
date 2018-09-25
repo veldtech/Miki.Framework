@@ -1,4 +1,5 @@
 ﻿using Miki.Framework.Events;
+using Miki.Localization;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -1,4 +1,5 @@
-﻿using Miki.Cache;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Cache;
 using Miki.Common;
 using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
