@@ -28,6 +28,8 @@ namespace Miki.Framework.Events
 
 		public override async Task CheckAsync(EventContext context)
 		{
+			var stopWatch = Stopwatch.StartNew();
+
 			context.commandHandler = this;
 			context.Channel = await context.message.GetChannelAsync();
 
@@ -71,7 +73,7 @@ namespace Miki.Framework.Events
 					if (await eventInstance.IsEnabled(await Bot.Instance.CachePool.GetAsync(), (await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(context, identifier);
-						await OnMessageProcessed(eventInstance, context.message, (DateTime.UtcNow - context.message.Timestamp).Milliseconds);
+						await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
 					}
 				}
 			}
