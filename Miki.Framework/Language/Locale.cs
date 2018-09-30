@@ -2,6 +2,7 @@
 using Miki.Framework;
 using Miki.Framework.Language;
 using Miki.Framework.Models;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -73,11 +74,14 @@ namespace Miki.Framework.Languages
 			if (resource == null)
 			{
 				await cache.UpsertAsync(cacheKey, DefaultResource);
+				resource = DefaultResource;
 			}
-
-			if(CompatibilityLayer.ContainsKey(resource))
+			else
 			{
-				resource = CompatibilityLayer[resource];
+				if (CompatibilityLayer.ContainsKey(resource))
+				{
+					resource = CompatibilityLayer[resource];
+				}
 			}
 
 			return new LocaleInstance(resource);
@@ -93,6 +97,11 @@ namespace Miki.Framework.Languages
 			}
 		}
 
+		public static void SetDefaultLanguage(string iso)
+		{
+			LanguageDatabase.SetDefault(iso);
+		}
+
 		public static async Task SetLanguageAsync(DbContext context, ulong channelId, string language)
 		{
 			var cache = await Bot.Instance.CachePool.GetAsync();
@@ -102,11 +111,11 @@ namespace Miki.Framework.Languages
 
 			if (l == null)
 			{
-				await context.Set<ChannelLanguage>().AddAsync(new ChannelLanguage()
+				l = (await context.Set<ChannelLanguage>().AddAsync(new ChannelLanguage()
 				{
 					EntityId = channelId.ToDbLong(),
 					Language = language
-				});
+				})).Entity;
 			}
 			else
 			{

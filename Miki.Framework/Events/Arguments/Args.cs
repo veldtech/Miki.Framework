@@ -44,6 +44,7 @@ namespace Miki.Framework.Events
 
 			return new ArgObject(args[index], index, this);
 		}
+
 		public ArgObject GetOrDefault(int index)
 		{
 			if (index >= args.Count || index < 0)
@@ -107,6 +108,7 @@ namespace Miki.Framework.Events
 			}
 			return null;
 		}
+
 		public bool? AsBoolean()
 		{
 			if (bool.TryParse(Argument, out bool s))
@@ -114,6 +116,11 @@ namespace Miki.Framework.Events
 				return s;
 			}
 			return null;
+		}
+
+		public bool IsValid()
+		{
+			return !string.IsNullOrEmpty(Argument);
 		}
 
 		public IEnumerable<ArgObject> TakeWhile(Func<ArgObject, bool> func)
@@ -181,9 +188,28 @@ namespace Miki.Framework.Events
 			{
 				guildUser = (await guild.GetMembersAsync())
 					.Where(x => x != null)
-					.Where(x => x.Username.ToLower() == Argument.ToLower()
-						|| (x.Nickname?.ToLower() ?? "") == Argument.ToLower()
-						|| x.Username.ToLower() + "#" + x.Discriminator == Argument.ToLower())
+					.Where(x =>
+					{
+						if(x.Nickname != null)
+						{
+							if(x.Nickname.ToLowerInvariant() == Argument)
+							{
+								return true;
+							}
+						}
+						else if (x.Username != null)
+						{
+							if(x.Username.ToLowerInvariant() == Argument)
+							{
+								return true;
+							}
+							else if(Argument == x.Username + "#" + x.Discriminator)
+							{
+								return true;
+							}
+						}
+						return false;
+					})
 					.FirstOrDefault();
 			}
 
