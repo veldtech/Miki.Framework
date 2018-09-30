@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Miki.Localization;
+using Miki.Localization.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Miki.Framework.Exceptions
 {
-    class ArgObjectNullException : BotException
+    class ArgObjectNullException : LocalizedException
     {
-		public override string Resource => "error_argument_null";
-		public override object[] Parameters => new object[] { "[docs](https://github.com/Mikibot/Miki/wiki)" };
+		public override IResource LocaleResource 
+			=> new LanguageResource("error_argument_null", "[docs](https://github.com/Mikibot/Miki/wiki)");
 	}
 }
