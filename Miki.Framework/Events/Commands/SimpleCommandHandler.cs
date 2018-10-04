@@ -80,14 +80,18 @@ namespace Miki.Framework.Events
 		}
 
 		// TODO: rework this
-		public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage msg, IDiscordGuildChannel channel)
+		public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage msg, IDiscordChannel channel)
 		{
-			return await GetUserAccessibility(new EventContext
+			if (channel is IDiscordGuildChannel c)
 			{
-				Guild = await channel.GetGuildAsync(),
-				Channel = channel,
-				message = msg,
-			});
+				return await GetUserAccessibility(new EventContext
+				{
+					Guild = await c.GetGuildAsync(),
+					Channel = channel as IDiscordTextChannel,
+					message = msg,
+				});
+			}
+			return EventAccessibility.ADMINONLY;
 		}
         public async Task<EventAccessibility> GetUserAccessibility(EventContext e)
         {

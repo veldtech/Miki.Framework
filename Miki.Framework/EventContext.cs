@@ -18,7 +18,7 @@ namespace Miki.Framework.Events
 
 		public IDiscordUser Author => message.Author;
 
-		public IDiscordChannel Channel { get; internal set; }
+		public IDiscordTextChannel Channel { get; internal set; }
 
 		public IDiscordGuild Guild { get; internal set; }
 

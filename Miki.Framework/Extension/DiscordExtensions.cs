@@ -23,7 +23,7 @@ namespace Miki.Discord
 				{
 					embed = embed
 				},
-				channel = channel
+				channel = channel as IDiscordTextChannel
 			});
 		}
 
@@ -46,7 +46,7 @@ namespace Miki.Discord
 			//		}
 			//	}
 			//}
-			return await channel.SendMessageAsync("", false, embed);
+			return await (channel as IDiscordTextChannel).SendMessageAsync("", false, embed);
 		}
 		public static async Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
 		{
@@ -54,7 +54,7 @@ namespace Miki.Discord
 			return await (await user.GetDMChannelAsync()).SendMessageAsync("", false, embed);
 		}
 
-		public static void QueueMessageAsync(this IDiscordChannel channel, string message)
+		public static void QueueMessageAsync(this IDiscordTextChannel channel, string message)
 			=> MessageBucket.Add(new MessageBucketArgs()
 			{
 				properties = new MessageArgs()

@@ -13,7 +13,7 @@ namespace Miki.Framework
 	public class MessageBucketArgs
 	{
 		public MessageArgs properties;
-		public IDiscordChannel channel;
+		public IDiscordTextChannel channel;
 	}
 
 	public class MessageBucket

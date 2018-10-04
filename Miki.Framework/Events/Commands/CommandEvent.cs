@@ -72,7 +72,7 @@ namespace Miki.Framework.Events
 				{
 					if (!(await e.Guild.GetPermissionsAsync(e.message.Author as IDiscordGuildUser)).HasFlag(g))
 					{
-						await e.Channel.SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
+						await (e.Channel as IDiscordTextChannel).SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
 						return;
 					}
 				}

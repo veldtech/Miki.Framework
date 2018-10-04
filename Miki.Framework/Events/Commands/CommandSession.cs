@@ -17,6 +17,12 @@ namespace Miki.Framework.Events.Commands
 			}
 			return false;
 		}
+
+		public override int GetHashCode()
+		{
+			return HashCode.Combine(UserId, ChannelId);
+		}
+
 		public static bool operator ==(CommandSession c1, CommandSession c2)
 		{
 			return c1.ChannelId == c2.ChannelId && c1.UserId == c2.UserId;
