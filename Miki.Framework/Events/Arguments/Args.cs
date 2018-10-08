@@ -192,18 +192,18 @@ namespace Miki.Framework.Events
 					{
 						if(x.Nickname != null)
 						{
-							if(x.Nickname.ToLowerInvariant() == Argument)
+							if(x.Nickname.ToLowerInvariant() == Argument.ToLowerInvariant())
 							{
 								return true;
 							}
 						}
 						else if (x.Username != null)
 						{
-							if(x.Username.ToLowerInvariant() == Argument)
+							if(x.Username.ToLowerInvariant() == Argument.ToLowerInvariant())
 							{
 								return true;
 							}
-							else if(Argument == x.Username + "#" + x.Discriminator)
+							else if(Argument == (x.Username + "#" + x.Discriminator).ToLowerInvariant())
 							{
 								return true;
 							}

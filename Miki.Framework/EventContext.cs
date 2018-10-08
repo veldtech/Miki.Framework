@@ -27,8 +27,5 @@ namespace Miki.Framework.Events
 		public PrefixInstance Prefix;
 
 		public LocaleInstance Locale;
-
-		public CommandSession CreateSession()
-			=> new CommandSession() { ChannelId = Channel.Id, UserId = Author.Id };
 	}
 }
