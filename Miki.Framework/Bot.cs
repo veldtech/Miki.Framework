@@ -20,7 +20,6 @@ namespace Miki.Framework
 		public static Bot Instance { get; private set; }
 
 		public DiscordClient Client { get; private set; }
-		public CacheClient CacheClient { get; private set; }
 
 		public ClientInformation Information { private set; get; }
 		public ICachePool CachePool { private set; get; }
@@ -39,10 +38,6 @@ namespace Miki.Framework
 				Gateway = gateway,
 				Token = cInfo.Token
 			});
-
-			CacheClient = new CacheClient(
-				gateway, (client.GetAsync().Result as IExtendedCacheClient), Client.ApiClient
-			);
 
 			if (Instance == null)
 			{
