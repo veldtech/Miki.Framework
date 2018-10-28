@@ -1,29 +1,15 @@
-﻿using Miki.Framework.Events.Attributes;
-using Miki.Framework.Models;
-using Miki.Common;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Threading;
-using Miki.Framework.Events.Filters;
+﻿using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
-using Miki.Framework.Exceptions;
-using Miki.Framework.Extension;
-using Miki.Framework.Languages;
-using Miki.Discord.Common;
-using Miki.Discord;
-using Miki.Discord.Internal;
-using Miki.Logging;
+using Miki.Framework.Events.Filters;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
 	public class EventSystem : IAttachable
 	{
-		internal Bot bot;
+		internal DiscordBot bot;
 
 		private Dictionary<Guid, CommandHandler> commandHandlers = new Dictionary<Guid, CommandHandler>();
 
@@ -43,15 +29,15 @@ namespace Miki.Framework.Events
 			commandHandlers.Add(handler.GetType().GUID, handler);
 		}
 
-		public void AttachTo(Bot bot)
+		public void AttachTo(DiscordBot bot)
 		{
 			this.bot = bot;
-			bot.Client.MessageCreate += OnMessageReceivedAsync;
+			bot.Discord.MessageCreate += OnMessageReceivedAsync;
 		}
 
 		public T GetCommandHandler<T>() where T : CommandHandler
 		{
-			 if(commandHandlers.TryGetValue(typeof(T).GUID, out var commandHandler))
+			if (commandHandlers.TryGetValue(typeof(T).GUID, out var commandHandler))
 			{
 				return commandHandler as T;
 			}

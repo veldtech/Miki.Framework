@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Miki.Cache;
 using Miki.Framework.Models;
-using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
@@ -31,32 +29,31 @@ namespace Miki.Framework.Events
 		{
 			if (Changable)
 			{
+				long guildId = id.ToDbLong();
 
-					long guildId = id.ToDbLong();
-
-					Identifier i = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
-					if (i == null)
-					{
-						await context.Set<Identifier>()
-							.AddAsync(new Identifier() { GuildId = guildId, DefaultValue = DefaultValue, Value = prefix });
-					}
-					else
-					{
-						i.Value = prefix;
-					}
-					await context.SaveChangesAsync();
+				Identifier i = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
+				if (i == null)
+				{
+					await context.Set<Identifier>()
+						.AddAsync(new Identifier() { GuildId = guildId, DefaultValue = DefaultValue, Value = prefix });
+				}
+				else
+				{
+					i.Value = prefix;
+				}
+				await context.SaveChangesAsync();
 
 				await cache.UpsertAsync(GetCacheKey(id), prefix);
 			}
 		}
 
-		async Task<Identifier> CreateNewAsync(DbContext context, long id)
+		private async Task<Identifier> CreateNewAsync(DbContext context, long id)
 		{
 			return (await context.Set<Identifier>()
 				.AddAsync(new Identifier() { GuildId = id, DefaultValue = DefaultValue, Value = DefaultValue })).Entity;
 		}
 
-		string GetCacheKey(ulong id)
+		private string GetCacheKey(ulong id)
 			=> $"framework:prefix:{id}";
 
 		public async Task<string> GetForGuildAsync(ICacheClient cache, ulong id)
@@ -79,7 +76,7 @@ namespace Miki.Framework.Events
 			long guildId = id.ToDbLong();
 			Identifier identifier = null;
 
-			using (var context = Bot.Instance.Information.DatabaseContextFactory())
+			using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
 			{
 				identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
 				if (identifier == null)
@@ -94,4 +91,3 @@ namespace Miki.Framework.Events
 		}
 	}
 }
- 

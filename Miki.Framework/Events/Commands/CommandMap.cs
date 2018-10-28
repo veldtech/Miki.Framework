@@ -3,17 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
-    public class CommandMap
-    {
+	public class CommandMap
+	{
 		public IReadOnlyList<CommandEvent> Commands
 			=> commandCache.Values.ToList();
 
-		public IReadOnlyList<Module> Modules 
+		public IReadOnlyList<Module> Modules
 			=> modulesLoaded;
 
 		public event Action<Module> OnModuleLoaded;
@@ -39,7 +38,7 @@ namespace Miki.Framework.Events
 
 		public CommandEvent GetCommandEvent(string value)
 		{
-			if(commandCache.TryGetValue(value, out var cmd))
+			if (commandCache.TryGetValue(value, out var cmd))
 			{
 				return cmd;
 			}
@@ -56,9 +55,9 @@ namespace Miki.Framework.Events
 
 		public void RegisterAttributeCommands(Assembly assembly = null)
 		{
-			Bot b = Bot.Instance;
+			DiscordBot b = DiscordBot.Instance;
 
-			if(assembly == null)
+			if (assembly == null)
 			{
 				assembly = Assembly.GetEntryAssembly();
 			}
@@ -120,7 +119,7 @@ namespace Miki.Framework.Events
 						newModule.AddCommand(newEvent);
 					}
 
-					foreach(var a in newEvent.Aliases)
+					foreach (var a in newEvent.Aliases)
 					{
 						commandCache.Add(a.ToLower(), newEvent);
 					}
@@ -129,7 +128,7 @@ namespace Miki.Framework.Events
 
 				var services = m.GetProperties().Where(x => x.GetCustomAttributes<ServiceAttribute>().Count() > 0).ToArray();
 
-				foreach(var s in services)
+				foreach (var s in services)
 				{
 					BaseService service = Activator.CreateInstance(s.PropertyType, true) as BaseService;
 					var attrib = s.GetCustomAttribute<ServiceAttribute>();
@@ -147,7 +146,7 @@ namespace Miki.Framework.Events
 		public void RemoveCommand(CommandEvent command)
 		{
 			commandCache.Remove(command.Name.ToLower());
-			foreach(var c in command.Aliases)
+			foreach (var c in command.Aliases)
 			{
 				commandCache.Remove(c.ToLower());
 			}

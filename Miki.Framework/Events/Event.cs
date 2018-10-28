@@ -1,48 +1,47 @@
-﻿using Miki.Framework.Models;
-using Miki.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Cache;
+using Miki.Framework.Models;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Miki.Discord.Common;
-using Miki.Cache;
-using Microsoft.EntityFrameworkCore;
 
 namespace Miki.Framework.Events
 {
-    public class Event
-    {
-        public string Name { get; set; }
+	public class Event
+	{
+		public string Name { get; set; }
 
-        public EventAccessibility Accessibility { get; set; } = EventAccessibility.PUBLIC;
+		public EventAccessibility Accessibility { get; set; } = EventAccessibility.PUBLIC;
 
-        public bool OverridableByDefaultPrefix { get; set; } = false;
-        public bool CanBeDisabled { get; set; } = true;
-        public bool DefaultEnabled { get; set; } = true;
+		public bool OverridableByDefaultPrefix { get; set; } = false;
+		public bool CanBeDisabled { get; set; } = true;
+		public bool DefaultEnabled { get; set; } = true;
 
-        public Module Module { get; set; }
+		public Module Module { get; set; }
 
-        public int TimesUsed { get; set; } = 0;
+		public int TimesUsed { get; set; } = 0;
 
-        protected ConcurrentDictionary<ulong, EventCooldownObject> lastTimeUsed = new ConcurrentDictionary<ulong, EventCooldownObject>();
+		protected ConcurrentDictionary<ulong, EventCooldownObject> lastTimeUsed = new ConcurrentDictionary<ulong, EventCooldownObject>();
 
-        public Event()
-        {
-        }
-        public Event(Event eventObject)
-        {
-            Name = eventObject.Name;
-            Accessibility = eventObject.Accessibility;
-            OverridableByDefaultPrefix = eventObject.OverridableByDefaultPrefix;
-            CanBeDisabled = eventObject.CanBeDisabled;
-            DefaultEnabled = eventObject.DefaultEnabled;
-            Module = eventObject.Module;
-            TimesUsed = eventObject.TimesUsed;
-        }
-        public Event(Action<Event> info)
-        {
-            info.Invoke(this);
-        }
+		public Event()
+		{
+		}
+
+		public Event(Event eventObject)
+		{
+			Name = eventObject.Name;
+			Accessibility = eventObject.Accessibility;
+			OverridableByDefaultPrefix = eventObject.OverridableByDefaultPrefix;
+			CanBeDisabled = eventObject.CanBeDisabled;
+			DefaultEnabled = eventObject.DefaultEnabled;
+			Module = eventObject.Module;
+			TimesUsed = eventObject.TimesUsed;
+		}
+
+		public Event(Action<Event> info)
+		{
+			info.Invoke(this);
+		}
 
 		public string GetCacheKey(ulong channelId)
 			=> $"event:{Name}:enabled:{channelId}";
@@ -63,12 +62,12 @@ namespace Miki.Framework.Events
 			await context.SaveChangesAsync();
 		}
 
-        public async Task<bool> IsEnabled(ICacheClient client, ulong id)
-        {
-            if (Module != null)
-            {
-                if (!await Module.IsEnabled(client, id)) return false;
-            }
+		public async Task<bool> IsEnabled(ICacheClient client, ulong id)
+		{
+			if (Module != null)
+			{
+				if (!await Module.IsEnabled(client, id)) return false;
+			}
 
 			if (await client.ExistsAsync(GetCacheKey(id)))
 			{
@@ -76,12 +75,11 @@ namespace Miki.Framework.Events
 			}
 			else
 			{
-				
 				CommandState state = null;
 
 				long guildId = id.ToDbLong();
 
-				using (var context = Bot.Instance.Information.DatabaseContextFactory())
+				using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
 				{
 					state = await context.Set<CommandState>().FindAsync(Name, guildId);
 				}
@@ -90,49 +88,49 @@ namespace Miki.Framework.Events
 				await client.UpsertAsync(GetCacheKey(id), currentState);
 				return currentState;
 			}
-        }
+		}
 
-        public Event SetName(string name)
-        {
-            Name = name;
-            return this;
-        }
+		public Event SetName(string name)
+		{
+			Name = name;
+			return this;
+		}
 
-        public Event SetAccessibility(EventAccessibility accessibility)
-        {
-            Accessibility = accessibility;
-            return this;
-        }
-    }
+		public Event SetAccessibility(EventAccessibility accessibility)
+		{
+			Accessibility = accessibility;
+			return this;
+		}
+	}
 
-    public class EventCooldownObject
-    {
-        DateTime lastTimeUsed;
-        DateTime prevLastTimeUsed;
+	public class EventCooldownObject
+	{
+		private DateTime lastTimeUsed;
+		private DateTime prevLastTimeUsed;
 
-        DateTime canBeUsedWhen;
+		private DateTime canBeUsedWhen;
 
-		readonly int coolDown = 1;
+		private readonly int coolDown = 1;
 
-        public EventCooldownObject(int Cooldown)
-        {
-            lastTimeUsed = DateTime.Now;
-            coolDown = Cooldown;
-        }
+		public EventCooldownObject(int Cooldown)
+		{
+			lastTimeUsed = DateTime.Now;
+			coolDown = Cooldown;
+		}
 
-        public void Tick()
-        {
-            prevLastTimeUsed = lastTimeUsed;
-            lastTimeUsed = DateTime.Now;
+		public void Tick()
+		{
+			prevLastTimeUsed = lastTimeUsed;
+			lastTimeUsed = DateTime.Now;
 
-            double s = Math.Max(0, coolDown - (lastTimeUsed - prevLastTimeUsed).TotalSeconds);
+			double s = Math.Max(0, coolDown - (lastTimeUsed - prevLastTimeUsed).TotalSeconds);
 
-            canBeUsedWhen = DateTime.Now.AddSeconds(s);
-        }
+			canBeUsedWhen = DateTime.Now.AddSeconds(s);
+		}
 
-        public bool CanBeUsed()
-        {
-            return canBeUsedWhen <= DateTime.Now;
-        }
-    }
+		public bool CanBeUsed()
+		{
+			return canBeUsedWhen <= DateTime.Now;
+		}
+	}
 }

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Miki.Discord.Common;
+using Miki.Framework.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Miki.Framework.Exceptions;
-using Miki.Discord.Common;
 
 namespace Miki.Framework.Events
 {
@@ -29,11 +28,13 @@ namespace Miki.Framework.Events
 
 		public ArgObject First()
 			=> Get(0);
+
 		public ArgObject FirstOrDefault()
 			=> (Count > 0) ? First() : null;
 
 		public ArgObject Last()
 			=> Get(Count - 1);
+
 		public ArgObject LastOrDefault()
 			=> (Count > 0) ? Last() : null;
 
@@ -64,7 +65,7 @@ namespace Miki.Framework.Events
 		public IEnumerable<ArgObject> Where(Func<string, bool> predicate)
 		{
 			List<ArgObject> allObjects = new List<ArgObject>();
-			for(int i = 0; i < Count; i++)
+			for (int i = 0; i < Count; i++)
 			{
 				if (predicate(Get(i).Argument))
 				{
@@ -84,8 +85,8 @@ namespace Miki.Framework.Events
 	{
 		public string Argument { get; private set; }
 
-		Args args;
-		readonly int index;
+		private Args args;
+		private readonly int index;
 
 		public bool IsLast
 			=> (args.Count - 1 == index);
@@ -146,7 +147,7 @@ namespace Miki.Framework.Events
 		public ArgObject TakeUntilEnd(int offset = 0)
 		{
 			ArgObject o = this;
-			for(int i = index + 1; i < args.Count - offset; i++)
+			for (int i = index + 1; i < args.Count - offset; i++)
 			{
 				o.Argument += " " + args.Get(i).Argument;
 			}
@@ -155,7 +156,7 @@ namespace Miki.Framework.Events
 
 		public bool TryParseInt(out int i)
 		{
-			if(int.TryParse(Argument, out int x))
+			if (int.TryParse(Argument, out int x))
 			{
 				i = x;
 				return true;
@@ -166,7 +167,7 @@ namespace Miki.Framework.Events
 
 		public async Task<IDiscordGuildUser> GetUserAsync(IDiscordGuild guild)
 		{
-			if(string.IsNullOrWhiteSpace(Argument))
+			if (string.IsNullOrWhiteSpace(Argument))
 			{
 				return null;
 			}
@@ -190,20 +191,20 @@ namespace Miki.Framework.Events
 					.Where(x => x != null)
 					.Where(x =>
 					{
-						if(x.Nickname != null)
+						if (x.Nickname != null)
 						{
-							if(x.Nickname.ToLowerInvariant() == Argument.ToLowerInvariant())
+							if (x.Nickname.ToLowerInvariant() == Argument.ToLowerInvariant())
 							{
 								return true;
 							}
 						}
 						else if (x.Username != null)
 						{
-							if(x.Username.ToLowerInvariant() == Argument.ToLowerInvariant())
+							if (x.Username.ToLowerInvariant() == Argument.ToLowerInvariant())
 							{
 								return true;
 							}
-							else if(Argument == (x.Username + "#" + x.Discriminator).ToLowerInvariant())
+							else if (Argument == (x.Username + "#" + x.Discriminator).ToLowerInvariant())
 							{
 								return true;
 							}
@@ -213,12 +214,12 @@ namespace Miki.Framework.Events
 					.FirstOrDefault();
 			}
 
-			if(guildUser == null)
+			if (guildUser == null)
 			{
 				throw new ArgObjectNullException();
 			}
 
-			if(guildUser.Id == 0)
+			if (guildUser.Id == 0)
 			{
 				throw new ArgObjectNullException();
 			}

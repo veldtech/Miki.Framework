@@ -1,12 +1,8 @@
-﻿using Miki.Common;
-using Miki.Discord.Common;
-using Miki.Framework.Events.Commands;
+﻿using Miki.Discord.Common;
 using Miki.Framework.Exceptions;
-using Miki.Framework.Languages;
 using Miki.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,10 +23,12 @@ namespace Miki.Framework.Events
 		public CommandEvent()
 		{
 		}
+
 		public CommandEvent(string name)
 		{
 			Name = name;
 		}
+
 		public CommandEvent(Action<CommandEvent> info)
 		{
 			info.Invoke(this);

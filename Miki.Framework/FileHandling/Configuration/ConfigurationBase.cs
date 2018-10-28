@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.FileHandling.Configuration
+﻿namespace Miki.Framework.FileHandling.Configuration
 {
-    public class ConfigurationBase
-    {
-        public ConfigurationBase()
-        {
-
-        }
-    }
+	public class ConfigurationBase
+	{
+		public ConfigurationBase()
+		{
+		}
+	}
 }

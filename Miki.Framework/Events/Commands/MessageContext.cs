@@ -2,9 +2,9 @@
 
 namespace Miki.Framework.Events.Commands
 {
-    public struct MessageContext
-    {
+	public struct MessageContext
+	{
 		public EventSystem eventSystem;
 		public IDiscordMessage message;
-    }
+	}
 }

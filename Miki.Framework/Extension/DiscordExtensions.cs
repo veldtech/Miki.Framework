@@ -1,20 +1,12 @@
 ﻿using Miki.Common.Builders;
-using Miki.Discord;
 using Miki.Discord.Common;
-using Miki.Discord.Rest;
 using Miki.Framework;
-using Miki.Framework.Languages;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Miki.Discord
 {
-    public static class DiscordExtensions
-    {
+	public static class DiscordExtensions
+	{
 		public static void QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel)
 		{
 			MessageBucket.Add(new MessageBucketArgs()
@@ -48,6 +40,7 @@ namespace Miki.Discord
 			//}
 			return await (channel as IDiscordTextChannel).SendMessageAsync("", false, embed);
 		}
+
 		public static async Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
 		{
 			await Task.Yield();

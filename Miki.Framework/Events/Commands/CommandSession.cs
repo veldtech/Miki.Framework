@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Miki.Framework.Events.Commands
 {
@@ -27,6 +25,7 @@ namespace Miki.Framework.Events.Commands
 		{
 			return c1.ChannelId == c2.ChannelId && c1.UserId == c2.UserId;
 		}
+
 		public static bool operator !=(CommandSession c1, CommandSession c2)
 		{
 			return c1.ChannelId != c2.ChannelId || c1.UserId != c2.UserId;

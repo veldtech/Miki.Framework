@@ -1,10 +1,5 @@
 ﻿using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
-using Miki.Framework.Language;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {

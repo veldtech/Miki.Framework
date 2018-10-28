@@ -1,35 +1,31 @@
-﻿using Miki.Framework.Models;
-using Miki.Common;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Miki.Cache;
 using Miki.Discord.Common;
-using Miki.Cache;
-using Microsoft.EntityFrameworkCore;
+using Miki.Framework.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
-    public class Module
-    {
-        public string Name { get; set; }
+	public class Module
+	{
+		public string Name { get; set; }
 
-        public bool Nsfw { get; set; } = false;
-        public bool Enabled { get; set; } = true;
-        public bool CanBeDisabled { get; set; } = true;
+		public bool Nsfw { get; set; } = false;
+		public bool Enabled { get; set; } = true;
+		public bool CanBeDisabled { get; set; } = true;
 
-        public Func<IDiscordMessage, Task> MessageRecieved { get; set; }
-        public Func<IDiscordUser, IDiscordUser, Task> UserUpdated { get; set; }
-        public Func<IDiscordGuildUser, Task> UserJoinGuild { get; set; }
-        public Func<IDiscordGuildUser, Task> UserLeaveGuild { get; set; }
-		public Func<IDiscordGuild, Task> JoinedGuild { get; set; } 
-        public Func<IDiscordGuild, Task> LeftGuild { get; set; }
+		public Func<IDiscordMessage, Task> MessageRecieved { get; set; }
+		public Func<IDiscordUser, IDiscordUser, Task> UserUpdated { get; set; }
+		public Func<IDiscordGuildUser, Task> UserJoinGuild { get; set; }
+		public Func<IDiscordGuildUser, Task> UserLeaveGuild { get; set; }
+		public Func<IDiscordGuild, Task> JoinedGuild { get; set; }
+		public Func<IDiscordGuild, Task> LeftGuild { get; set; }
 
-        public List<CommandEvent> Events { get; set; } = new List<CommandEvent>();
-        public List<BaseService> Services { get; set; } = new List<BaseService>();
+		public List<CommandEvent> Events { get; set; } = new List<CommandEvent>();
+		public List<BaseService> Services { get; set; } = new List<BaseService>();
 
-        public EventSystem EventSystem;
+		public EventSystem EventSystem;
 
 		public string SqlName => "module:" + Name;
 
@@ -37,8 +33,8 @@ namespace Miki.Framework.Events
 
 		private bool isInstalled = false;
 
-        internal Module(object instanceOf = null)
-        {
+		internal Module(object instanceOf = null)
+		{
 			InstanceOf = instanceOf;
 		}
 
@@ -52,13 +48,13 @@ namespace Miki.Framework.Events
 			=> $"module:{Name}:enabled:{id}";
 
 		public void Install(EventSystem system)
-        {
+		{
 			EventSystem = system;
 			Name = Name.ToLower();
 
-			if(MessageRecieved != null)
+			if (MessageRecieved != null)
 			{
-				system.bot.Client.MessageCreate += async (message) =>
+				system.bot.Discord.MessageCreate += async (message) =>
 				{
 					await HandleEvent(MessageRecieved(message), message.ChannelId);
 				};
@@ -66,7 +62,7 @@ namespace Miki.Framework.Events
 
 			if (UserJoinGuild != null)
 			{
-				system.bot.Client.GuildMemberCreate += async (guildMember) =>
+				system.bot.Discord.GuildMemberCreate += async (guildMember) =>
 				{
 					await UserJoinGuild(guildMember);
 				};
@@ -74,7 +70,7 @@ namespace Miki.Framework.Events
 
 			if (UserLeaveGuild != null)
 			{
-				system.bot.Client.GuildMemberDelete += async (guildMember) =>
+				system.bot.Discord.GuildMemberDelete += async (guildMember) =>
 				{
 					await UserLeaveGuild(guildMember);
 				};
@@ -82,28 +78,28 @@ namespace Miki.Framework.Events
 
 			if (UserUpdated != null)
 			{
-				system.bot.Client.UserUpdate += async (oldUser, newUser) =>
+				system.bot.Discord.UserUpdate += async (oldUser, newUser) =>
 				{
 					await UserUpdated(oldUser, newUser);
 				};
 			}
 
 			foreach (CommandEvent e in Events)
-            {
+			{
 				e.Module = this;
-            }
+			}
 
-			foreach(BaseService s in Services)
+			foreach (BaseService s in Services)
 			{
 				s.Install(this);
 			}
 
-            isInstalled = true;
-        }
-		
+			isInstalled = true;
+		}
+
 		private async Task HandleEvent(Task runnableEvent, ulong channelId)
 		{
-			if (await IsEnabled(await EventSystem.bot.CachePool.GetAsync(), channelId))
+			if (await IsEnabled(EventSystem.bot.Discord.CacheClient, channelId))
 			{
 				await runnableEvent;
 			}
@@ -121,7 +117,7 @@ namespace Miki.Framework.Events
 
 				long id = channelId.ToDbLong();
 
-				using (var context = Bot.Instance.Information.DatabaseContextFactory())
+				using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
 				{
 					state = await context.Set<ModuleState>().FindAsync(SqlName, id);
 				}
@@ -138,16 +134,16 @@ namespace Miki.Framework.Events
 		}
 
 		public void Uninstall(object bot)
-        {
-            Bot b = (Bot)bot;
+		{
+			DiscordBot b = (DiscordBot)bot;
 
-            if (!isInstalled)
-            {
-                return;
-            }
+			if (!isInstalled)
+			{
+				return;
+			}
 
-            isInstalled = false;
-        }
+			isInstalled = false;
+		}
 
 		public object GetReflectedInstance()
 		{
@@ -159,33 +155,31 @@ namespace Miki.Framework.Events
 			InstanceOf = instance;
 		}
 
-        public Module SetNsfw(bool val)
-        {
-            Nsfw = val;
-            return this;
-        }
+		public Module SetNsfw(bool val)
+		{
+			Nsfw = val;
+			return this;
+		}
 
-        public async Task SetEnabled(ICacheClient cache, ulong channelId, bool enabled)
-        {
-            using (var context = Bot.Instance.Information.DatabaseContextFactory())
-            {
-                ModuleState state = await context.Set<ModuleState>().FindAsync(SqlName, channelId.ToDbLong());
-                if (state == null)
-                {
-                    state = (await context.Set<ModuleState>().AddAsync(new ModuleState()
+		public async Task SetEnabled(ICacheClient cache, ulong channelId, bool enabled)
+		{
+			using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
+			{
+				ModuleState state = await context.Set<ModuleState>().FindAsync(SqlName, channelId.ToDbLong());
+				if (state == null)
+				{
+					state = (await context.Set<ModuleState>().AddAsync(new ModuleState()
 					{
 						ChannelId = channelId.ToDbLong(),
 						ModuleName = SqlName,
 						State = Enabled
 					})).Entity;
-                }
-                state.State = enabled;
+				}
+				state.State = enabled;
 
-                await cache.UpsertAsync(GetCacheKey(channelId), enabled);
-                await context.SaveChangesAsync();
-            }
-        }
-
-		
-    }
+				await cache.UpsertAsync(GetCacheKey(channelId), enabled);
+				await context.SaveChangesAsync();
+			}
+		}
+	}
 }

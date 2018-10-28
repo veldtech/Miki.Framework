@@ -3,8 +3,6 @@ using Miki.Framework.Exceptions;
 using Miki.Logging;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Events.Commands
@@ -20,9 +18,9 @@ namespace Miki.Framework.Events.Commands
 
 		public async Task AddSessionAsync(CommandSession session, CommandHandler handler, TimeSpan? expiration = null)
 		{
-			if(Sessions.TryGetValue(session, out var handlerTuple))
+			if (Sessions.TryGetValue(session, out var handlerTuple))
 			{
-				if(handlerTuple.Item2 >= DateTime.Now)
+				if (handlerTuple.Item2 >= DateTime.Now)
 				{
 					throw new SessionInUseException();
 				}
@@ -30,7 +28,7 @@ namespace Miki.Framework.Events.Commands
 				await RemoveSessionAsync(session);
 			}
 
-			while(!Sessions.TryAdd(session, new Tuple<CommandHandler, DateTime>(handler, DateTime.Now + (expiration ?? TimeSpan.FromSeconds(30)))))
+			while (!Sessions.TryAdd(session, new Tuple<CommandHandler, DateTime>(handler, DateTime.Now + (expiration ?? TimeSpan.FromSeconds(30)))))
 			{
 				await Task.Delay(100);
 			}
@@ -55,7 +53,7 @@ namespace Miki.Framework.Events.Commands
 					await commandHandler.Item1.CheckAsync(context);
 				}
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				Log.Error(e);
 			}
@@ -68,6 +66,7 @@ namespace Miki.Framework.Events.Commands
 			s.UserId = userId;
 			await RemoveSessionAsync(s);
 		}
+
 		public async Task RemoveSessionAsync(CommandSession session)
 		{
 			while (!Sessions.TryRemove(session, out var x))

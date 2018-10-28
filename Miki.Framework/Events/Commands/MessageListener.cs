@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Miki.Cache;
+﻿using Miki.Cache;
 using Miki.Discord.Common;
-using Miki.Logging;
+using System;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Miki.Framework.Events.Commands
 {
 	public class MessageListener : CommandHandler
 	{
-		ConcurrentDictionary<CommandSession, Action<IDiscordMessage>> sessionCache = new ConcurrentDictionary<CommandSession, Action<IDiscordMessage>>();
+		private ConcurrentDictionary<CommandSession, Action<IDiscordMessage>> sessionCache = new ConcurrentDictionary<CommandSession, Action<IDiscordMessage>>();
 
 		public MessageListener(ICachePool cachePool)
 			: base(cachePool)
@@ -20,6 +17,7 @@ namespace Miki.Framework.Events.Commands
 
 		public async Task<IDiscordMessage> WaitForNextMessage(ulong userId, ulong channelId, int timeOutInMilliseconds = 10000)
 			=> await WaitForNextMessage(new CommandSession { ChannelId = channelId, UserId = userId }, timeOutInMilliseconds);
+
 		public async Task<IDiscordMessage> WaitForNextMessage(CommandSession session, int timeOutInMilliseconds = 10000)
 		{
 			IDiscordMessage nextMessage = null;
@@ -34,7 +32,7 @@ namespace Miki.Framework.Events.Commands
 					await Task.Delay(100);
 					timeOutInMilliseconds -= 100;
 
-					if(timeOutInMilliseconds <= 0)
+					if (timeOutInMilliseconds <= 0)
 					{
 						throw new TimeoutException();
 					}
@@ -43,7 +41,7 @@ namespace Miki.Framework.Events.Commands
 			}
 
 			return nextMessage;
-		}	
+		}
 
 		public override async Task CheckAsync(EventContext context)
 		{

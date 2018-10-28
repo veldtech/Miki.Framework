@@ -1,11 +1,7 @@
 ﻿using Miki.Discord.Common;
-using Miki.Discord;
-using Miki.Discord.Rest;
 using Miki.Logging;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Miki.Framework
@@ -17,12 +13,12 @@ namespace Miki.Framework
 	}
 
 	public class MessageBucket
-    {
+	{
 		private static ConcurrentQueue<MessageBucketArgs> queuedMessages = new ConcurrentQueue<MessageBucketArgs>();
 
 		private static async Task Tick()
 		{
-			while(true)
+			while (true)
 			{
 				if (queuedMessages.IsEmpty)
 				{
@@ -52,5 +48,5 @@ namespace Miki.Framework
 		{
 			Task.Run(async () => await Tick());
 		}
-    }
+	}
 }

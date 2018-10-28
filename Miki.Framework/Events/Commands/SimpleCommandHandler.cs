@@ -1,12 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Miki.Cache;
-using Miki.Common;
+﻿using Miki.Cache;
 using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
-using Miki.Framework.Events.Filters;
 using Miki.Framework.Languages;
-using Miki.Logging;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -44,7 +39,7 @@ namespace Miki.Framework.Events
 
 				if (context.Guild != null)
 				{
-					identifier = await prefix.GetForGuildAsync(await Bot.Instance.CachePool.GetAsync(), context.Guild.Id);
+					identifier = await prefix.GetForGuildAsync(DiscordBot.Instance.Discord.CacheClient, context.Guild.Id);
 				}
 
 				if (!context.message.Content.StartsWith(identifier))
@@ -55,11 +50,11 @@ namespace Miki.Framework.Events
 				context.Prefix = prefix;
 				context.Locale = await Locale.GetLanguageInstanceAsync(context.Channel.Id);
 
-                string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
-                    .Substring(identifier.Length)
-                    .Split(' ')
-                    .First()
-                    .ToLower();
+				string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
+					.Substring(identifier.Length)
+					.Split(' ')
+					.First()
+					.ToLower();
 
 				CommandEvent eventInstance = _map.GetCommandEvent(command);
 
@@ -70,7 +65,7 @@ namespace Miki.Framework.Events
 
 				if ((await GetUserAccessibility(context)) >= eventInstance.Accessibility)
 				{
-					if (await eventInstance.IsEnabled(await Bot.Instance.CachePool.GetAsync(), (await context.message.GetChannelAsync()).Id))
+					if (await eventInstance.IsEnabled(DiscordBot.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(context, identifier);
 						await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
@@ -93,8 +88,9 @@ namespace Miki.Framework.Events
 			}
 			return EventAccessibility.ADMINONLY;
 		}
-        public async Task<EventAccessibility> GetUserAccessibility(EventContext e)
-        {
+
+		public async Task<EventAccessibility> GetUserAccessibility(EventContext e)
+		{
 			if (e.Author.Id == 121919449996460033)
 			{
 				return EventAccessibility.DEVELOPERONLY;
@@ -114,6 +110,6 @@ namespace Miki.Framework.Events
 			}
 
 			return EventAccessibility.PUBLIC;
-        }
-    }
+		}
+	}
 }

@@ -1,20 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Miki.Framework;
-using Miki.Framework.Language;
 using Miki.Framework.Models;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Resources;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Languages
 {
-    public static class Locale
-    {
+	public static class Locale
+	{
 		// TODO: add resource based locale names
-        public static Dictionary<string, string> LocaleNames = new Dictionary<string, string>();
+		public static Dictionary<string, string> LocaleNames = new Dictionary<string, string>();
+
 		public static Dictionary<string, string> CompatibilityLayer = new Dictionary<string, string>()
 		{
 			{ "uk-ae", "ara" },
@@ -49,7 +45,7 @@ namespace Miki.Framework.Languages
 
 		public static async Task<LocaleInstance> GetLanguageInstanceAsync(ulong channelId)
 		{
-			var cache = await Bot.Instance.CachePool.GetAsync();
+			var cache = DiscordBot.Instance.Discord.CacheClient;
 			var cacheKey = $"miki:language:{channelId}";
 
 			string resource = null;
@@ -60,7 +56,7 @@ namespace Miki.Framework.Languages
 			}
 			else
 			{
-				using (var context = Bot.Instance.Information.DatabaseContextFactory())
+				using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
 				{
 					ChannelLanguage l = await context.Set<ChannelLanguage>().FindAsync(channelId.ToDbLong());
 					if (l != null)
@@ -104,7 +100,7 @@ namespace Miki.Framework.Languages
 
 		public static async Task SetLanguageAsync(DbContext context, ulong channelId, string language)
 		{
-			var cache = await Bot.Instance.CachePool.GetAsync();
+			var cache = DiscordBot.Instance.Discord.CacheClient;
 			var cacheKey = $"miki:language:{channelId}";
 
 			ChannelLanguage l = await context.Set<ChannelLanguage>().FindAsync(channelId.ToDbLong());
