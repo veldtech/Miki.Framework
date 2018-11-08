@@ -63,13 +63,19 @@ namespace Miki.Framework.Events
 					return;
 				}
 
-				if ((await GetUserAccessibility(context)) >= eventInstance.Accessibility)
+				
+				if(eventInstance.Accessibility != EventAccessibility.PUBLIC)
 				{
-					if (await eventInstance.IsEnabled(DiscordBot.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
+					if ((await GetUserAccessibility(context)) < eventInstance.Accessibility)
 					{
-						await eventInstance.Check(context, identifier);
-						await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
+						return;
 					}
+				}
+
+				if (await eventInstance.IsEnabled(DiscordBot.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
+				{
+					await eventInstance.Check(context, identifier);
+					await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
 				}
 			}
 		}
