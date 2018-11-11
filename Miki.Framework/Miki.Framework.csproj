@@ -11,9 +11,9 @@
     <Company />
     <Description>Miki discord bot framework</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.3.2</Version>
+    <Version>1.4.0</Version>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <PackageIconUrl>https://miki-cdn.nyc3.digitaloceanspaces.com/nuget/miki-framework-icon.png</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <PackageProjectUrl>https://github.com/mikibot/miki.framework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mikibot/miki.framework</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -37,7 +37,7 @@
   <ItemGroup>
     <PackageReference Include="DogStatsD-CSharp-Client" Version="3.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />
-    <PackageReference Include="Miki.Discord" Version="2.6.4" />
+    <PackageReference Include="Miki.Discord" Version="2.6.6" />
     <PackageReference Include="Miki.Discord.Caching" Version="2.4.3" />
     <PackageReference Include="Miki.Localization" Version="1.1.0" />
     <PackageReference Include="Miki.Logging" Version="1.1.2" />
