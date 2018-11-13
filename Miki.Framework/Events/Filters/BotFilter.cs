@@ -7,7 +7,7 @@ namespace Miki.Framework.Events.Filters
 	{
 		public async Task<bool> FilterAsync(IDiscordMessage msg)
 		{
-			return msg.Author.IsBot;
+			return await Task.FromResult(msg.Author.IsBot);
 		}
 	}
 }
