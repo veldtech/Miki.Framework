@@ -37,7 +37,7 @@
   <ItemGroup>
     <PackageReference Include="DogStatsD-CSharp-Client" Version="3.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />
-    <PackageReference Include="Miki.Discord" Version="2.6.6" />
+    <PackageReference Include="Miki.Discord" Version="2.6.7" />
     <PackageReference Include="Miki.Discord.Caching" Version="2.4.3" />
     <PackageReference Include="Miki.Localization" Version="1.1.0" />
     <PackageReference Include="Miki.Logging" Version="1.1.2" />
@@ -47,6 +47,11 @@
   
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Miki.Discord\Miki.Discord\Miki.Discord.csproj" />
+    <ProjectReference Include="..\..\Miki.Bot.Models\Miki.Bot.Models.csproj" />
   </ItemGroup>
   
 </Project>
