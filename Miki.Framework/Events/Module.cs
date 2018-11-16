@@ -27,8 +27,6 @@ namespace Miki.Framework.Events
 
 		public EventSystem EventSystem;
 
-		public string SqlName => "module:" + Name;
-
 		public object InstanceOf { get; private set; }
 
 		private bool isInstalled = false;
@@ -119,7 +117,7 @@ namespace Miki.Framework.Events
 
 				using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
 				{
-					state = await context.Set<ModuleState>().FindAsync(SqlName, id);
+					state = await context.Set<ModuleState>().FindAsync(Name, id);
 				}
 
 				if (state == null)
@@ -165,13 +163,13 @@ namespace Miki.Framework.Events
 		{
 			using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
 			{
-				ModuleState state = await context.Set<ModuleState>().FindAsync(SqlName, channelId.ToDbLong());
+				ModuleState state = await context.Set<ModuleState>().FindAsync(Name, channelId.ToDbLong());
 				if (state == null)
 				{
 					state = (await context.Set<ModuleState>().AddAsync(new ModuleState()
 					{
-						ChannelId = channelId.ToDbLong(),
-						ModuleName = SqlName,
+						GuildId = channelId.ToDbLong(),
+						Name = Name,
 						State = Enabled
 					})).Entity;
 				}

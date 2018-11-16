@@ -52,7 +52,7 @@ namespace Miki.Framework.Events
 			if (state == null)
 			{
 				state = (await context.Set<CommandState>()
-					.AddAsync(new CommandState() { ChannelId = channelId.ToDbLong(), CommandName = Name, State = DefaultEnabled })).Entity;
+					.AddAsync(new CommandState() { ChannelId = channelId.ToDbLong(), Name = Name, State = DefaultEnabled })).Entity;
 			}
 
 			state.State = enabled;
