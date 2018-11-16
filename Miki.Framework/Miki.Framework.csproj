@@ -50,7 +50,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Miki.Discord\Miki.Discord\Miki.Discord.csproj" />
     <ProjectReference Include="..\..\Miki.Bot.Models\Miki.Bot.Models.csproj" />
   </ItemGroup>
   
