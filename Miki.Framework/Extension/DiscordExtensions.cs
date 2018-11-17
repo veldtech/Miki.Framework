@@ -7,12 +7,13 @@ namespace Miki.Discord
 {
 	public static class DiscordExtensions
 	{
-		public static void QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel)
+		public static void QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel, string content = "")
 		{
 			MessageBucket.Add(new MessageBucketArgs()
 			{
 				properties = new MessageArgs()
 				{
+					content = content,
 					embed = embed
 				},
 				channel = channel as IDiscordTextChannel
