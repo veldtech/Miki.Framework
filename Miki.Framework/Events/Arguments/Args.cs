@@ -101,7 +101,7 @@ namespace Miki.Framework.Events
 			args = a;
 		}
 
-		public int? AsInt()
+		public int? TakeInt()
 		{
 			if (int.TryParse(Argument, out int s))
 			{
@@ -110,13 +110,44 @@ namespace Miki.Framework.Events
 			return null;
 		}
 
-		public bool? AsBoolean()
+		public bool? TakeBoolean()
 		{
 			if (bool.TryParse(Argument, out bool s))
 			{
 				return s;
 			}
 			return null;
+		}
+
+		public ArgObject TakeString()
+		{
+			if (Argument.StartsWith('"'))
+			{
+				List<string> toTake = new List<string>();
+				ArgObject arg = this;
+
+				while (true)
+				{
+					toTake.Add(arg.Argument);
+
+					if(arg.Argument.EndsWith('"'))
+					{
+						break;
+					}
+
+					arg = arg.Next();
+
+					if (arg == null)
+					{
+						throw new UnclosedDelimiterException("\"", Argument);
+					}
+				}
+				return new ArgObject(string.Join(" ", toTake).TrimStart('"').TrimEnd('"'), arg.index, args);
+			}
+			else
+			{
+				return this;
+			}
 		}
 
 		public bool IsValid()
@@ -126,7 +157,7 @@ namespace Miki.Framework.Events
 
 		public IEnumerable<ArgObject> TakeWhile(Func<ArgObject, bool> func)
 		{
-			List<ArgObject> o = new List<ArgObject> { this };
+			List<ArgObject> o = new List<ArgObject>();
 
 			for (int i = index; i < args.args.Count; i++)
 			{
