@@ -14,6 +14,7 @@ namespace Miki.Discord
 			{
 				properties = new MessageArgs()
 				{
+					content = content,
 					embed = embed
 				},
 				channel = channel as IDiscordTextChannel

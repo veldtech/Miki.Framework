@@ -58,8 +58,6 @@ namespace Miki.Framework.Events
 			state.State = enabled;
 
 			await client.UpsertAsync(GetCacheKey(channelId), enabled);
-
-			await context.SaveChangesAsync();
 		}
 
 		public async Task<bool> IsEnabled(ICacheClient client, ulong id)
