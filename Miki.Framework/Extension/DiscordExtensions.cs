@@ -8,7 +8,7 @@ namespace Miki.Discord
 {
 	public static class DiscordExtensions
 	{
-		public static IMessageReference QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel)
+		public static IMessageReference QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel, string content = "")
 		{
 			return MessageBucket.Add(new MessageBucketArgs()
 			{
