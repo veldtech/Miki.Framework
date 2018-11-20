@@ -1,4 +1,5 @@
 ﻿using Miki.Framework.Events.Attributes;
+using Miki.Framework.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,12 @@ namespace Miki.Framework.Events
 			{
 				return cmd;
 			}
-			return null;
+			throw new CommandNullException(value);
+		}
+
+		public bool TryGetCommandEvent(string value, out CommandEvent command)
+		{
+			return commandCache.TryGetValue(value, out command);
 		}
 
 		public void Install(EventSystem system)

@@ -94,7 +94,6 @@ namespace Miki.Framework.Events
 			}
 			return EventAccessibility.ADMINONLY;
 		}
-
 		public async Task<EventAccessibility> GetUserAccessibility(EventContext e)
 		{
 			if (e.Author.Id == 121919449996460033)
@@ -117,5 +116,8 @@ namespace Miki.Framework.Events
 
 			return EventAccessibility.PUBLIC;
 		}
+
+		public CommandEvent GetCommandById(string id)
+			=> _map.GetCommandEvent(id);
 	}
 }
