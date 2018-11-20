@@ -56,26 +56,26 @@ namespace Miki.Framework.Events
 					.First()
 					.ToLower();
 
-				CommandEvent eventInstance = _map.GetCommandEvent(command);
-
-				if (eventInstance == null)
+				if (_map.TryGetCommandEvent(command, out var eventInstance))
 				{
-					return;
-				}
-
-				
-				if(eventInstance.Accessibility != EventAccessibility.PUBLIC)
-				{
-					if ((await GetUserAccessibility(context)) < eventInstance.Accessibility)
+					if (eventInstance == null)
 					{
 						return;
 					}
-				}
 
-				if (await eventInstance.IsEnabled(DiscordBot.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
-				{
-					await eventInstance.Check(context, identifier);
-					await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
+					if (eventInstance.Accessibility != EventAccessibility.PUBLIC)
+					{
+						if ((await GetUserAccessibility(context)) < eventInstance.Accessibility)
+						{
+							return;
+						}
+					}
+
+					if (await eventInstance.IsEnabled(DiscordBot.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
+					{
+						await eventInstance.Check(context, identifier);
+						await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
+					}
 				}
 			}
 		}
