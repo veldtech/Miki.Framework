@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Miki.Localization;
+using Miki.Localization.Exceptions;
 
 namespace Miki.Framework.Exceptions
 {
-    public class SessionInUseException : BotException
-    {
-		public override string Resource => "error_session_in_use";
+	public class SessionInUseException : LocalizedException
+	{
+		public override IResource LocaleResource
+			=> new LanguageResource("error_session_in_use");
 	}
 }

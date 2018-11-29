@@ -3,7 +3,6 @@ using Miki.Discord.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Events.Commands
@@ -36,9 +35,9 @@ namespace Miki.Framework.Events.Commands
 		public void AddPrefix(string prefix, bool? isDefault = null, bool changable = false)
 		{
 			Prefixes.Add(new PrefixInstance(
-				prefix, 
-				isDefault ?? !Prefixes.Any(x => x.IsDefault), 
-				changable, 
+				prefix,
+				isDefault ?? !Prefixes.Any(x => x.IsDefault),
+				changable,
 				false
 			));
 		}
@@ -59,13 +58,14 @@ namespace Miki.Framework.Events.Commands
 		{
 			var command = _map.Commands.FirstOrDefault(x => x.Name == commandName.ToLower());
 
-			if(command == null)
+			if (command == null)
 			{
 				throw new ArgumentNullException();
 			}
 
 			_map.RemoveCommand(command);
 		}
+
 		public void RemoveCommand(CommandEvent e)
 		{
 			_map.RemoveCommand(e);

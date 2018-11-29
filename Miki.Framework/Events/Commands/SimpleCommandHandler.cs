@@ -1,11 +1,7 @@
 ﻿using Miki.Cache;
-using Miki.Common;
 using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
-using Miki.Framework.Events.Filters;
 using Miki.Framework.Languages;
-using Miki.Logging;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -27,6 +23,8 @@ namespace Miki.Framework.Events
 
 		public override async Task CheckAsync(EventContext context)
 		{
+			var stopWatch = Stopwatch.StartNew();
+
 			context.commandHandler = this;
 			context.Channel = await context.message.GetChannelAsync();
 
@@ -41,7 +39,7 @@ namespace Miki.Framework.Events
 
 				if (context.Guild != null)
 				{
-					identifier = await prefix.GetForGuildAsync(await Bot.Instance.CachePool.GetAsync(), context.Guild.Id);
+					identifier = await prefix.GetForGuildAsync(DiscordBot.Instance.Discord.CacheClient, context.Guild.Id);
 				}
 
 				if (!context.message.Content.StartsWith(identifier))
@@ -52,42 +50,52 @@ namespace Miki.Framework.Events
 				context.Prefix = prefix;
 				context.Locale = await Locale.GetLanguageInstanceAsync(context.Channel.Id);
 
-                string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
-                    .Substring(identifier.Length)
-                    .Split(' ')
-                    .First()
-                    .ToLower();
+				string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
+					.Substring(identifier.Length)
+					.Split(' ')
+					.First()
+					.ToLower();
 
-				CommandEvent eventInstance = _map.GetCommandEvent(command);
-
-				if (eventInstance == null)
+				if (_map.TryGetCommandEvent(command, out var eventInstance))
 				{
-					return;
-				}
+					if (eventInstance == null)
+					{
+						return;
+					}
 
-				if ((await GetUserAccessibility(context)) >= eventInstance.Accessibility)
-				{
-					if (await eventInstance.IsEnabled(await Bot.Instance.CachePool.GetAsync(), (await context.message.GetChannelAsync()).Id))
+					if (eventInstance.Accessibility != EventAccessibility.PUBLIC)
+					{
+						if ((await GetUserAccessibility(context)) < eventInstance.Accessibility)
+						{
+							return;
+						}
+					}
+
+					if (await eventInstance.IsEnabled(DiscordBot.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(context, identifier);
-						await OnMessageProcessed(eventInstance, context.message, (DateTime.UtcNow - context.message.Timestamp).Milliseconds);
+						await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
 					}
 				}
 			}
 		}
 
 		// TODO: rework this
-		public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage msg, IDiscordGuildChannel channel)
+		public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage msg, IDiscordChannel channel)
 		{
-			return await GetUserAccessibility(new EventContext
+			if (channel is IDiscordGuildChannel c)
 			{
-				Guild = await channel.GetGuildAsync(),
-				Channel = channel,
-				message = msg,
-			});
+				return await GetUserAccessibility(new EventContext
+				{
+					Guild = await c.GetGuildAsync(),
+					Channel = channel as IDiscordTextChannel,
+					message = msg,
+				});
+			}
+			return EventAccessibility.ADMINONLY;
 		}
-        public async Task<EventAccessibility> GetUserAccessibility(EventContext e)
-        {
+		public async Task<EventAccessibility> GetUserAccessibility(EventContext e)
+		{
 			if (e.Author.Id == 121919449996460033)
 			{
 				return EventAccessibility.DEVELOPERONLY;
@@ -107,6 +115,9 @@ namespace Miki.Framework.Events
 			}
 
 			return EventAccessibility.PUBLIC;
-        }
-    }
+		}
+
+		public CommandEvent GetCommandById(string id)
+			=> _map.GetCommandEvent(id);
+	}
 }

@@ -1,10 +1,5 @@
 ﻿using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
-using Miki.Framework.Language;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
@@ -18,7 +13,7 @@ namespace Miki.Framework.Events
 
 		public IDiscordUser Author => message.Author;
 
-		public IDiscordChannel Channel { get; internal set; }
+		public IDiscordTextChannel Channel { get; internal set; }
 
 		public IDiscordGuild Guild { get; internal set; }
 
@@ -27,8 +22,5 @@ namespace Miki.Framework.Events
 		public PrefixInstance Prefix;
 
 		public LocaleInstance Locale;
-
-		public CommandSession CreateSession()
-			=> new CommandSession() { ChannelId = Channel.Id, UserId = Author.Id };
 	}
 }

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Miki.Localization;
+using Miki.Localization.Exceptions;
 
 namespace Miki.Framework.Exceptions
 {
-	public class ChannelNotNsfwException : BotException
+	public class ChannelNotNsfwException : LocalizedException
 	{
-		public override string Resource => "error_channel_not_nsfw";
-
-		public ChannelNotNsfwException() : base()
-		{ }
+		public override IResource LocaleResource
+			=> new LanguageResource("error_channel_not_nsfw");
 	}
 }

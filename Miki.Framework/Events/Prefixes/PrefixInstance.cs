@@ -1,8 +1,6 @@
-﻿using Miki.Cache;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Cache;
 using Miki.Framework.Models;
-using Miki.Framework.Models.Context;
-using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
@@ -27,35 +25,35 @@ namespace Miki.Framework.Events
 			ForceCommandExecution = forceExec;
 		}
 
-		public async Task ChangeForGuildAsync(ICacheClient cache, ulong id, string prefix)
+		public async Task ChangeForGuildAsync(DbContext context, ICacheClient cache, ulong id, string prefix)
 		{
 			if (Changable)
 			{
-				using (var context = new IAContext())
-				{
-					long guildId = id.ToDbLong();
+				long guildId = id.ToDbLong();
 
-					Identifier i = await context.Identifiers.FindAsync(guildId, DefaultValue);
-					if (i == null)
-					{
-						context.Identifiers.Add(new Identifier() { GuildId = guildId, DefaultValue = DefaultValue, Value = prefix });
-					}
-					else
-					{
-						i.Value = prefix;
-					}
-					await context.SaveChangesAsync();
+				Identifier i = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
+				if (i == null)
+				{
+					await context.Set<Identifier>()
+						.AddAsync(new Identifier() { GuildId = guildId, DefaultValue = DefaultValue, Value = prefix });
 				}
+				else
+				{
+					i.Value = prefix;
+				}
+				await context.SaveChangesAsync();
+
 				await cache.UpsertAsync(GetCacheKey(id), prefix);
 			}
 		}
 
-		async Task<Identifier> CreateNewAsync(IAContext context, long id)
+		private async Task<Identifier> CreateNewAsync(DbContext context, long id)
 		{
-			return (await context.Identifiers.AddAsync(new Identifier() { GuildId = id, DefaultValue = DefaultValue, Value = DefaultValue })).Entity;
+			return (await context.Set<Identifier>()
+				.AddAsync(new Identifier() { GuildId = id, DefaultValue = DefaultValue, Value = DefaultValue })).Entity;
 		}
 
-		string GetCacheKey(ulong id)
+		private string GetCacheKey(ulong id)
 			=> $"framework:prefix:{id}";
 
 		public async Task<string> GetForGuildAsync(ICacheClient cache, ulong id)
@@ -78,17 +76,18 @@ namespace Miki.Framework.Events
 			long guildId = id.ToDbLong();
 			Identifier identifier = null;
 
-			using (var context = new IAContext())
+			using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
 			{
-				identifier = await context.Identifiers.FindAsync(guildId, DefaultValue);
+				identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
 				if (identifier == null)
 				{
 					identifier = await CreateNewAsync(context, guildId);
 				}
+
 				await context.SaveChangesAsync();
 			}
+
 			return identifier.Value;
 		}
 	}
 }
- 

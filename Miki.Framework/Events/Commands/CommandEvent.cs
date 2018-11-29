@@ -1,12 +1,8 @@
-﻿using Miki.Common;
-using Miki.Discord.Common;
-using Miki.Framework.Events.Commands;
+﻿using Miki.Discord.Common;
 using Miki.Framework.Exceptions;
-using Miki.Framework.Languages;
 using Miki.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,10 +23,12 @@ namespace Miki.Framework.Events
 		public CommandEvent()
 		{
 		}
+
 		public CommandEvent(string name)
 		{
 			Name = name;
 		}
+
 		public CommandEvent(Action<CommandEvent> info)
 		{
 			info.Invoke(this);
@@ -54,7 +52,7 @@ namespace Miki.Framework.Events
 
 			if (Module != null)
 			{
-				if (Module.Nsfw && !(await e.message.GetChannelAsync()).IsNsfw)
+				if (Module.Nsfw && !e.Channel.IsNsfw)
 				{
 					throw new ChannelNotNsfwException();
 				}
@@ -70,9 +68,9 @@ namespace Miki.Framework.Events
 			{
 				foreach (GuildPermission g in GuildPermissions)
 				{
-					if (!(await (await e.message.GetChannelAsync() as IDiscordGuildChannel).GetPermissionsAsync(e.message.Author as IDiscordGuildUser)).HasFlag(g))
+					if (!(await e.Guild.GetPermissionsAsync(e.message.Author as IDiscordGuildUser)).HasFlag(g))
 					{
-						await (await e.message.GetChannelAsync()).SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
+						await (e.Channel as IDiscordTextChannel).SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
 						return;
 					}
 				}
@@ -87,11 +85,6 @@ namespace Miki.Framework.Events
 					targetCommand = CommandPool[arguments[0]];
 					args = args.Substring((arguments[0].Length == args.Length) ? arguments[0].Length : arguments[0].Length + 1);
 				}
-			}
-
-			if(e.Channel is IDiscordGuildChannel c)
-			{
-				e.Guild = await c.GetGuildAsync();
 			}
 
 			e.Arguments = new Args(args);

@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Miki.Discord.Common;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Miki.Discord.Common;
 
 namespace Miki.Framework.Events.Filters
 {

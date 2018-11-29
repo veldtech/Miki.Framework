@@ -11,9 +11,9 @@
     <Company />
     <Description>Miki discord bot framework</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.2.2</Version>
+    <Version>1.4.0</Version>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <PackageIconUrl>https://miki-cdn.nyc3.digitaloceanspaces.com/nuget/miki-framework-icon.png</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <PackageProjectUrl>https://github.com/mikibot/miki.framework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mikibot/miki.framework</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -35,15 +35,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DogStatsD-CSharp-Client" Version="3.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
-    <PackageReference Include="Miki.Common" Version="1.2.0" />
-    <PackageReference Include="Miki.Discord" Version="2.5.1" />
-    <PackageReference Include="Miki.Discord.Caching" Version="2.3.6" />
+    <PackageReference Include="DogStatsD-CSharp-Client" Version="3.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />
+    <PackageReference Include="Miki.Discord" Version="2.6.7" />
+    <PackageReference Include="Miki.Discord.Caching" Version="2.4.3" />
+    <PackageReference Include="Miki.Localization" Version="1.1.0" />
     <PackageReference Include="Miki.Logging" Version="1.1.2" />
     <PackageReference Include="Miki.Rest" Version="1.6.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.1" />
+    <PackageReference Include="Npgsql" Version="4.0.3" />
   </ItemGroup>
   
   <ItemGroup>
@@ -51,8 +50,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\Miki.Discord\Miki.Discord.Caching\Miki.Discord.Caching.csproj" />
-    <ProjectReference Include="..\..\Miki.Discord\Miki.Discord\Miki.Discord.csproj" />
+    <ProjectReference Include="..\..\Miki.Bot.Models\Miki.Bot.Models.csproj" />
   </ItemGroup>
   
 </Project>

@@ -1,30 +1,58 @@
 ﻿using Miki.Common.Builders;
-using Miki.Discord;
 using Miki.Discord.Common;
-using Miki.Discord.Rest;
 using Miki.Framework;
-using Miki.Framework.Languages;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Miki.Discord
 {
-    public static class DiscordExtensions
-    {
-		public static void QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel)
+	public static class DiscordExtensions
+	{
+		public static IMessageReference QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel, string content = "")
 		{
-			MessageBucket.Add(new MessageBucketArgs()
+			return MessageBucket.Add(new MessageBucketArgs()
 			{
 				properties = new MessageArgs()
 				{
+					content = content,
 					embed = embed
 				},
-				channel = channel
+				channel = channel as IDiscordTextChannel
 			});
+		}
+
+		public static IMessageReference ThenWait(this IMessageReference reference, int milliseconds)
+		{
+			reference.ProcessAfterComplete(async (msg) =>
+			{
+				await Task.Delay(milliseconds);
+			});
+			return reference;
+		}
+
+		public static IMessageReference ThenDelete(this IMessageReference reference)
+		{
+			reference.ProcessAfterComplete(async (msg) =>
+			{
+				await msg.DeleteAsync();
+			});
+			return reference;
+		}
+
+		public static IMessageReference ThenEdit(this IMessageReference reference, string message = "", DiscordEmbed embed = null)
+		{
+			reference.ProcessAfterComplete(async (x) => await x.EditAsync(new EditMessageArgs
+			{
+				content = message,
+				embed = embed
+			}));
+			return reference;
+		}
+
+		public static IMessageReference Then(this IMessageReference reference, Func<IDiscordMessage, Task> fn)
+		{
+			reference.ProcessAfterComplete(fn);
+			return reference;
 		}
 
 		public static async Task<IDiscordMessage> SendToChannel(this DiscordEmbed embed, IDiscordChannel channel)
@@ -46,15 +74,15 @@ namespace Miki.Discord
 			//		}
 			//	}
 			//}
-			return await channel.SendMessageAsync("", false, embed);
+			return await (channel as IDiscordTextChannel).SendMessageAsync("", false, embed);
 		}
+
 		public static async Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
 		{
-			await Task.Yield();
 			return await (await user.GetDMChannelAsync()).SendMessageAsync("", false, embed);
 		}
 
-		public static void QueueMessageAsync(this IDiscordChannel channel, string message)
+		public static IMessageReference QueueMessageAsync(this IDiscordTextChannel channel, string message)
 			=> MessageBucket.Add(new MessageBucketArgs()
 			{
 				properties = new MessageArgs()

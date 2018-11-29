@@ -1,13 +1,11 @@
 ﻿using Miki.Discord;
 using Miki.Discord.Common;
 using Miki.Discord.Rest;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Miki.Localization;
 
 namespace Miki.Framework.Language
 {
-    public class LocalizedEmbedBuilder
+	public class LocalizedEmbedBuilder
 	{
 		public EmbedBuilder EmbedBuilder { get; private set; } = new EmbedBuilder();
 
@@ -41,6 +39,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithDescription(string description, params object[] param)
 			=> WithDescription(new LanguageResource(description, param));
+
 		public LocalizedEmbedBuilder WithDescription(LanguageResource description)
 		{
 			EmbedBuilder.SetDescription(description.Get(_instance));
@@ -49,6 +48,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithFooter(string text, string iconUrl = null, params object[] param)
 			=> WithFooter(new LanguageResource(text, param), iconUrl);
+
 		public LocalizedEmbedBuilder WithFooter(IResource text, string iconUrl = null)
 		{
 			EmbedBuilder.SetFooter(text.Get(_instance), iconUrl);
@@ -69,10 +69,11 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithTitle(string resource, params object[] param)
 			=> WithTitle(new LanguageResource(resource, param));
+
 		public LocalizedEmbedBuilder WithTitle(IResource title)
 		{
 			EmbedBuilder.SetTitle(title.Get(_instance));
 			return this;
 		}
-    }
+	}
 }
