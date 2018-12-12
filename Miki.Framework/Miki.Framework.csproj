@@ -39,17 +39,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.4" />
     <PackageReference Include="Miki.Discord" Version="2.6.7" />
     <PackageReference Include="Miki.Discord.Caching" Version="2.4.3" />
-    <PackageReference Include="Miki.Localization" Version="1.1.0" />
     <PackageReference Include="Miki.Logging" Version="1.1.2" />
     <PackageReference Include="Miki.Rest" Version="1.6.0" />
     <PackageReference Include="Npgsql" Version="4.0.3" />
   </ItemGroup>
   
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.1" />
-  </ItemGroup>
-  
-  <ItemGroup>
+    <ProjectReference Include="..\..\..\Miki.Localization\Miki.Localization.csproj" />
     <ProjectReference Include="..\..\Miki.Bot.Models\Miki.Bot.Models.csproj" />
   </ItemGroup>
   

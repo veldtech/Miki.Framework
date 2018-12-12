@@ -11,7 +11,7 @@ namespace Miki.Framework.Events.Commands
 	{
 		public ConcurrentDictionary<CommandSession, Tuple<CommandHandler, DateTime>> Sessions { get; private set; } = new ConcurrentDictionary<CommandSession, Tuple<CommandHandler, DateTime>>();
 
-		public SessionBasedCommandHandler(ICachePool cachePool)
+		public SessionBasedCommandHandler(ICacheClient cachePool)
 			: base(cachePool)
 		{
 		}

@@ -77,7 +77,7 @@ namespace Miki.Framework.Events
 
 				long guildId = id.ToDbLong();
 
-				using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
+				using (var context = MikiApplication.Instance.Information.DatabaseContextFactory())
 				{
 					state = await context.Set<CommandState>().FindAsync(Name, guildId);
 				}

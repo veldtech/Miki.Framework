@@ -13,11 +13,11 @@ namespace Miki.Framework.Events.Commands
 
 		public List<PrefixInstance> Prefixes { get; private set; } = new List<PrefixInstance>();
 
-		protected ICachePool _cachePool = null;
+		protected ICacheClient _cachePool = null;
 
 		protected CommandMap _map = new CommandMap();
 
-		public CommandHandler(ICachePool cachePool)
+		public CommandHandler(ICacheClient cachePool)
 		{
 			_cachePool = cachePool;
 		}
@@ -51,7 +51,7 @@ namespace Miki.Framework.Events.Commands
 
 		public async Task<string> GetDefaultPrefixValueAsync(ulong guildId)
 		{
-			return await GetDefaultPrefix().GetForGuildAsync(await _cachePool.GetAsync(), guildId);
+			return await GetDefaultPrefix().GetForGuildAsync(_cachePool, guildId);
 		}
 
 		public void RemoveCommand(string commandName)

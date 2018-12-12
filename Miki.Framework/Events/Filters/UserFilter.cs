@@ -8,9 +8,7 @@ namespace Miki.Framework.Events.Filters
 	{
 		public HashSet<ulong> Users { get; private set; } = new HashSet<ulong>();
 
-		public async Task<bool> FilterAsync(IDiscordMessage msg)
-		{
-			return Users.Contains(msg.Author.Id);
-		}
+		public Task<bool> FilterAsync(IDiscordMessage msg)
+			=> Task.FromResult(Users.Contains(msg.Author.Id));
 	}
 }

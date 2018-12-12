@@ -1,28 +1,38 @@
-﻿using Miki.Common;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Common;
 using Miki.Discord;
 using System.Collections.Generic;
 
 namespace Miki.Framework
 {
-	public class DiscordBot
+	public class MikiApplication
 	{
-		public static DiscordBot Instance { get; private set; }
+		public static MikiApplication Instance { get; private set; }
 
 		public DiscordClient Discord { get; private set; }
 
 		public ClientInformation Information { get; private set; }
 
-		private List<IAttachable> _attachables = new List<IAttachable>();
+		public IServiceCollection Services { get; private set; }
 
-		public DiscordBot(ClientInformation information)
+		private readonly List<IAttachable> _attachables = new List<IAttachable>();
+
+		public MikiApplication(ClientInformation information)
 		{
 			Discord = new DiscordClient(information.ClientConfiguration);
+			Services = new ServiceCollection();
+
 			Information = information;
 
 			if (Instance == null)
 			{
 				Instance = this;
 			}
+		}
+
+		public void AddService<T>(T value)
+		{
+			Services.Add(new ServiceDescriptor(typeof(T), value));
 		}
 
 		public void Attach(IAttachable attachable)

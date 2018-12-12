@@ -8,9 +8,9 @@ namespace Miki.Framework.Events.Commands
 {
 	public class MessageListener : CommandHandler
 	{
-		private ConcurrentDictionary<CommandSession, Action<IDiscordMessage>> sessionCache = new ConcurrentDictionary<CommandSession, Action<IDiscordMessage>>();
+		private readonly ConcurrentDictionary<CommandSession, Action<IDiscordMessage>> sessionCache = new ConcurrentDictionary<CommandSession, Action<IDiscordMessage>>();
 
-		public MessageListener(ICachePool cachePool)
+		public MessageListener(ICacheClient cachePool)
 			: base(cachePool)
 		{
 		}

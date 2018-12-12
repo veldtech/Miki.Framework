@@ -61,7 +61,7 @@ namespace Miki.Framework.Events
 
 		public void RegisterAttributeCommands(Assembly assembly = null)
 		{
-			DiscordBot b = DiscordBot.Instance;
+			MikiApplication b = MikiApplication.Instance;
 
 			if (assembly == null)
 			{

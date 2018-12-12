@@ -115,7 +115,7 @@ namespace Miki.Framework.Events
 
 				long id = channelId.ToDbLong();
 
-				using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
+				using (var context = MikiApplication.Instance.Information.DatabaseContextFactory())
 				{
 					state = await context.Set<ModuleState>().FindAsync(Name, id);
 				}
@@ -133,7 +133,7 @@ namespace Miki.Framework.Events
 
 		public void Uninstall(object bot)
 		{
-			DiscordBot b = (DiscordBot)bot;
+			MikiApplication b = (MikiApplication)bot;
 
 			if (!isInstalled)
 			{
@@ -161,7 +161,7 @@ namespace Miki.Framework.Events
 
 		public async Task SetEnabled(ICacheClient cache, ulong channelId, bool enabled)
 		{
-			using (var context = DiscordBot.Instance.Information.DatabaseContextFactory())
+			using (var context = MikiApplication.Instance.Information.DatabaseContextFactory())
 			{
 				ModuleState state = await context.Set<ModuleState>().FindAsync(Name, channelId.ToDbLong());
 				if (state == null)

@@ -15,7 +15,7 @@ namespace Miki.Framework.Events
 		public IReadOnlyList<CommandEvent> Commands => _map.Commands;
 		public IReadOnlyList<Module> Modules => _map.Modules;
 
-		public SimpleCommandHandler(ICachePool pool, CommandMap map)
+		public SimpleCommandHandler(ICacheClient pool, CommandMap map)
 			: base(pool)
 		{
 			this._map = map;
@@ -39,7 +39,7 @@ namespace Miki.Framework.Events
 
 				if (context.Guild != null)
 				{
-					identifier = await prefix.GetForGuildAsync(DiscordBot.Instance.Discord.CacheClient, context.Guild.Id);
+					identifier = await prefix.GetForGuildAsync(MikiApplication.Instance.Discord.CacheClient, context.Guild.Id);
 				}
 
 				if (!context.message.Content.StartsWith(identifier))
@@ -71,7 +71,7 @@ namespace Miki.Framework.Events
 						}
 					}
 
-					if (await eventInstance.IsEnabled(DiscordBot.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
+					if (await eventInstance.IsEnabled(MikiApplication.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(context, identifier);
 						await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);

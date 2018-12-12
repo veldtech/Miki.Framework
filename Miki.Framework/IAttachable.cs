@@ -3,6 +3,6 @@
 	// TODO: consider privatizing function due to user friendliness
 	public interface IAttachable
 	{
-		void AttachTo(DiscordBot bot);
+		void AttachTo(MikiApplication bot);
 	}
 }

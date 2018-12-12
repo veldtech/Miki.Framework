@@ -9,7 +9,7 @@ namespace Miki.Framework.Events
 {
 	public class EventSystem : IAttachable
 	{
-		internal DiscordBot bot;
+		internal MikiApplication bot;
 
 		private Dictionary<Guid, CommandHandler> commandHandlers = new Dictionary<Guid, CommandHandler>();
 
@@ -29,7 +29,7 @@ namespace Miki.Framework.Events
 			commandHandlers.Add(handler.GetType().GUID, handler);
 		}
 
-		public void AttachTo(DiscordBot bot)
+		public void AttachTo(MikiApplication bot)
 		{
 			this.bot = bot;
 			bot.Discord.MessageCreate += OnMessageReceivedAsync;
