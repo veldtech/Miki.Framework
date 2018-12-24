@@ -85,7 +85,7 @@ namespace Miki.Framework.Events
 	{
 		public string Argument { get; private set; }
 
-		private Args args;
+		private readonly Args args;
 		private readonly int index;
 
 		public bool IsLast
@@ -218,8 +218,9 @@ namespace Miki.Framework.Events
 			}
 			else
 			{
-				guildUser = (await guild.GetMembersAsync())
-					.Where(x => x != null)
+                var allUsers = await guild.GetMembersAsync();
+
+                guildUser = allUsers.Where(x => x != null)
 					.Where(x =>
 					{
 						if (x.Nickname != null)
