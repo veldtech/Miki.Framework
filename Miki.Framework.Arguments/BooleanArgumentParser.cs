@@ -6,6 +6,9 @@ namespace Miki.Framework.Arguments
 {
 	public class BooleanArgumentParser : IArgumentParser
 	{
+        public Type OutputType
+            => typeof(bool);
+
 		public int Priority => 1;
 
 		public bool CanParse(IArgumentPack pack)

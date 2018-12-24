@@ -14,11 +14,14 @@ namespace Miki.Framework.Arguments
 		{
 		}
 
-		public object Take(IArgumentPack p)
+		public object Take(IArgumentPack p, Type type)
 			=> _parsers.Where(x => x.CanParse(p))
+                .Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
 				.OrderByDescending(x => x.Priority)
 				.FirstOrDefault()
 				.Parse(p);
+        public T Take<T>(IArgumentPack p)
+            => (T)Take(p, typeof(T));
 
 		public void SeedAssembly(Assembly a)
 		{

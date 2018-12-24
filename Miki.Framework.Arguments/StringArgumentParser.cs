@@ -6,6 +6,9 @@ namespace Miki.Framework.Arguments
 {
 	public class StringArgumentParser : IArgumentParser
 	{
+        public Type OutputType
+            => typeof(string);
+
 		public int Priority
 			=> 0;
 

@@ -6,6 +6,9 @@ namespace Miki.Framework.Arguments
 {
 	public class IntArgumentParser : IArgumentParser
 	{
+        public Type OutputType
+            => typeof(int);
+
 		public int Priority => 1;
 
 		public bool CanParse(IArgumentPack pack)
@@ -13,7 +16,13 @@ namespace Miki.Framework.Arguments
 
 		public object Parse(IArgumentPack pack)
 		{
-			return int.Parse(pack.Take());
+            var value = pack.Take();
+
+            if (int.TryParse(value, out int result))
+            {
+                return result;
+            }
+            return null;
 		}
 	}
 }

@@ -6,6 +6,8 @@ namespace Miki.Framework.Arguments
 {
 	public interface IArgumentParser
 	{
+        Type OutputType { get; }
+
 		int Priority { get; }
 
 		bool CanParse(IArgumentPack pack);
