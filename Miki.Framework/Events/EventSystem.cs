@@ -1,4 +1,5 @@
-﻿using Miki.Discord.Common;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
 using Miki.Framework.Events.Filters;
 using System;
@@ -7,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
-	public class EventSystem : IAttachable
+	public class EventSystem
 	{
-		internal MikiApplication bot;
-
 		private Dictionary<Guid, CommandHandler> commandHandlers = new Dictionary<Guid, CommandHandler>();
 
 		private readonly EventSystemConfig config;
@@ -27,12 +26,6 @@ namespace Miki.Framework.Events
 		public void AddCommandHandler(CommandHandler handler)
 		{
 			commandHandlers.Add(handler.GetType().GUID, handler);
-		}
-
-		public void AttachTo(MikiApplication bot)
-		{
-			this.bot = bot;
-			bot.Discord.MessageCreate += OnMessageReceivedAsync;
 		}
 
 		public T GetCommandHandler<T>() where T : CommandHandler
@@ -55,20 +48,25 @@ namespace Miki.Framework.Events
 			context.message = msg;
 			context.EventSystem = this;
 
-			try
-			{
-				foreach (var handler in commandHandlers.Values)
-				{
-					await handler.CheckAsync(context);
-				}
-			}
-			catch (Exception ex)
-			{
-				if (OnError != null)
-				{
-					await OnError(ex, context);
-				}
-			}
+            using (var scope = MikiApp.Instance.Services.CreateScope())
+            {
+                context.Services = scope.ServiceProvider;
+
+                try
+                {
+                    foreach (var handler in commandHandlers.Values)
+                    {
+                        await handler.CheckAsync(context);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (OnError != null)
+                    {
+                        await OnError(ex, context);
+                    }
+                }
+            }
 		}
 	}
 }

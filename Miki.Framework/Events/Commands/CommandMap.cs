@@ -61,7 +61,7 @@ namespace Miki.Framework.Events
 
 		public void RegisterAttributeCommands(Assembly assembly = null)
 		{
-			MikiApplication b = MikiApplication.Instance;
+			MikiApp b = MikiApp.Instance;
 
 			if (assembly == null)
 			{

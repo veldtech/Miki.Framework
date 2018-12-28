@@ -45,7 +45,7 @@ namespace Miki.Framework.Languages
 
 		public static async Task<LocaleInstance> GetLanguageInstanceAsync(ulong channelId)
 		{
-			var cache = MikiApplication.Instance.Discord.CacheClient;
+			var cache = MikiApp.Instance.Discord.CacheClient;
 			var cacheKey = $"miki:language:{channelId}";
 
 			string resource = null;
@@ -56,7 +56,7 @@ namespace Miki.Framework.Languages
 			}
 			else
 			{
-				using (var context = MikiApplication.Instance.Information.DatabaseContextFactory())
+				using (var context = MikiApp.Instance.GetService<DbContext>())
 				{
 					ChannelLanguage l = await context.Set<ChannelLanguage>().FindAsync(channelId.ToDbLong());
 					if (l != null)
@@ -100,7 +100,7 @@ namespace Miki.Framework.Languages
 
 		public static async Task SetLanguageAsync(DbContext context, ulong channelId, string language)
 		{
-			var cache = MikiApplication.Instance.Discord.CacheClient;
+			var cache = MikiApp.Instance.Discord.CacheClient;
 			var cacheKey = $"miki:language:{channelId}";
 
 			ChannelLanguage l = await context.Set<ChannelLanguage>().FindAsync(channelId.ToDbLong());

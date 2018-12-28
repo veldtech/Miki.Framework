@@ -8,8 +8,8 @@ namespace Miki.Framework.Exceptions
 {
 	public class UnclosedDelimiterException : LocalizedException
 	{
-		private string _delimiter;
-		private string _input;
+		private readonly string _delimiter;
+		private readonly string _input;
 
 		public override IResource LocaleResource => new LanguageResource("error_unclosed_delimiter", _delimiter, _input);
 

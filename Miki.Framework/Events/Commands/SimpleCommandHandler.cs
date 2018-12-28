@@ -1,4 +1,6 @@
-﻿using Miki.Cache;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Miki.Cache;
 using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
 using Miki.Framework.Languages;
@@ -18,7 +20,7 @@ namespace Miki.Framework.Events
 		public SimpleCommandHandler(ICacheClient pool, CommandMap map)
 			: base(pool)
 		{
-			this._map = map;
+			_map = map;
 		}
 
 		public override async Task CheckAsync(EventContext context)
@@ -39,7 +41,7 @@ namespace Miki.Framework.Events
 
 				if (context.Guild != null)
 				{
-					identifier = await prefix.GetForGuildAsync(MikiApplication.Instance.Discord.CacheClient, context.Guild.Id);
+					identifier = await prefix.GetForGuildAsync(MikiApp.Instance.Discord.CacheClient, context.Guild.Id);
 				}
 
 				if (!context.message.Content.StartsWith(identifier))
@@ -71,7 +73,10 @@ namespace Miki.Framework.Events
 						}
 					}
 
-					if (await eventInstance.IsEnabled(MikiApplication.Instance.Discord.CacheClient, (await context.message.GetChannelAsync()).Id))
+					if (await eventInstance.IsEnabled(
+                        context.Services.GetService<ICacheClient>(), 
+                        context.Services.GetService<DbContext>(), 
+                        (await context.message.GetChannelAsync()).Id))
 					{
 						await eventInstance.Check(context, identifier);
 						await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);

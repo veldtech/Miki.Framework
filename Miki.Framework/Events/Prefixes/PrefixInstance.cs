@@ -76,7 +76,7 @@ namespace Miki.Framework.Events
 			long guildId = id.ToDbLong();
 			Identifier identifier = null;
 
-			using (var context = MikiApplication.Instance.Information.DatabaseContextFactory())
+			using (var context = MikiApp.Instance.GetService<DbContext>())
 			{
 				identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
 				if (identifier == null)

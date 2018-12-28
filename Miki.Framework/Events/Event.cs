@@ -60,12 +60,15 @@ namespace Miki.Framework.Events
 			await client.UpsertAsync(GetCacheKey(channelId), enabled);
 		}
 
-		public async Task<bool> IsEnabled(ICacheClient client, ulong id)
+		public async Task<bool> IsEnabled(ICacheClient client, DbContext db, ulong id)
 		{
-			if (Module != null)
-			{
-				if (!await Module.IsEnabled(client, id)) return false;
-			}
+            if (Module != null)
+            {
+                if (!await Module.IsEnabled(client, db, id))
+                {
+                    return false;
+                }
+            }
 
 			if (await client.ExistsAsync(GetCacheKey(id)))
 			{
@@ -77,10 +80,7 @@ namespace Miki.Framework.Events
 
 				long guildId = id.ToDbLong();
 
-				using (var context = MikiApplication.Instance.Information.DatabaseContextFactory())
-				{
-					state = await context.Set<CommandState>().FindAsync(Name, guildId);
-				}
+				state = await db.Set<CommandState>().FindAsync(Name, guildId);
 
 				bool currentState = state?.State ?? DefaultEnabled;
 				await client.UpsertAsync(GetCacheKey(id), currentState);

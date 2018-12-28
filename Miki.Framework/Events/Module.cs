@@ -1,4 +1,5 @@
-﻿using Miki.Cache;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Cache;
 using Miki.Discord.Common;
 using Miki.Framework.Models;
 using System;
@@ -52,7 +53,7 @@ namespace Miki.Framework.Events
 
 			if (MessageRecieved != null)
 			{
-				system.bot.Discord.MessageCreate += async (message) =>
+				MikiApp.Instance.Discord.MessageCreate += async (message) =>
 				{
 					await HandleEvent(MessageRecieved(message), message.ChannelId);
 				};
@@ -60,7 +61,7 @@ namespace Miki.Framework.Events
 
 			if (UserJoinGuild != null)
 			{
-				system.bot.Discord.GuildMemberCreate += async (guildMember) =>
+                MikiApp.Instance.Discord.GuildMemberCreate += async (guildMember) =>
 				{
 					await UserJoinGuild(guildMember);
 				};
@@ -68,7 +69,7 @@ namespace Miki.Framework.Events
 
 			if (UserLeaveGuild != null)
 			{
-				system.bot.Discord.GuildMemberDelete += async (guildMember) =>
+                MikiApp.Instance.Discord.GuildMemberDelete += async (guildMember) =>
 				{
 					await UserLeaveGuild(guildMember);
 				};
@@ -76,7 +77,7 @@ namespace Miki.Framework.Events
 
 			if (UserUpdated != null)
 			{
-				system.bot.Discord.UserUpdate += async (oldUser, newUser) =>
+                MikiApp.Instance.Discord.UserUpdate += async (oldUser, newUser) =>
 				{
 					await UserUpdated(oldUser, newUser);
 				};
@@ -97,13 +98,13 @@ namespace Miki.Framework.Events
 
 		private async Task HandleEvent(Task runnableEvent, ulong channelId)
 		{
-			if (await IsEnabled(EventSystem.bot.Discord.CacheClient, channelId))
+			if (await IsEnabled(MikiApp.Instance.GetService<ICacheClient>(), MikiApp.Instance.GetService<DbContext>(), channelId))
 			{
 				await runnableEvent;
 			}
 		}
 
-		public async Task<bool> IsEnabled(ICacheClient cache, ulong channelId)
+		public async Task<bool> IsEnabled(ICacheClient cache, DbContext db, ulong channelId)
 		{
 			if (await cache.ExistsAsync(GetCacheKey(channelId)))
 			{
@@ -114,11 +115,8 @@ namespace Miki.Framework.Events
 				ModuleState state = null;
 
 				long id = channelId.ToDbLong();
-
-				using (var context = MikiApplication.Instance.Information.DatabaseContextFactory())
-				{
-					state = await context.Set<ModuleState>().FindAsync(Name, id);
-				}
+				
+				state = await db.Set<ModuleState>().FindAsync(Name, id);
 
 				if (state == null)
 				{
@@ -133,7 +131,7 @@ namespace Miki.Framework.Events
 
 		public void Uninstall(object bot)
 		{
-			MikiApplication b = (MikiApplication)bot;
+			MikiApp b = (MikiApp)bot;
 
 			if (!isInstalled)
 			{
@@ -161,7 +159,7 @@ namespace Miki.Framework.Events
 
 		public async Task SetEnabled(ICacheClient cache, ulong channelId, bool enabled)
 		{
-			using (var context = MikiApplication.Instance.Information.DatabaseContextFactory())
+			using (var context = MikiApp.Instance.GetService<DbContext>())
 			{
 				ModuleState state = await context.Set<ModuleState>().FindAsync(Name, channelId.ToDbLong());
 				if (state == null)

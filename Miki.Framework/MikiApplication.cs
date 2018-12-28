@@ -1,56 +1,37 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Cache;
 using Miki.Common;
 using Miki.Discord;
-using System.Collections.Generic;
+using Miki.Discord.Common;
+using System;
 
 namespace Miki.Framework
 {
-	public class MikiApplication
+	public class MikiApp
 	{
-		public static MikiApplication Instance { get; private set; }
+		public static MikiApp Instance { get; internal set; }
 
-		public DiscordClient Discord { get; private set; }
+		public DiscordClient Discord { get; internal set; }
 
-		public ClientInformation Information { get; private set; }
+        public IServiceProvider Services { get; }
 
-		public IServiceCollection Services { get; private set; }
-
-		private readonly List<IAttachable> _attachables = new List<IAttachable>();
-
-		public MikiApplication(ClientInformation information)
+		internal MikiApp(ServiceProvider provider)
 		{
-			Discord = new DiscordClient(information.ClientConfiguration);
-			Services = new ServiceCollection();
+            Services = provider;
 
-			Information = information;
+            Discord = new DiscordClient(new DiscordClientConfigurations
+            {
+                ApiClient = provider.GetService<IApiClient>(),
+                Gateway = provider.GetService<IGateway>(),
+                CacheClient = provider.GetService<IExtendedCacheClient>()
+            });
 
-			if (Instance == null)
-			{
-				Instance = this;
-			}
+            Instance = this;
 		}
 
-		public void AddService<T>(T value)
-		{
-			Services.Add(new ServiceDescriptor(typeof(T), value));
-		}
-
-		public void Attach(IAttachable attachable)
-		{
-			_attachables.Add(attachable);
-			attachable.AttachTo(this);
-		}
-
-		public T GetAttachedObject<T>() where T : class, IAttachable
-		{
-			for (int i = 0; i < _attachables.Count; i++)
-			{
-				if (_attachables[i] is T)
-				{
-					return _attachables[i] as T;
-				}
-			}
-			return default(T);
-		}
-	}
+        public T GetService<T>()
+        {
+            return Services.GetService<T>();
+        }
+    }
 }

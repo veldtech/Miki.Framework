@@ -1,5 +1,6 @@
 ﻿using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
+using System;
 
 namespace Miki.Framework.Events
 {
@@ -16,6 +17,8 @@ namespace Miki.Framework.Events
 		public IDiscordTextChannel Channel { get; internal set; }
 
 		public IDiscordGuild Guild { get; internal set; }
+
+        public IServiceProvider Services { get; internal set; }
 
 		public EventSystem EventSystem;
 
