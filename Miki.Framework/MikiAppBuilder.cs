@@ -6,8 +6,6 @@ namespace Miki.Framework
 {
     public class MikiAppBuilder
     {
-        private readonly MikiApp _app;
-
         public IServiceCollection Services { get; }
 
         public MikiAppBuilder()
