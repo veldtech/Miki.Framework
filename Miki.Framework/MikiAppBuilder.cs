@@ -16,6 +16,7 @@ namespace Miki.Framework
         }
 
         public MikiAppBuilder AddSingletonService<T>(Func<IServiceProvider, T> factory)
+            where T : class
         {
             Services.AddSingleton(factory);
             return this;
