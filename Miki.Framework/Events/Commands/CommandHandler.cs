@@ -1,4 +1,5 @@
-﻿using Miki.Cache;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Cache;
 using Miki.Discord.Common;
 using System;
 using System.Collections.Generic;
@@ -49,9 +50,9 @@ namespace Miki.Framework.Events.Commands
 			return Prefixes.FirstOrDefault(x => x.IsDefault);
 		}
 
-		public async Task<string> GetDefaultPrefixValueAsync(ulong guildId)
+		public async Task<string> GetDefaultPrefixValueAsync(DbContext context, ulong guildId)
 		{
-			return await GetDefaultPrefix().GetForGuildAsync(_cachePool, guildId);
+			return await GetDefaultPrefix().GetForGuildAsync(context, _cachePool, guildId);
 		}
 
 		public void RemoveCommand(string commandName)

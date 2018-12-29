@@ -41,7 +41,10 @@ namespace Miki.Framework.Events
 
 				if (context.Guild != null)
 				{
-					identifier = await prefix.GetForGuildAsync(MikiApp.Instance.Discord.CacheClient, context.Guild.Id);
+					identifier = await prefix.GetForGuildAsync(
+                        context.Services.GetService<DbContext>(), 
+                        MikiApp.Instance.Discord.CacheClient, 
+                        context.Guild.Id);
 				}
 
 				if (!context.message.Content.StartsWith(identifier))

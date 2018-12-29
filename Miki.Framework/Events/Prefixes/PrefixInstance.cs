@@ -56,7 +56,7 @@ namespace Miki.Framework.Events
 		private string GetCacheKey(ulong id)
 			=> $"framework:prefix:{id}";
 
-		public async Task<string> GetForGuildAsync(ICacheClient cache, ulong id)
+		public async Task<string> GetForGuildAsync(DbContext db, ICacheClient cache, ulong id)
 		{
 			if (Changable)
 			{
@@ -64,30 +64,27 @@ namespace Miki.Framework.Events
 				{
 					return await cache.GetAsync<string>(GetCacheKey(id));
 				}
-				string dbPrefix = await LoadFromDatabase(id);
+				string dbPrefix = await LoadFromDatabase(db, id);
 				await cache.UpsertAsync(GetCacheKey(id), dbPrefix);
 				return dbPrefix;
 			}
 			return DefaultValue;
 		}
 
-		public async Task<string> LoadFromDatabase(ulong id)
-		{
-			long guildId = id.ToDbLong();
-			Identifier identifier = null;
+        public async Task<string> LoadFromDatabase(DbContext context, ulong id)
+        {
+            long guildId = id.ToDbLong();
+            Identifier identifier = null;
 
-			using (var context = MikiApp.Instance.GetService<DbContext>())
-			{
-				identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
-				if (identifier == null)
-				{
-					identifier = await CreateNewAsync(context, guildId);
-				}
+            identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
+            if (identifier == null)
+            {
+                identifier = await CreateNewAsync(context, guildId);
+            }
 
-				await context.SaveChangesAsync();
-			}
+            await context.SaveChangesAsync();
 
-			return identifier.Value;
-		}
+            return identifier.Value;
+        }
 	}
 }
