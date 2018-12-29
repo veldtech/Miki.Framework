@@ -43,29 +43,26 @@ namespace Miki.Framework.Languages
 
 		public static string DefaultResource = "eng";
 
-		public static async Task<LocaleInstance> GetLanguageInstanceAsync(ulong channelId)
+		public static async Task<LocaleInstance> GetLanguageInstanceAsync(DbContext db, ulong channelId)
 		{
 			var cache = MikiApp.Instance.Discord.CacheClient;
 			var cacheKey = $"miki:language:{channelId}";
 
 			string resource = null;
 
-			if (await cache.ExistsAsync(cacheKey))
-			{
-				resource = await cache.GetAsync<string>(cacheKey);
-			}
-			else
-			{
-				using (var context = MikiApp.Instance.GetService<DbContext>())
-				{
-					ChannelLanguage l = await context.Set<ChannelLanguage>().FindAsync(channelId.ToDbLong());
-					if (l != null)
-					{
-						await cache.UpsertAsync(cacheKey, l.Language);
-						resource = l.Language;
-					}
-				}
-			}
+            if (await cache.ExistsAsync(cacheKey))
+            {
+                resource = await cache.GetAsync<string>(cacheKey);
+            }
+            else
+            {
+                ChannelLanguage l = await db.Set<ChannelLanguage>().FindAsync(channelId.ToDbLong());
+                if (l != null)
+                {
+                    await cache.UpsertAsync(cacheKey, l.Language);
+                    resource = l.Language;
+                }
+            }
 
 			if (resource == null)
 			{

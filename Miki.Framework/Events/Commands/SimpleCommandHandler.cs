@@ -50,7 +50,7 @@ namespace Miki.Framework.Events
 				}
 
 				context.Prefix = prefix;
-				context.Locale = await Locale.GetLanguageInstanceAsync(context.Channel.Id);
+				context.Locale = await Locale.GetLanguageInstanceAsync(context.Services.GetService<DbContext>(), context.Channel.Id);
 
 				string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
 					.Substring(identifier.Length)
