@@ -12,81 +12,84 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
-	public class SimpleCommandHandler : CommandHandler
-	{
-		public IReadOnlyList<CommandEvent> Commands => _map.Commands;
-		public IReadOnlyList<Module> Modules => _map.Modules;
+    public class SimpleCommandHandler : CommandHandler
+    {
+        public IReadOnlyList<CommandEvent> Commands => _map.Commands;
+        public IReadOnlyList<Module> Modules => _map.Modules;
 
-		public SimpleCommandHandler(ICacheClient pool, CommandMap map)
-			: base(pool)
-		{
-			_map = map;
-		}
+        public SimpleCommandHandler(ICacheClient pool, CommandMap map)
+            : base(pool)
+        {
+            _map = map;
+        }
 
-		public override async Task CheckAsync(EventContext context)
-		{
-			var stopWatch = Stopwatch.StartNew();
+        public override async Task CheckAsync(EventContext context)
+        {
+            var stopWatch = Stopwatch.StartNew();
 
-			context.commandHandler = this;
-			context.Channel = await context.message.GetChannelAsync();
+            context.commandHandler = this;
+            context.Channel = await context.message.GetChannelAsync();
+            var dbContext = context.Services.GetService<DbContext>();
+            var cache = context.Services.GetService<IExtendedCacheClient>();
 
-			if (context.Channel is IDiscordGuildChannel guildChannel)
-			{
-				context.Guild = await guildChannel.GetGuildAsync();
-			}
+            if (context.Channel is IDiscordGuildChannel guildChannel)
+            {
+                context.Guild = await guildChannel.GetGuildAsync();
+            }
 
-			foreach (PrefixInstance prefix in Prefixes)
-			{
-				string identifier = prefix.DefaultValue;
+            string identifier = null;
+            foreach (PrefixInstance prefix in Prefixes)
+            {
+                if (context.Guild != null)
+                {
+                    identifier = await prefix.GetForGuildAsync
+                        (dbContext, cache, context.Guild.Id);
+                }
 
-				if (context.Guild != null)
-				{
-					identifier = await prefix.GetForGuildAsync(
-                        context.Services.GetService<DbContext>(), 
-                        MikiApp.Instance.Discord.CacheClient, 
-                        context.Guild.Id);
-				}
+                if (!context.message.Content.StartsWith(identifier))
+                {
+                    continue;
+                }
 
-				if (!context.message.Content.StartsWith(identifier))
-				{
-					continue;
-				}
+                context.Prefix = prefix;
+            }
 
-				context.Prefix = prefix;
-				context.Locale = await Locale.GetLanguageInstanceAsync(context.Services.GetService<DbContext>(), context.Channel.Id);
+            if(identifier == null)
+            {
+                return;
+            }
 
-				string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
-					.Substring(identifier.Length)
-					.Split(' ')
-					.First()
-					.ToLower();
+            context.Locale = await Locale.GetLanguageInstanceAsync(dbContext, context.Channel.Id);
 
-				if (_map.TryGetCommandEvent(command, out var eventInstance))
-				{
-					if (eventInstance == null)
-					{
-						return;
-					}
+            string command = Regex.Replace(context.message.Content, @"\r\n?|\n", "")
+                .Substring(identifier.Length)
+                .Split(' ')
+                .First()
+                .ToLower();
 
-					if (eventInstance.Accessibility != EventAccessibility.PUBLIC)
-					{
-						if ((await GetUserAccessibility(context)) < eventInstance.Accessibility)
-						{
-							return;
-						}
-					}
+            if (_map.TryGetCommandEvent(command, out var eventInstance))
+            {
+                if (eventInstance == null)
+                {
+                    return;
+                }
 
-					if (await eventInstance.IsEnabled(
-                        context.Services.GetService<ICacheClient>(), 
-                        context.Services.GetService<DbContext>(), 
-                        (await context.message.GetChannelAsync()).Id))
-					{
-						await eventInstance.Check(context, identifier);
-						await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
-					}
-				}
-			}
-		}
+                if (eventInstance.Accessibility != EventAccessibility.PUBLIC)
+                {
+                    if ((await GetUserAccessibility(context)) < eventInstance.Accessibility)
+                    {
+                        return;
+                    }
+                }
+
+                if (await eventInstance.IsEnabled
+                    (cache, dbContext, context.Channel.Id))
+                {
+                    await eventInstance.Check(context, identifier);
+                    await OnMessageProcessed(eventInstance, context.message, stopWatch.ElapsedMilliseconds);
+                }
+            }
+        }
 
 		// TODO: rework this
 		public async Task<EventAccessibility> GetUserAccessibility(IDiscordMessage msg, IDiscordChannel channel)
@@ -121,7 +124,6 @@ namespace Miki.Framework.Events
 					}
 				}
 			}
-
 			return EventAccessibility.PUBLIC;
 		}
 

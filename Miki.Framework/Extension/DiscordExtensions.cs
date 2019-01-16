@@ -1,25 +1,51 @@
 ﻿using Miki.Common.Builders;
 using Miki.Discord.Common;
 using Miki.Framework;
+using Miki.Rest;
 using System;
+using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Miki.Discord
 {
 	public static class DiscordExtensions
 	{
-		public static IMessageReference QueueToChannel(this DiscordEmbed embed, IDiscordChannel channel, string content = "")
-		{
-			return MessageBucket.Add(new MessageBucketArgs()
-			{
-				properties = new MessageArgs()
-				{
-					content = content,
-					embed = embed
-				},
-				channel = channel as IDiscordTextChannel
-			});
-		}
+        public static async Task<IMessageReference> QueueToChannelAsync(this DiscordEmbed embed, IDiscordTextChannel channel, string content = "")
+        {
+            if (channel is IDiscordGuildChannel guildChannel)
+            {
+                var currentUser = await MikiApp.Instance.Discord.GetCurrentUserAsync();
+                var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
+                var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
+
+                if (!permissions.HasFlag(GuildPermission.EmbedLinks))
+                {
+                    if (!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
+                    {
+                        using (RestClient wc = new RestClient(embed.Image.Url))
+                        {
+                            Stream ms = await wc.GetStreamAsync();
+                            return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
+                    {
+                        using (WebClient wc = new WebClient())
+                        {
+                            byte[] image = wc.DownloadData(embed.Thumbnail.Url);
+                            MemoryStream ms = new MemoryStream(image);
+                            return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
+                        }
+                    }
+                    else
+                    {
+                        return channel.QueueMessage(message: embed.ToMessageBuilder().Build());
+                    }
+                }
+            }
+            return QueueMessage(channel, embed, content);
+        }
 
 		public static IMessageReference ThenWait(this IMessageReference reference, int milliseconds)
 		{
@@ -55,26 +81,62 @@ namespace Miki.Discord
 			return reference;
 		}
 
-		public static async Task<IDiscordMessage> SendToChannel(this DiscordEmbed embed, IDiscordChannel channel)
-		{
-			//if (!(await (await (channel as IDiscordGuildChannel).GetGuildAsync()).GetSelfAsync())
-			//	.GuildPermissions.HasFlag (GuildPermission.EmbedLinks))
-			//{
-			//	if (!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
-			//	{
-			//		return await channel.SendMessageAsync(embed.ToMessageBuilder().Build());
-			//	}
+        public static async Task<IDiscordMessage> EditAsync(this DiscordEmbed embed, IDiscordMessage msg)
+        {
+            var channel = await msg.GetChannelAsync();
+            if (channel is IDiscordGuildChannel guildChannel)
+            {
+                var currentUser = await MikiApp.Instance.Discord.GetCurrentUserAsync();
+                var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
+                var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
 
-			//	using (WebClient wc = new WebClient())
-			//	{
-			//		byte[] image = wc.DownloadData(embed.Image.Url);
-			//		using (MemoryStream ms = new MemoryStream(image))
-			//		{
-			//			return await channel.SendFileAsync(ms, embed.ToMessageBuilder().Build());
-			//		}
-			//	}
-			//}
-			return await (channel as IDiscordTextChannel).SendMessageAsync("", false, embed);
+                if (!permissions.HasFlag(GuildPermission.EmbedLinks))
+                {
+                    return await msg.EditAsync(new EditMessageArgs { content = embed.ToMessageBuilder().Build() });
+                }
+            }
+            return await msg.EditAsync(new EditMessageArgs { content = "", embed = embed });
+        }
+
+		public static async Task<IDiscordMessage> SendToChannel(this DiscordEmbed embed, IDiscordTextChannel channel)
+		{
+            if (channel is IDiscordGuildChannel guildChannel)
+            {
+                var currentUser = await MikiApp.Instance.Discord.GetCurrentUserAsync();
+                var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
+                var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
+
+                if (!permissions.HasFlag(GuildPermission.EmbedLinks))
+                {
+                    if (!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
+                    {
+                        using (WebClient wc = new WebClient())
+                        {
+                            byte[] image = wc.DownloadData(embed.Image.Url);
+                            using (MemoryStream ms = new MemoryStream(image))
+                            {
+                                return await channel.SendFileAsync(ms, "output.png", embed.ToMessageBuilder().Build());
+                            }
+                        }
+                    }
+                    else if(!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
+                    {
+                        using (WebClient wc = new WebClient())
+                        {
+                            byte[] image = wc.DownloadData(embed.Thumbnail.Url);
+                            using (MemoryStream ms = new MemoryStream(image))
+                            {
+                                return await channel.SendFileAsync(ms, "output.png", embed.ToMessageBuilder().Build());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return await channel.SendMessageAsync(embed.ToMessageBuilder().Build());
+                    }
+                }
+            }
+            return await channel.SendMessageAsync("", embed: embed);
 		}
 
 		public static async Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
@@ -82,15 +144,20 @@ namespace Miki.Discord
 			return await (await user.GetDMChannelAsync()).SendMessageAsync("", false, embed);
 		}
 
-		public static IMessageReference QueueMessageAsync(this IDiscordTextChannel channel, string message)
-			=> MessageBucket.Add(new MessageBucketArgs()
-			{
-				properties = new MessageArgs()
-				{
-					content = message
-				},
-				channel = channel
-			});
+        public static IMessageReference QueueMessage(this IDiscordTextChannel channel, string message)
+            => QueueMessage(channel, null, message: message);
+
+        public static IMessageReference QueueMessage(this IDiscordTextChannel channel, DiscordEmbed embed = null, string message = "", Stream stream = null)
+            => MessageBucket.Add(new MessageBucketArgs()
+            {
+                attachment = stream,
+                channel = channel,
+                properties = new MessageArgs()
+                {
+                    content = message,
+                    embed = embed
+                },
+            });
 
 		public static MessageBuilder ToMessageBuilder(this DiscordEmbed embed)
 		{
@@ -104,12 +171,15 @@ namespace Miki.Discord
 			b.AppendText(embed.Title, MessageFormatting.Bold)
 			 .AppendText(embed.Description);
 
-			foreach (EmbedField f in embed.Fields)
-			{
-				b.AppendText(f.Title, MessageFormatting.Underlined)
-				 .AppendText(f.Content)
-				 .NewLine();
-			}
+            if (embed.Fields != null)
+            {
+                foreach (EmbedField f in embed.Fields)
+                {
+                    b.AppendText(f.Title, MessageFormatting.Underlined)
+                     .AppendText(f.Content)
+                     .NewLine();
+                }
+            }
 
 			if (embed.Footer != null)
 			{

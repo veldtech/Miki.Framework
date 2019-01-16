@@ -1,4 +1,5 @@
 ﻿using Miki.Discord.Common;
+using Miki.Framework.Arguments;
 using Miki.Framework.Events.Commands;
 using System;
 
@@ -6,9 +7,9 @@ namespace Miki.Framework.Events
 {
 	public class EventContext
 	{
-		public Args Arguments;
+        public ITypedArgumentPack Arguments { get; }
 
-		public CommandHandler commandHandler;
+        public CommandHandler commandHandler;
 
 		public IDiscordMessage message;
 

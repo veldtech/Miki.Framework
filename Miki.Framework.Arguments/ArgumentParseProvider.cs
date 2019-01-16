@@ -8,18 +8,34 @@ namespace Miki.Framework.Arguments
 {
 	public class ArgumentParseProvider
 	{
-		private List<IArgumentParser> _parsers = new List<IArgumentParser>();
+		private readonly List<IArgumentParser> _parsers = new List<IArgumentParser>();
 
 		public ArgumentParseProvider()
 		{
 		}
 
-		public object Take(IArgumentPack p, Type type)
-			=> _parsers.Where(x => x.CanParse(p))
-                .Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
-				.OrderByDescending(x => x.Priority)
-				.FirstOrDefault()
-				.Parse(p);
+        public object Peek(IArgumentPack p, Type type)
+        {
+            int cursor = p.Cursor;
+            object output = _parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
+                .Where(x => x.CanParse(p))
+                .OrderByDescending(x => x.Priority)
+                .FirstOrDefault()
+                .Parse(p);
+            p.SetCursor(cursor);
+            return output;
+        }
+
+        public T Peek<T>(IArgumentPack p)
+            => (T)Peek(p, typeof(T));
+
+        public object Take(IArgumentPack p, Type type)
+            => _parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
+                .Where(x => x.CanParse(p))
+                .OrderByDescending(x => x.Priority)
+                .FirstOrDefault()
+                .Parse(p);
+
         public T Take<T>(IArgumentPack p)
             => (T)Take(p, typeof(T));
 

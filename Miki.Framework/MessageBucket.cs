@@ -4,6 +4,7 @@ using Miki.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,7 +17,8 @@ namespace Miki.Framework
 
 	public class MessageBucketArgs
 	{
-		public MessageArgs properties;
+        public Stream attachment;
+        public MessageArgs properties;
 		public IDiscordTextChannel channel;
 	}
 
@@ -35,7 +37,7 @@ namespace Miki.Framework
 
 	public class MessageBucket
 	{
-		private static ConcurrentQueue<MessageReference> queuedMessages = new ConcurrentQueue<MessageReference>();
+		private readonly static ConcurrentQueue<MessageReference> queuedMessages = new ConcurrentQueue<MessageReference>();
 
 		private static async Task Tick()
 		{
@@ -50,9 +52,18 @@ namespace Miki.Framework
 				{
 					try
 					{
-						IDiscordMessage m = await msg.Arguments.channel.SendMessageAsync(msg.Arguments.properties.content ?? "", false, msg.Arguments.properties.embed ?? null);
+                        IDiscordMessage m = null;
+                        if (msg.Arguments.attachment == null)
+                        {
+                             m = await msg.Arguments.channel.SendMessageAsync(msg.Arguments.properties.content ?? "", false, msg.Arguments.properties.embed ?? null);
+                        }
+                        else
+                        {
+                            m = await msg.Arguments.channel.SendFileAsync(msg.Arguments.attachment, "file.png", msg.Arguments.properties.content ?? "", false, msg.Arguments.properties.embed ?? null);
+                            msg.Arguments.attachment.Dispose();
+                        }
 
-						if (msg.AllActions.Count > 0)
+                        if (msg.AllActions.Count > 0)
 						{
 							ProcessDecorators(msg, m);
 						}
