@@ -20,7 +20,7 @@ namespace Miki.Framework.Arguments
             object output = _parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
                 .Where(x => x.CanParse(p))
                 .OrderByDescending(x => x.Priority)
-                .FirstOrDefault()
+                .FirstOrDefault()?
                 .Parse(p);
             p.SetCursor(cursor);
             return output;
@@ -33,7 +33,7 @@ namespace Miki.Framework.Arguments
             => _parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
                 .Where(x => x.CanParse(p))
                 .OrderByDescending(x => x.Priority)
-                .FirstOrDefault()
+                .FirstOrDefault()?
                 .Parse(p);
 
         public T Take<T>(IArgumentPack p)

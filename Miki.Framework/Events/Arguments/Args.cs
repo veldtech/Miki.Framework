@@ -196,69 +196,6 @@ namespace Miki.Framework.Events
 			return false;
 		}
 
-		public async Task<IDiscordGuildUser> GetUserAsync(IDiscordGuild guild)
-		{
-			if (string.IsNullOrWhiteSpace(Argument))
-			{
-				return null;
-			}
-
-			IDiscordGuildUser guildUser = null;
-			if (IsMention)
-			{
-				guildUser = await guild.GetMemberAsync(ulong.Parse(Argument
-					.TrimStart('<')
-					.TrimStart('@')
-					.TrimStart('!')
-					.TrimEnd('>')));
-			}
-			else if (ulong.TryParse(Argument, out ulong id))
-			{
-				guildUser = await guild.GetMemberAsync(id);
-			}
-			else
-			{
-                var allUsers = await guild.GetMembersAsync();
-
-                guildUser = allUsers.Where(x => x != null)
-					.Where(x =>
-					{
-						if (x.Nickname != null)
-						{
-							if (x.Nickname.ToLowerInvariant() == Argument.ToLowerInvariant())
-							{
-								return true;
-							}
-						}
-						else if (x.Username != null)
-						{
-							if (x.Username.ToLowerInvariant() == Argument.ToLowerInvariant())
-							{
-								return true;
-							}
-							else if (Argument == (x.Username + "#" + x.Discriminator).ToLowerInvariant())
-							{
-								return true;
-							}
-						}
-						return false;
-					})
-					.FirstOrDefault();
-			}
-
-			if (guildUser == null)
-			{
-				throw new ArgObjectNullException();
-			}
-
-			if (guildUser.Id == 0)
-			{
-				throw new ArgObjectNullException();
-			}
-
-			return guildUser;
-		}
-
 		public ArgObject Next()
 		{
 			return args.GetOrDefault(index + 1);

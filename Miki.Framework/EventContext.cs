@@ -7,7 +7,7 @@ namespace Miki.Framework.Events
 {
 	public class EventContext
 	{
-        public ITypedArgumentPack Arguments { get; }
+        public ITypedArgumentPack Arguments { get; internal set; }
 
         public CommandHandler commandHandler;
 

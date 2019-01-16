@@ -45,6 +45,11 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\Miki.Bot.Models\Miki.Bot.Models.csproj" />
+    <ProjectReference Include="..\Miki.Framework.Arguments\Miki.Framework.Arguments.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Events\Arguments\Parsers\" />
   </ItemGroup>
   
 </Project>

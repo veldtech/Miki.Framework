@@ -1,10 +1,13 @@
 ﻿using Miki.Common.Builders;
 using Miki.Discord.Common;
 using Miki.Framework;
+using Miki.Framework.Exceptions;
 using Miki.Rest;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Miki.Discord
@@ -188,5 +191,68 @@ namespace Miki.Discord
 
 			return b;
 		}
+
+        public static async Task<IDiscordGuildUser> GetUserAsync(string text, IDiscordGuild guild)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return null;
+            }
+
+            IDiscordGuildUser guildUser = null;
+            if (Regex.IsMatch(text, "<@(!?)\\d+>"))
+            {
+                guildUser = await guild.GetMemberAsync(ulong.Parse(text
+                    .TrimStart('<')
+                    .TrimStart('@')
+                    .TrimStart('!')
+                    .TrimEnd('>')));
+            }
+            else if (ulong.TryParse(text, out ulong id))
+            {
+                guildUser = await guild.GetMemberAsync(id);
+            }
+            else
+            {
+                var allUsers = await guild.GetMembersAsync();
+
+                guildUser = allUsers.Where(x => x != null)
+                    .Where(x =>
+                    {
+                        if (x.Nickname != null)
+                        {
+                            if (x.Nickname.ToLowerInvariant() == text.ToLowerInvariant())
+                            {
+                                return true;
+                            }
+                        }
+                        else if (x.Username != null)
+                        {
+                            if (x.Username.ToLowerInvariant() == text.ToLowerInvariant())
+                            {
+                                return true;
+                            }
+                            else if (text == (x.Username + "#" + x.Discriminator).ToLowerInvariant())
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    })
+                    .FirstOrDefault();
+            }
+
+            if (guildUser == null)
+            {
+                throw new ArgObjectNullException();
+            }
+
+            if (guildUser.Id == 0)
+            {
+                throw new ArgObjectNullException();
+            }
+
+            return guildUser;
+        }
 	}
 }

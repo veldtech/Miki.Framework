@@ -46,12 +46,11 @@ namespace Miki.Framework.Events
                         (dbContext, cache, context.Guild.Id);
                 }
 
-                if (!context.message.Content.StartsWith(identifier))
+                if (context.message.Content.StartsWith(identifier))
                 {
-                    continue;
+                    context.Prefix = prefix;
+                    break;
                 }
-
-                context.Prefix = prefix;
             }
 
             if(identifier == null)

@@ -1,4 +1,5 @@
 ﻿using Miki.Discord.Common;
+using Miki.Framework.Arguments;
 using Miki.Framework.Exceptions;
 using Miki.Logging;
 using System;
@@ -77,8 +78,12 @@ namespace Miki.Framework.Events
 			}
 
 			ProcessCommandDelegate targetCommand = ProcessCommand;
-			e.Arguments = new Args(args);
-			await targetCommand(e);
+
+            var argumentPack = new ArgumentPack(arguments);
+            var provider = (ArgumentParseProvider)e.Services.GetService(typeof(ArgumentParseProvider));
+            e.Arguments = new TypedArgumentPack(argumentPack, provider);
+			
+            await targetCommand(e);
 		}
 
 		private bool IsOnCooldown(ulong id)
