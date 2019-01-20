@@ -27,11 +27,32 @@ namespace Miki.Framework.Arguments
             }
         }
 
-        public T Peek<T>()
-            => _parseProvider.Peek<T>(_args);
-
-        public bool Take<T>(out T value)
+        public bool Peek<T>(out T value)
         {
+            if(!CanTake)
+            {
+                value = default(T);
+                return false;
+            }
+
+            var output = _parseProvider.Peek(_args, typeof(T));
+            if (output == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = (T)output;
+            return true;
+        }
+
+            public bool Take<T>(out T value)
+        {
+            if (!CanTake)
+            {
+                value = default(T);
+                return false;
+            }
+
             var output = _parseProvider.Take(_args, typeof(T));
             if(output == null)
             {

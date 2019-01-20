@@ -7,11 +7,10 @@ namespace Miki.Framework.Arguments
 	public class ArgumentPack : IArgumentPack
 	{
 		private readonly IReadOnlyList<string> _arguments;
-		int _index = 0;
 
-		public bool CanTake => _index < _arguments.Count && _index >= 0;
+        public bool CanTake => Cursor < _arguments.Count && Cursor >= 0;
 
-        public int Cursor => _index;
+        public int Cursor { get; private set; } = 0;
 
         public int Length => _arguments.Count;
 
@@ -22,13 +21,13 @@ namespace Miki.Framework.Arguments
 
 		public string Peek()
 		{
-			return Get(_index);
+			return Get(Cursor);
 		}
 
 		public string Take()
 		{
 			var g = Peek();
-			_index++;
+			Cursor++;
 			return g;
 		}
 
@@ -36,8 +35,8 @@ namespace Miki.Framework.Arguments
 		{
 			if (!CanTake)
 			{
-				throw new IndexOutOfRangeException();
-			}
+                throw new IndexOutOfRangeException();
+            }
 			return _arguments[index];
 		}
 
@@ -46,10 +45,10 @@ namespace Miki.Framework.Arguments
             if (value < 0)
                 throw new ArgumentOutOfRangeException();
 
-            if (value >= Length)
+            if (value > Length)
                 throw new ArgumentOutOfRangeException();
 
-            _index = value;
+            Cursor = value;
         }
     }
 }

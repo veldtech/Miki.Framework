@@ -5,35 +5,33 @@ using Miki.Localization;
 
 namespace Miki.Framework.Language
 {
-	public class LocalizedEmbedBuilder
+	public class LocalizedEmbedBuilder : EmbedBuilder
 	{
-		public EmbedBuilder EmbedBuilder { get; private set; } = new EmbedBuilder();
-
 		private readonly LocaleInstance _instance;
 
 		public LocalizedEmbedBuilder(LocaleInstance instance)
 		{
-			this._instance = instance;
+			_instance = instance;
 		}
 
 		public LocalizedEmbedBuilder AddField(IResource title, IResource content, bool inline = false)
 		{
-			EmbedBuilder.AddField(title.Get(_instance), content.Get(_instance), inline);
+			AddField(title.Get(_instance), content.Get(_instance), inline);
 			return this;
 		}
 
 		public DiscordEmbed Build()
-			=> EmbedBuilder.ToEmbed();
+			=> ToEmbed();
 
 		public LocalizedEmbedBuilder WithAuthor(IResource title, string iconUrl = null, string url = null)
 		{
-			EmbedBuilder.SetAuthor(title.Get(_instance), iconUrl, url);
+			SetAuthor(title.Get(_instance), iconUrl, url);
 			return this;
 		}
 
 		public LocalizedEmbedBuilder WithColor(Color color)
 		{
-			EmbedBuilder.SetColor(color);
+			SetColor(color);
 			return this;
 		}
 
@@ -42,7 +40,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithDescription(LanguageResource description)
 		{
-			EmbedBuilder.SetDescription(description.Get(_instance));
+			SetDescription(description.Get(_instance));
 			return this;
 		}
 
@@ -51,19 +49,19 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithFooter(IResource text, string iconUrl = null)
 		{
-			EmbedBuilder.SetFooter(text.Get(_instance), iconUrl);
+			SetFooter(text.Get(_instance), iconUrl);
 			return this;
 		}
 
 		public LocalizedEmbedBuilder WithImageUrl(string imageUrl)
 		{
-			EmbedBuilder.SetImage(imageUrl);
+			SetImage(imageUrl);
 			return this;
 		}
 
 		public LocalizedEmbedBuilder WithThumbnailUrl(string thumbnailUrl)
 		{
-			EmbedBuilder.SetThumbnail(thumbnailUrl);
+			SetThumbnail(thumbnailUrl);
 			return this;
 		}
 
@@ -72,7 +70,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithTitle(IResource title)
 		{
-			EmbedBuilder.SetTitle(title.Get(_instance));
+			SetTitle(title.Get(_instance));
 			return this;
 		}
 	}

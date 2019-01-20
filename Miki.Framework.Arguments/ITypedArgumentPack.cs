@@ -19,7 +19,7 @@ namespace Miki.Framework.Arguments
         /// Returns the string without consuming the argument.
         /// </summary>
         /// <returns>current first argument</returns>
-        T Peek<T>();
+        bool Peek<T>(out T value);
 
         /// <summary>
         /// Returns and consumes the argument.
