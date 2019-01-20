@@ -40,15 +40,21 @@ namespace Miki.Framework.Events
             string identifier = null;
             foreach (PrefixInstance prefix in Prefixes)
             {
+                string tempIdentifier = null;
                 if (context.Guild != null)
                 {
-                    identifier = await prefix.GetForGuildAsync
+                    tempIdentifier = await prefix.GetForGuildAsync
                         (dbContext, cache, context.Guild.Id);
                 }
+                else
+                {
+                    tempIdentifier = prefix.DefaultValue;
+                }
 
-                if (context.message.Content.StartsWith(identifier))
+                if (context.message.Content.StartsWith(tempIdentifier))
                 {
                     context.Prefix = prefix;
+                    identifier = tempIdentifier;
                     break;
                 }
             }
