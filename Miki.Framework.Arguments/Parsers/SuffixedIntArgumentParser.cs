@@ -29,8 +29,8 @@ namespace Miki.Framework.Arguments
         public object Parse(IArgumentPack pack)
         {
             var value = pack.Take();
-            return int.Parse(value.Substring(0, value.Length - 1)) 
-                * _suffixes[char.ToLowerInvariant(value[value.Length - 1])];
+            return (int)(int.Parse(value.Substring(0, value.Length - 1)) 
+                * _suffixes[char.ToLowerInvariant(value[value.Length - 1])]);
         }
     }
 }
