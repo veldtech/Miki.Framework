@@ -17,14 +17,15 @@ namespace Miki.Framework.Arguments
 
 		public object Parse(IArgumentPack pack)
 		{
-			if (pack.Peek().StartsWith("\""))
-			{
+            var arg = pack.Peek();
+            if (arg.StartsWithAny("\"", "“", "”"))
+            {
 				List<string> allItems = new List<string>();
 				do
 				{
 					allItems.Add(pack.Take());
-				} while (!allItems[allItems.Count - 1].EndsWith("\""));
-				return string.Join(" ", allItems).TrimStart('"').TrimEnd('"');
+				} while (!allItems[allItems.Count - 1].EndsWithAny("\"", "“", "”"));
+				return string.Join(" ", allItems).TrimStart('"', '“', '”').TrimEnd('"', '“', '”');
 			}
 			else
 			{
