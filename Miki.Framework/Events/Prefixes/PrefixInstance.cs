@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Miki.Bot.Models;
 using Miki.Cache;
-using Miki.Framework.Models;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Events

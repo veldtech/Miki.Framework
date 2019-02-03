@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Miki.Framework.Models;
+using Miki.Bot.Models;
 using System.Collections.Generic;
 using System.Resources;
 using System.Threading.Tasks;
