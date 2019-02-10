@@ -157,25 +157,21 @@ namespace Miki.Framework.Events
 			return this;
 		}
 
-		public async Task SetEnabled(ICacheClient cache, ulong channelId, bool enabled)
-		{
-			using (var context = MikiApp.Instance.GetService<DbContext>())
-			{
-				ModuleState state = await context.Set<ModuleState>().FindAsync(Name, channelId.ToDbLong());
-				if (state == null)
-				{
-					state = (await context.Set<ModuleState>().AddAsync(new ModuleState()
-					{
-						GuildId = channelId.ToDbLong(),
-						Name = Name,
-						State = Enabled
-					})).Entity;
-				}
-				state.State = enabled;
+        public async Task SetEnabled(DbContext context, ICacheClient cache, ulong channelId, bool enabled)
+        {
+            ModuleState state = await context.Set<ModuleState>().FindAsync(Name, channelId.ToDbLong());
+            if (state == null)
+            {
+                state = (await context.Set<ModuleState>().AddAsync(new ModuleState()
+                {
+                    GuildId = channelId.ToDbLong(),
+                    Name = Name,
+                    State = Enabled
+                })).Entity;
+            }
+            state.State = enabled;
 
-				await cache.UpsertAsync(GetCacheKey(channelId), enabled);
-				await context.SaveChangesAsync();
-			}
-		}
+            await cache.UpsertAsync(GetCacheKey(channelId), enabled);
+        }
 	}
 }
