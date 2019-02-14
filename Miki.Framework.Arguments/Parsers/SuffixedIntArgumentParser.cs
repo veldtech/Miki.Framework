@@ -7,7 +7,7 @@ namespace Miki.Framework.Arguments
 {
     internal class SuffixedIntArgumentParser : IArgumentParser
     {
-        private Dictionary<char, long> _suffixes = new Dictionary<char, long>
+        private readonly Dictionary<char, long> _suffixes = new Dictionary<char, long>
         {
             { 'k', 1000 },
             { 'm', 1000000 },

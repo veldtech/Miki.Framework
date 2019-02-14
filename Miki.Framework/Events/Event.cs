@@ -76,11 +76,9 @@ namespace Miki.Framework.Events
 			}
 			else
 			{
-				CommandState state = null;
-
 				long guildId = id.ToDbLong();
 
-				state = await db.Set<CommandState>().FindAsync(Name, guildId);
+				var state = await db.Set<CommandState>().FindAsync(Name, guildId);
 
 				bool currentState = state?.State ?? DefaultEnabled;
 				await client.UpsertAsync(GetCacheKey(id), currentState);

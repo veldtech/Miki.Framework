@@ -74,9 +74,8 @@ namespace Miki.Framework.Events
         public async Task<string> LoadFromDatabase(DbContext context, ulong id)
         {
             long guildId = id.ToDbLong();
-            Identifier identifier = null;
 
-            identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
+            var identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
             if (identifier == null)
             {
                 identifier = await CreateNewAsync(context, guildId);

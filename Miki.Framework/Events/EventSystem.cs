@@ -10,18 +10,11 @@ namespace Miki.Framework.Events
 {
 	public class EventSystem
 	{
-		private Dictionary<Guid, CommandHandler> commandHandlers = new Dictionary<Guid, CommandHandler>();
-
-		private readonly EventSystemConfig config;
+		private readonly Dictionary<Guid, CommandHandler> commandHandlers = new Dictionary<Guid, CommandHandler>();
 
 		public MessageFilter MessageFilter { get; private set; } = new MessageFilter();
 
 		public Func<Exception, EventContext, Task> OnError;
-
-		public EventSystem(EventSystemConfig config)
-		{
-			this.config = config;
-		}
 
 		public void AddCommandHandler(CommandHandler handler)
 		{
