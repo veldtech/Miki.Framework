@@ -106,5 +106,14 @@ namespace Miki.Framework.Events
 
 		public CommandEvent GetCommandById(string id)
 			=> _map.GetCommandEvent(id);
-	}
+
+        public CommandEvent GetCommandByIdOrDefault(string id)
+        {
+            if(_map.TryGetCommandEvent(id, out var val))
+            {
+                return val;
+            }
+            return null;
+        }
+    }
 }
