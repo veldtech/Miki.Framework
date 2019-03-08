@@ -41,9 +41,11 @@ namespace Miki.Framework.Events
 		public async Task ExecuteAsync(CommandContext e)
 		{
 			List<string> arguments = new List<string>();
-			if (e.Message.Content.Split(' ').Length > 1)
+            var content = e.Message.Content.Substring(e.PrefixUsed.Length);
+
+            if (content.Split(' ').Length > 1)
 			{
-				string args = e.Message.Content.Substring(e.Message.Content.Split(' ')[0].Length + 1);
+				string args = content.Substring(content.Split(' ')[0].Length + 1);
 				arguments.AddRange(args.Split(' '));
 				arguments = arguments
 					.Where(x => !string.IsNullOrWhiteSpace(x))
