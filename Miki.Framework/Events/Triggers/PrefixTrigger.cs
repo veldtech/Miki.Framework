@@ -1,31 +1,33 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Miki.Bot.Models;
 using Miki.Cache;
+using Miki.Discord.Common;
+using Miki.Framework.Arguments;
+using Miki.Framework.Events.Triggers;
+using System;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Events
 {
-	public class PrefixInstance
+	public class PrefixTrigger : ITrigger<IDiscordMessage>
 	{
 		public short Id { get; internal set; }
 		public string Value { get; internal set; }
 		public string DefaultValue { get; internal set; }
-
 		public bool Changable { get; internal set; }
-		public bool ForceCommandExecution { get; internal set; }
-
 		public bool IsDefault { get; internal set; }
 
-		internal PrefixInstance(string value, bool isDefault, bool changable = false, bool forceExec = false)
+        public Func<EventContext, Task> OnTriggerReceived { get; set; }
+
+		public PrefixTrigger(string value, bool isDefault, bool changable = false)
 		{
 			Value = value;
 			DefaultValue = value;
 			IsDefault = isDefault;
 			Changable = changable;
-			ForceCommandExecution = forceExec;
 		}
 
-		public async Task ChangeForGuildAsync(DbContext context, ICacheClient cache, ulong id, string prefix)
+        public async Task ChangeForGuildAsync(DbContext context, ICacheClient cache, ulong id, string prefix)
 		{
 			if (Changable)
 			{
@@ -35,14 +37,17 @@ namespace Miki.Framework.Events
 				if (i == null)
 				{
 					await context.Set<Identifier>()
-						.AddAsync(new Identifier() { GuildId = guildId, DefaultValue = DefaultValue, Value = prefix });
+						.AddAsync(new Identifier() {
+                            GuildId = guildId,
+                            DefaultValue = DefaultValue,
+                            Value = prefix
+                        });
 				}
 				else
 				{
 					i.Value = prefix;
 				}
 				await context.SaveChangesAsync();
-
 				await cache.UpsertAsync(GetCacheKey(id), prefix);
 			}
 		}
@@ -64,6 +69,7 @@ namespace Miki.Framework.Events
 				{
 					return await cache.GetAsync<string>(GetCacheKey(id));
 				}
+
 				string dbPrefix = await LoadFromDatabase(db, id);
 				await cache.UpsertAsync(GetCacheKey(id), dbPrefix);
 				return dbPrefix;
@@ -74,7 +80,6 @@ namespace Miki.Framework.Events
         public async Task<string> LoadFromDatabase(DbContext context, ulong id)
         {
             long guildId = id.ToDbLong();
-
             var identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
             if (identifier == null)
             {
@@ -82,8 +87,31 @@ namespace Miki.Framework.Events
             }
 
             await context.SaveChangesAsync();
-
             return identifier.Value;
         }
-	}
+
+        public async Task<EventContext> CheckTrigger(EventContext e, IDiscordMessage packet)
+        {
+            var channel = await packet.GetChannelAsync();
+            var msgContext = e as MessageContext;
+            var prefix = DefaultValue;
+            if (channel is IDiscordGuildChannel c)
+            {
+                prefix = await GetForGuildAsync(e.GetService<DbContext>(), e.GetService<ICacheClient>(), c.GuildId);
+            }
+
+            if(packet.Content.StartsWith(prefix))
+            {
+                var context = CommandContext.FromMessageContext(msgContext);
+                context.Prefix = this;
+                context.PrefixUsed = prefix;
+                if(OnTriggerReceived != null)
+                {
+                    await Task.WhenAll(OnTriggerReceived(context));
+                }               
+                return context;
+            }
+            return null;
+        }
+    }
 }

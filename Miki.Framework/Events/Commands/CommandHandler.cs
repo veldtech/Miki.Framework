@@ -12,16 +12,9 @@ namespace Miki.Framework.Events.Commands
 	{
 		public Func<CommandEvent, IDiscordMessage, long, Task> OnMessageProcessed;
 
-		public List<PrefixInstance> Prefixes { get; private set; } = new List<PrefixInstance>();
-
 		protected ICacheClient _cachePool = null;
 
 		protected CommandMap _map = new CommandMap();
-
-		public CommandHandler(ICacheClient cachePool)
-		{
-			_cachePool = cachePool;
-		}
 
 		public void AddCommand(CommandEvent e)
 		{
@@ -33,27 +26,7 @@ namespace Miki.Framework.Events.Commands
 			_map.AddModule(module);
 		}
 
-		public void AddPrefix(string prefix, bool? isDefault = null, bool changable = false)
-		{
-			Prefixes.Add(new PrefixInstance(
-				prefix,
-				isDefault ?? !Prefixes.Any(x => x.IsDefault),
-				changable,
-				false
-			));
-		}
-
-		public abstract Task CheckAsync(EventContext message);
-
-		public PrefixInstance GetDefaultPrefix()
-		{
-			return Prefixes.FirstOrDefault(x => x.IsDefault);
-		}
-
-		public async Task<string> GetDefaultPrefixValueAsync(DbContext context, ulong guildId)
-		{
-			return await GetDefaultPrefix().GetForGuildAsync(context, _cachePool, guildId);
-		}
+		public abstract Task CheckAsync(CommandContext message);
 
 		public void RemoveCommand(string commandName)
 		{

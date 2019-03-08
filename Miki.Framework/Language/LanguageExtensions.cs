@@ -8,7 +8,7 @@ namespace Miki.Framework.Language
 		public static LanguageResource CreateResource(this EventContext context, string resource, params object[] parameters)
 			=> new LanguageResource(resource, parameters);
 
-		public static LocalizedEmbedBuilder CreateEmbedBuilder(this EventContext context)
+		public static LocalizedEmbedBuilder CreateEmbedBuilder(this MessageContext context)
 			=> new LocalizedEmbedBuilder(context.Locale);
 	}
 }

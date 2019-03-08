@@ -11,8 +11,8 @@ namespace Miki.Framework.Events.Commands
 	{
 		public ConcurrentDictionary<CommandSession, Tuple<CommandHandler, DateTime>> Sessions { get; private set; } = new ConcurrentDictionary<CommandSession, Tuple<CommandHandler, DateTime>>();
 
-		public SessionBasedCommandHandler(ICacheClient cachePool)
-			: base(cachePool)
+		public SessionBasedCommandHandler()
+			: base()
 		{
 		}
 
@@ -34,14 +34,14 @@ namespace Miki.Framework.Events.Commands
 			}
 		}
 
-		public override async Task CheckAsync(EventContext context)
+		public override async Task CheckAsync(CommandContext context)
 		{
 			try
 			{
 				CommandSession session;
 
-				session.ChannelId = context.message.ChannelId;
-				session.UserId = context.message.Author.Id;
+				session.ChannelId = context.Message.ChannelId;
+				session.UserId = context.Message.Author.Id;
 
 				if (Sessions.TryGetValue(session, out var commandHandler))
 				{

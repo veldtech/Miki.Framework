@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Miki.Framework.Arguments
@@ -14,9 +15,9 @@ namespace Miki.Framework.Arguments
 
         public int Length => _arguments.Count;
 
-        public ArgumentPack(IReadOnlyList<string> arguments)
+        public ArgumentPack(IEnumerable<string> arguments)
 		{
-			_arguments = arguments;
+			_arguments = arguments.ToList();
 		}
 
 		public string Peek()

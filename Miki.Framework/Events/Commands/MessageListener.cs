@@ -10,8 +10,8 @@ namespace Miki.Framework.Events.Commands
 	{
 		private readonly ConcurrentDictionary<CommandSession, Action<IDiscordMessage>> sessionCache = new ConcurrentDictionary<CommandSession, Action<IDiscordMessage>>();
 
-		public MessageListener(ICacheClient cachePool)
-			: base(cachePool)
+		public MessageListener()
+			: base()
 		{
 		}
 
@@ -43,18 +43,18 @@ namespace Miki.Framework.Events.Commands
 			return nextMessage;
 		}
 
-		public override async Task CheckAsync(EventContext context)
+		public override async Task CheckAsync(CommandContext context)
 		{
 			await Task.Yield();
 			CommandSession session;
-			session.ChannelId = context.message.ChannelId;
-			session.UserId = context.message.Author.Id;
+			session.ChannelId = context.Message.ChannelId;
+			session.UserId = context.Message.Author.Id;
 
 			if (sessionCache.ContainsKey(session))
 			{
 				if (sessionCache.TryGetValue(session, out Action<IDiscordMessage> a))
 				{
-					a(context.message);
+					a(context.Message);
 				}
 			}
 		}

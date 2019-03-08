@@ -48,8 +48,4 @@
     <ProjectReference Include="..\Miki.Framework.Arguments\Miki.Framework.Arguments.csproj" />
   </ItemGroup>
   
-  <ItemGroup>
-    <Folder Include="Events\Arguments\Parsers\" />
-  </ItemGroup>
-  
 </Project>

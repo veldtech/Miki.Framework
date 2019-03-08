@@ -18,12 +18,8 @@ namespace Miki.Framework.Events
 
 		public event Action<Module> OnModuleLoaded;
 
-		private List<Module> modulesLoaded = new List<Module>();
-		private Dictionary<string, CommandEvent> commandCache = new Dictionary<string, CommandEvent>();
-
-		public CommandMap()
-		{
-		}
+		private readonly List<Module> modulesLoaded = new List<Module>();
+		private readonly Dictionary<string, CommandEvent> commandCache = new Dictionary<string, CommandEvent>();
 
 		public void AddCommand(CommandEvent command)
 		{
@@ -109,16 +105,17 @@ namespace Miki.Framework.Events
 				{
 					CommandEvent newEvent = new CommandEvent();
 					CommandAttribute commandAttribute = x.GetCustomAttribute<CommandAttribute>();
+                    var requirements = x.GetCustomAttributes<CommandRequirementAttribute>(true);
 
 					newEvent = commandAttribute.command;
+                    newEvent.Requirements = requirements.ToList();
 					newEvent.ProcessCommand = async (context) => await (Task)x.Invoke(instance, new object[] { context });
 					newEvent.Module = newModule;
 
 					CommandEvent foundCommand = newModule.Events.Find(c => c.Name == newEvent.Name);
-
 					if (foundCommand != null)
 					{
-						foundCommand.Default(newEvent.ProcessCommand);
+						foundCommand.ProcessCommand = newEvent.ProcessCommand;
 					}
 					else
 					{

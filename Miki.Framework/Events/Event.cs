@@ -52,7 +52,11 @@ namespace Miki.Framework.Events
 			if (state == null)
 			{
 				state = (await context.Set<CommandState>()
-					.AddAsync(new CommandState() { ChannelId = channelId.ToDbLong(), Name = Name, State = DefaultEnabled })).Entity;
+					.AddAsync(new CommandState() {
+                        ChannelId = channelId.ToDbLong(),
+                        Name = Name,
+                        State = DefaultEnabled
+                    })).Entity;
 			}
 
 			state.State = enabled;
@@ -60,30 +64,38 @@ namespace Miki.Framework.Events
 			await client.UpsertAsync(GetCacheKey(channelId), enabled);
 		}
 
-		public async Task<bool> IsEnabled(ICacheClient client, DbContext db, ulong id)
+		public async Task<bool> IsEnabledAsync(EventContext context)
 		{
-            if (Module != null)
+            if (context is MessageContext c)
             {
-                if (!await Module.IsEnabled(client, db, id))
+                var client = context.GetService<ICacheClient>();
+                var db = context.GetService<DbContext>();
+
+                if (Module != null)
                 {
-                    return false;
+                    if (!await Module.IsEnabled(client, db, c.Channel.Id))
+                    {
+                        return false;
+                    }
+                }
+
+                if (await client.ExistsAsync(GetCacheKey(c.Channel.Id)))
+                {
+                    return await client.GetAsync<bool>(GetCacheKey(c.Channel.Id));
+                }
+                else
+                {
+                    long channelId = c.Channel.Id.ToDbLong();
+
+                    var state = await db.Set<CommandState>()
+                        .SingleOrDefaultAsync(x => x.Name == Name && x.ChannelId == channelId);
+
+                    bool currentState = state?.State ?? DefaultEnabled;
+                    await client.UpsertAsync(GetCacheKey(c.Channel.Id), currentState);
+                    return currentState;
                 }
             }
-
-			if (await client.ExistsAsync(GetCacheKey(id)))
-			{
-				return await client.GetAsync<bool>(GetCacheKey(id));
-			}
-			else
-			{
-				long guildId = id.ToDbLong();
-
-				var state = await db.Set<CommandState>().FindAsync(Name, guildId);
-
-				bool currentState = state?.State ?? DefaultEnabled;
-				await client.UpsertAsync(GetCacheKey(id), currentState);
-				return currentState;
-			}
+            return false;
 		}
 
 		public Event SetName(string name)
