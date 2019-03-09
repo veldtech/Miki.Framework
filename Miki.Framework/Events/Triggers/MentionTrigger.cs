@@ -11,8 +11,13 @@ namespace Miki.Framework.Events.Triggers
     {
         public async Task<EventContext> CheckTrigger(EventContext context, IDiscordMessage packet)
         {
-            var result = Regex.Match(packet.Content, "^<@!?\\d+> ");
+            var result = Regex.Match(packet.Content, "^<@!?(\\d+)> ");
             if(!result.Success)
+            {
+                return null;
+            }
+
+            if(context.Self.Id.ToString() != result.Groups[1].Value)
             {
                 return null;
             }
