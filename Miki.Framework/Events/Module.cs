@@ -30,8 +30,6 @@ namespace Miki.Framework.Events
 
 		public object InstanceOf { get; private set; }
 
-		private bool isInstalled = false;
-
 		internal Module(object instanceOf = null)
 		{
 			InstanceOf = instanceOf;
@@ -43,7 +41,7 @@ namespace Miki.Framework.Events
 			return this;
 		}
 
-		public string GetCacheKey(ulong id)
+		private string GetCacheKey(ulong id)
 			=> $"module:{Name}:enabled:{id}";
 
 		public void Install(EventSystem system)
@@ -92,8 +90,6 @@ namespace Miki.Framework.Events
 			{
 				s.Install(this);
 			}
-
-			isInstalled = true;
 		}
 
 		private async Task HandleEvent(Task runnableEvent, ulong channelId)
@@ -112,11 +108,9 @@ namespace Miki.Framework.Events
 			}
 			else
 			{
-				ModuleState state = null;
-
 				long id = channelId.ToDbLong();
-				
-				state = await db.Set<ModuleState>().FindAsync(Name, id);
+                ModuleState state = await db.Set<ModuleState>()
+                    .FindAsync(Name, id);
 
 				if (state == null)
 				{
@@ -127,18 +121,6 @@ namespace Miki.Framework.Events
 				await cache.UpsertAsync(GetCacheKey(channelId), state.State);
 				return state.State;
 			}
-		}
-
-		public void Uninstall(object bot)
-		{
-			MikiApp b = (MikiApp)bot;
-
-			if (!isInstalled)
-			{
-				return;
-			}
-
-			isInstalled = false;
 		}
 
 		public object GetReflectedInstance()

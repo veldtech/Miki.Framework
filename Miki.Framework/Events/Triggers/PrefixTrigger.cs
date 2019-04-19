@@ -90,28 +90,42 @@ namespace Miki.Framework.Events
             return identifier.Value;
         }
 
-        public async Task<EventContext> CheckTrigger(EventContext e, IDiscordMessage packet)
+        public async ValueTask<EventContext> CheckTriggerAsync(EventContext e, IDiscordMessage packet)
         {
             var channel = await packet.GetChannelAsync();
+            if(channel == null)
+            {
+                return null;
+            }
+
             var msgContext = e as MessageContext;
+            if(msgContext == null)
+            {
+                return null;
+            }
+
             var prefix = DefaultValue;
             if (channel is IDiscordGuildChannel c)
             {
-                prefix = await GetForGuildAsync(e.GetService<DbContext>(), e.GetService<ICacheClient>(), c.GuildId);
+                prefix = await GetForGuildAsync(
+                    e.GetService<DbContext>(), 
+                    e.GetService<ICacheClient>(), 
+                    c.GuildId);
             }
 
-            if(packet.Content.StartsWith(prefix))
+            if(!packet.Content.StartsWith(prefix))
             {
-                var context = CommandContext.FromMessageContext(msgContext);
-                context.Prefix = this;
-                context.PrefixUsed = prefix;
-                if(OnTriggerReceived != null)
-                {
-                    await Task.WhenAll(OnTriggerReceived(context));
-                }               
-                return context;
+                return null;
             }
-            return null;
+
+            var context = CommandContext.FromMessageContext(msgContext);
+            context.Prefix = this;
+            context.PrefixUsed = prefix;
+            if (OnTriggerReceived != null)
+            {
+                await Task.WhenAll(OnTriggerReceived(context));
+            }
+            return context;
         }
     }
 }

@@ -7,6 +7,6 @@ namespace Miki.Framework.Events.Triggers
 {
     public interface ITrigger<T>
     {
-        Task<EventContext> CheckTrigger(EventContext context, T packet);
+        ValueTask<EventContext> CheckTriggerAsync(EventContext context, T packet);
     }   
 }

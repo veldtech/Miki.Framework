@@ -9,23 +9,25 @@ namespace Miki.Framework.Events.Triggers
 {
     public class MentionTrigger : ITrigger<IDiscordMessage>
     {
-        public async Task<EventContext> CheckTrigger(EventContext context, IDiscordMessage packet)
+        public ValueTask<EventContext> CheckTriggerAsync(EventContext context, IDiscordMessage packet)
         {
             var result = Regex.Match(packet.Content, "^<@!?(\\d+)> ");
             if(!result.Success)
             {
-                return null;
+                return new ValueTask<EventContext>(
+                    Task.FromResult<EventContext>(null));
             }
 
             if(context.Self.Id.ToString() != result.Groups[1].Value)
             {
-                return null;
+                return new ValueTask<EventContext>(
+                    Task.FromResult<EventContext>(null));
             }
 
             var ctx = CommandContext.FromMessageContext(context as MessageContext);
             ctx.PrefixUsed = result.Value;
             ctx.Prefix = new PrefixTrigger(ctx.PrefixUsed, false);
-            return ctx;
+            return new ValueTask<EventContext>(ctx);
         }
     }
 }
