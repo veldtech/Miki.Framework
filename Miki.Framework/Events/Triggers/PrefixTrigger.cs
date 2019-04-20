@@ -98,8 +98,7 @@ namespace Miki.Framework.Events
                 return null;
             }
 
-            var msgContext = e as MessageContext;
-            if(msgContext == null)
+            if (!(e is MessageContext msgContext))
             {
                 return null;
             }

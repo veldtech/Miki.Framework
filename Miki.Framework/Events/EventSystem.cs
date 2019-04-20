@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Discord;
 using Miki.Discord.Common;
 using Miki.Framework.Events.Commands;
 using Miki.Framework.Events.Filters;
@@ -45,7 +46,12 @@ namespace Miki.Framework.Events
             return _messageTriggers;
         }
 
-        public async Task OnMessageReceivedAsync(IDiscordMessage msg)
+        public void Subscribe(DiscordClient client)
+        {
+            client.MessageCreate += OnMessageReceivedAsync;
+        }
+
+        private async Task OnMessageReceivedAsync(IDiscordMessage msg)
         {
             if (!await MessageFilter.IsAllowedAsync(msg))
             {
@@ -65,26 +71,28 @@ namespace Miki.Framework.Events
             using (var scope = MikiApp.Instance.Services.CreateScope())
             {
                 context.Services = scope.ServiceProvider;
-                try
+                foreach (var x in _messageTriggers)
                 {
-                    foreach(var x in _messageTriggers)
+                    CommandContext commandContext = (await x.CheckTriggerAsync(context, msg)) as CommandContext;
+                    if (commandContext == null)
                     {
-                        var command = await x.CheckTrigger(context, msg);
-                        if (command == null)
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        await Task.WhenAll(commandHandlers.Values.Select(y => y.CheckAsync(command as CommandContext)));
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (OnError != null)
-                    {
-                        await OnError(ex, context);
-                    }
+                    var tasks = commandHandlers.Values.Select(y => y.CheckAsync(commandContext));
+                    await Task.WhenAll(tasks)
+                        .ContinueWith(async t =>
+                        {
+                            if (t.IsFaulted)
+                            {
+                                foreach (var ex in t.Exception.InnerExceptions)
+                                {
+                                    await OnError(ex, commandContext);
+                                }
+                            }
+                        });
+
+                    break;
                 }
             }
         }
