@@ -18,7 +18,7 @@ namespace Miki.Framework.Events.Commands
 
 		public override int GetHashCode()
 		{
-			return HashCode.Combine(UserId, ChannelId);
+            return unchecked(ChannelId.GetHashCode() * 17 + UserId.GetHashCode());
 		}
 
 		public static bool operator ==(CommandSession c1, CommandSession c2)

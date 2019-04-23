@@ -1,21 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Miki.Cache" Version="0.3.0" />
-    <PackageReference Include="Miki.Logging" Version="1.1.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Miki.Discord\Miki.Discord.Common\Miki.Discord.Common.csproj" />
-    <ProjectReference Include="..\Miki\Miki.Framework.Common\Miki.Framework.Common.csproj" />
+    <ProjectReference Include="..\..\Miki.Framework\Miki.Framework.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Exceptions\" />
+    <Folder Include="Parser\" />
   </ItemGroup>
 
 </Project>

@@ -19,15 +19,13 @@ namespace Miki.Framework.Events
 
         public List<CommandRequirementAttribute> Requirements = new List<CommandRequirementAttribute>();
 
-		public List<GuildPermission> GuildPermissions { get; set; } = new List<GuildPermission>();
 		public string[] Aliases { get; set; } = new string[] { };
 
-		public ProcessCommandDelegate ProcessCommand { get; set; } = async (context) => await Task.Delay(0);
+		public ProcessCommandDelegate ProcessCommand { get; set; } = (context) => Task.CompletedTask;
 
 		public CommandEvent()
 		{
 		}
-
 		public CommandEvent(string name)
 		{
 			Name = name;
@@ -64,19 +62,6 @@ namespace Miki.Framework.Events
 			{
 				Log.Warning($"{Name} is on cooldown");
 				return;
-			}
-
-			if (GuildPermissions.Count > 0)
-			{
-				foreach (GuildPermission g in GuildPermissions)
-				{
-                    var permissions = await e.Guild.GetPermissionsAsync(e.Message.Author as IDiscordGuildUser);
-                    if (!permissions.HasFlag(g))
-					{
-						await e.Channel.SendMessageAsync($"Please give me the guild permission `{g}` to use this command.");
-						return;
-					}
-				}
 			}
 
             var argumentPack = new ArgumentPack(arguments);
