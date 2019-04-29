@@ -1,4 +1,4 @@
-﻿using Miki.Framework.Events;
+﻿using Miki.Framework.Commands;
 using Miki.Localization;
 using Miki.Localization.Exceptions;
 
@@ -9,9 +9,9 @@ namespace Miki.Framework.Exceptions
 		public override IResource LocaleResource
 			=> new LanguageResource("error_default_command");
 
-		public readonly CommandEvent Command;
+		public readonly Node Command;
 
-		public CommandException(CommandEvent e) : base()
+		public CommandException(Node e) : base()
 		{
 			Command = e;
 		}

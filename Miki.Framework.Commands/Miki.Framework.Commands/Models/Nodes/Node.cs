@@ -1,5 +1,4 @@
-﻿using Miki.Framework.Commands.Models;
-using Miki.Framework.Events;
+﻿using Miki.Framework.Events;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,22 +6,26 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework.Commands
 {
-    public class CommandNode 
+    public abstract class Node 
     {
-        public IExecutableCommand InnerCommand { get; }
         public CommandMetadata Metadata { get; }
-        public CommandNode Parent { get; }
-        public List<CommandNode> Children { get; }
+        public NodeContainer Parent { get; }
 
-        public async Task RunAsync(CommandContext e)
-        {   
-            if(InnerCommand == null)
-            {
-                return;
-            }
-            
-            await InnerCommand.ExecuteAsync(e);
+        public Node(CommandMetadata metadata)
+        {
+            Metadata = metadata;
         }
+        public Node(CommandMetadata metadata, NodeContainer parent)
+            : this(metadata)
+        {
+            if(parent == null)
+            {
+                throw new InvalidOperationException("Parent cannot be null when explicitly set up.");
+            }
+            Parent = parent;
+        }
+
+        public abstract Task RunAsync(IContext e);
 
         public override string ToString()
         {
@@ -33,8 +36,5 @@ namespace Miki.Framework.Commands
             }
             return $"{Parent.ToString()}.{Metadata.Name.ToLowerInvariant()}";
         }
-
-        private string GetCacheKey(ulong channelId)
-            => $"ev:state:{channelId}";
     }
 }

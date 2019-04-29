@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Miki.Framework.Commands.Models
+namespace Miki.Framework.Arguments
 {
-    class ModuleNode
+    public static class CommandPipelineExtensions
     {
     }
 }

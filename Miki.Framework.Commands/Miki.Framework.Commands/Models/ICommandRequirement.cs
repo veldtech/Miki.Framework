@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework.Commands
 {
-    public interface IExecutableCommand
+    public interface ICommandRequirement
     {
-        Task ExecuteAsync(CommandContext context);
+        Task<bool> CheckAsync(IContext e);
+        Task OnCheckFail(IContext e);
     }
 }

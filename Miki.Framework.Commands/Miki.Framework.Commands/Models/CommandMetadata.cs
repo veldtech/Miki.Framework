@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Miki.Framework.Commands.Models
+namespace Miki.Framework.Commands
 {
     public struct CommandMetadata
     {
         /// <summary>
-        /// Current Node's name.
+        /// Current node ID.
         /// </summary>
         public string Name;
 
