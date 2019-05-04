@@ -22,17 +22,7 @@ namespace Miki.Framework.Commands
 
         public Node GetCommand(IArgumentPack pack)
         {
-            NodeContainer root = Root;
-            while(true)
-            {
-                var current = root.FindCommand(pack);
-                if(current == null 
-                    || !(current is NodeContainer c))
-                {
-                    return current;
-                }
-                root = c;
-            }
+            return Root.FindCommand(pack);
         }
 
         public static CommandMap FromAssembly(Assembly assembly)
@@ -55,7 +45,7 @@ namespace Miki.Framework.Commands
                 throw new InvalidOperationException("Modules must have a valid ModuleAttribute.");
             }
 
-            NodeContainer module = new NodeModule(moduleAttrib.Name, parent);
+            NodeContainer module = new NodeModule(parent);
             module.Instance = CreateInstance(t);
 
             var allCommands = t.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
@@ -83,13 +73,14 @@ namespace Miki.Framework.Commands
                     $"Multi command of type '{t.ToString()}' must have a valid CommandAttribute.");
             }
 
-            if(commandAttrib.Name == null)
+            if(commandAttrib.Aliases?.Count() == 0)
             {
                 throw new InvalidOperationException(
                     $"Multi commands cannot have an invalid name.");
             }
 
             var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, null);
+            AddRequirements(t, multiCommand);
             multiCommand.Instance = CreateInstance(t);
 
             var allCommands = t.GetNestedTypes()
@@ -103,10 +94,16 @@ namespace Miki.Framework.Commands
                 .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
             foreach (var c in allSingleCommands)
             {
-                if (string.IsNullOrEmpty(c.GetCustomAttribute<CommandAttribute>().Name))
+                var attrib = c.GetCustomAttribute<CommandAttribute>();
+                if (attrib.Aliases == null
+                    || attrib.Aliases.Count() == 0)
                 {
-                    multiCommand.SetDefaultExecution(async (e)
-                        => await LoadCommand(c, multiCommand).RunAsync(e));
+                    var node = LoadCommand(c, multiCommand);
+                    if (node is IExecutable execNode)
+                    {
+                        multiCommand.SetDefaultExecution(async (e) 
+                            => await execNode.RunAsync(e));
+                    }
                 }
                 else
                 {
@@ -119,6 +116,7 @@ namespace Miki.Framework.Commands
         {
             var commandAttrib = m.GetCustomAttribute<CommandAttribute>();
             var command = new NodeExecutable(commandAttrib.AsMetadata(), parent);
+            AddRequirements(m, command);
 
             if (m.ReturnType == typeof(Task)
                 || m.ReturnType == typeof(Task<>)
@@ -138,6 +136,18 @@ namespace Miki.Framework.Commands
                 };
             }
             return command;
+        }
+
+        private static void AddRequirements(ICustomAttributeProvider t, Node e)
+        {
+            if(e.Requirements == null)
+            {
+                return;
+            }
+
+            e.Requirements.AddRange(
+                t.GetCustomAttributes(typeof(CommandRequirementAttribute), true)
+                    .Select(x => x as ICommandRequirement));
         }
 
         private static object CreateInstance(Type type)

@@ -7,24 +7,24 @@ using Miki.Logging;
 
 namespace Miki.Framework.Commands.Nodes
 {
-    public class NodeExecutable : Node
+    public class NodeExecutable : Node, IExecutable
     {
-        public readonly List<ICommandRequirement> Requirements = new List<ICommandRequirement>();
-
         internal Func<IContext, Task> runAsync;
 
         public NodeExecutable(CommandMetadata metadata, Func<IContext, Task> task  = null)
             : base(metadata)
         {
             runAsync = task;
+            Requirements = new List<ICommandRequirement>();
         }
         public NodeExecutable(CommandMetadata metadata, NodeContainer parent, Func<IContext, Task> task = null)
             : base(metadata, parent)
         {
             runAsync = task;
+            Requirements = new List<ICommandRequirement>();
         }
 
-        public override async Task RunAsync(IContext e)
+        public async Task RunAsync(IContext e)
         {
             if(runAsync == null)
             {

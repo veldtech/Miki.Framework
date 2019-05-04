@@ -20,7 +20,7 @@ namespace Miki.Framework.Commands
         public NodeContainer(CommandMetadata metadata, NodeContainer parent)
             : base(metadata, parent) {}
 
-        public Node FindCommand(IArgumentPack pack)
+        public virtual Node FindCommand(IArgumentPack pack)
         {
             if(!pack.CanTake)
             {
@@ -29,12 +29,24 @@ namespace Miki.Framework.Commands
 
             var arg = pack.Peek()
                 .ToLowerInvariant();
+
             foreach(var c in Children)
             {
-                if(c.Metadata.Name.ToLowerInvariant() == arg
-                    || c.Metadata.Aliases.Any(x => x == arg))
+                if (c is NodeContainer nc)
                 {
-                    return c;
+                    var foundNode = nc.FindCommand(pack);
+                    if (foundNode != null)
+                    {
+                        return foundNode;
+                    }
+                }
+                else
+                {
+                    if (c.Metadata.Identifiers.Any(x => x == arg))
+                    {
+                        pack.Take();
+                        return c;
+                    }
                 }
             }
             return null;

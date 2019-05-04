@@ -1,6 +1,7 @@
 ﻿using Miki.Framework.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,6 +11,8 @@ namespace Miki.Framework.Commands
     {
         public CommandMetadata Metadata { get; }
         public NodeContainer Parent { get; }
+
+        public List<ICommandRequirement> Requirements { get; protected set; }
 
         public Node(CommandMetadata metadata)
         {
@@ -22,19 +25,20 @@ namespace Miki.Framework.Commands
             {
                 throw new InvalidOperationException("Parent cannot be null when explicitly set up.");
             }
+
             Parent = parent;
         }
-
-        public abstract Task RunAsync(IContext e);
 
         public override string ToString()
         {
             if(Parent == null
                 || string.IsNullOrEmpty(Parent.ToString()))
             {
-                return Metadata.Name.ToLowerInvariant();
+                return Metadata.Identifiers
+                    .FirstOrDefault()
+                    ?.ToLowerInvariant() ?? null;
             }
-            return $"{Parent.ToString()}.{Metadata.Name.ToLowerInvariant()}";
+            return $"{Parent.ToString()}.{Metadata.Identifiers.FirstOrDefault().ToLowerInvariant()}";
         }
     }
 }

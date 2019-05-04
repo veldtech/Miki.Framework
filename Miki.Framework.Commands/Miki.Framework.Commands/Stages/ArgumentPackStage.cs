@@ -2,7 +2,7 @@
 using Miki.Framework.Arguments;
 using Miki.Framework.Commands;
 using Miki.Framework.Commands.Pipelines;
-using Miki.Framework.Pipelines;
+using System;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Commands.Pipelines
@@ -22,14 +22,14 @@ namespace Miki.Framework.Commands.Pipelines
             _provider = provider;
         }
         
-        public ValueTask<bool> CheckAsync(IDiscordMessage message, IMutableContext e)
+        public async Task CheckAsync(IDiscordMessage message, IMutableContext e, Func<Task> next)
         {
             e.SetContext<ITypedArgumentPack>(
                 ArgumentKey,
                 new TypedArgumentPack(
                     new ArgumentPack(e.GetQuery()),
                     _provider));
-            return new ValueTask<bool>(true);
+            await next();
         }
     }
 }
@@ -38,13 +38,13 @@ namespace Miki.Framework.Commands
 {
     public static class ArgumentPackCommandPipelineExtensions
     {
-        public static CommandPipelineBuilder WithArgumentPack(this CommandPipelineBuilder builder)
+        public static CommandPipelineBuilder UseArgumentPack(this CommandPipelineBuilder builder)
         {
-            return builder.WithStage(new ArgumentPackBuilder());
+            return builder.UseStage(new ArgumentPackBuilder());
         }
-        public static CommandPipelineBuilder WithArgumentPack(this CommandPipelineBuilder builder, ArgumentParseProvider provider)
+        public static CommandPipelineBuilder UseArgumentPack(this CommandPipelineBuilder builder, ArgumentParseProvider provider)
         {
-            return builder.WithStage(new ArgumentPackBuilder(provider));
+            return builder.UseStage(new ArgumentPackBuilder(provider));
         }
     }
 }

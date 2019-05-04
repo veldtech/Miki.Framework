@@ -1,6 +1,4 @@
-﻿using Miki.Framework.Commands;
-using Miki.Framework.Events;
-using Miki.Localization;
+﻿using Miki.Localization;
 
 namespace Miki.Framework.Language
 {

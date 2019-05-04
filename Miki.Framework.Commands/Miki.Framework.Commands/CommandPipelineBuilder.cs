@@ -1,43 +1,35 @@
-﻿using Miki.Discord.Common;
-using Miki.Framework.Events;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Discord.Common;
+using Miki.Logging;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Commands.Pipelines
 {
     public class CommandPipelineBuilder
     {
-        private List<IPipelineStage> _stages = new List<IPipelineStage>();
+        private readonly List<IPipelineStage> _stages = new List<IPipelineStage>();
+        private readonly MikiApp _app;
+        private readonly ServiceCollection _serviceCollection;
 
-        private CommandMap _commandMap;
-
-        private MikiAppBuilder _app;
-
-        public CommandPipelineBuilder(MikiAppBuilder app)
+        public CommandPipelineBuilder(MikiApp app)
         {
             _app = app;
+            _serviceCollection = new ServiceCollection();
         }
 
-        public CommandPipeline Build(MikiApp app)
+        public CommandPipeline Build()
         {
             return new CommandPipeline(
-                app, 
-                _commandMap, 
-                _stages);
+                _app, _serviceCollection, _stages);
         }
 
-        public CommandPipelineBuilder WithStage(IPipelineStage stage)
+        public CommandPipelineBuilder UseStage(IPipelineStage stage)
         {
-            _app.AddSingletonService(stage.GetType(), stage);
+            _serviceCollection.AddSingleton(stage.GetType(), stage);
             _stages.Add(stage);
-            return this;
-        }
-
-        public CommandPipelineBuilder WithCommandMap(CommandMap map)
-        {
-            _commandMap = map;
             return this;
         }
     }
@@ -45,30 +37,52 @@ namespace Miki.Framework.Commands.Pipelines
     public class CommandPipeline
     {
         public IReadOnlyList<IPipelineStage> PipelineStages { get; }
+        private IServiceProvider _services;
+        private IServiceProvider _stageServices;
 
-        private CommandMap _map;
-        private MikiApp _app;
-
-        internal CommandPipeline(MikiApp app, CommandMap map, List<IPipelineStage> stages)
+        internal CommandPipeline(MikiApp app, ServiceCollection stageServices, List<IPipelineStage> stages)
         {
             PipelineStages = stages;
-            _app = app;
-            _map = map;
+            _services = app.Services;
+            _stageServices = stageServices.BuildServiceProvider();
         }
 
         // TODO (Veld): Move IDiscordMessage to abstraction for a library-free solution.
         public async Task CheckAsync(IDiscordMessage data)
         {
-            using (ContextObject c = new ContextObject(_app.Services))
+            using (ContextObject c = new ContextObject(_services, _stageServices))
             {
-                foreach (var stage in PipelineStages)
+                int index = 0;
+                async Task nextFunc()
                 {
-                    if (!await stage.CheckAsync(data, c))
+                    if (index == PipelineStages.Count)
                     {
                         return;
                     }
+
+                    var stage = PipelineStages.ElementAtOrDefault(index);
+                    index++;
+
+                    if (stage == null)
+                    {
+                        return;
+                    }
+                    await stage.CheckAsync(data, c, nextFunc);
                 }
-                await _map.Root.RunAsync(c);
+
+                try
+                {
+                    await nextFunc();
+
+                    if (c.Executable != null)
+                    {
+                        await c.Executable.RunAsync(c);
+                    }
+                }
+                catch(Exception e)
+                {
+                    Log.Error(e);
+                }
             }
         }
     }

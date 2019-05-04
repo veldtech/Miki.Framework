@@ -16,18 +16,18 @@ namespace Miki.Framework.Commands
         public const string GuildArgumentKey = "framework-guild";
         public const string QueryArgumentKey = "framework-query";
 
-        public async ValueTask<bool> CheckAsync(IDiscordMessage msg, IMutableContext e)
+        public async Task CheckAsync(IDiscordMessage msg, IMutableContext e, Func<Task> next)
         {
             e.SetContext(MessageArgumentKey, msg);
             e.SetContext(QueryArgumentKey, msg.Content.Split(' ')
                 .ToList());
-            var channel = await msg.GetChannelAsync();
+            var channel = await msg.GetChannelAsync() as IDiscordTextChannel;
             e.SetContext(ChannelArgumentKey, channel);
             if (channel is IDiscordGuildChannel gc)
             {
                 e.SetContext(GuildArgumentKey, await gc.GetGuildAsync());
             }
-            return true;
+            await next();
         }
     }
 }
@@ -40,23 +40,19 @@ namespace Miki.Framework
         {
             return context.GetContext<IDiscordMessage>(CorePipelineStage.MessageArgumentKey);
         }
-        public static IDiscordChannel GetChannel(this IContext context)
+
+        public static IDiscordTextChannel GetChannel(this IContext context)
         {
-            return context.GetContext<IDiscordChannel>(CorePipelineStage.ChannelArgumentKey);
+            return context.GetContext<IDiscordTextChannel>(CorePipelineStage.ChannelArgumentKey);
         }
+
         public static IDiscordGuild GetGuild(this IContext context)
         {
             return context.GetContext<IDiscordGuild>(CorePipelineStage.GuildArgumentKey);
         }
-    }
-}
-
-namespace Miki.Framework.Pipelines
-{
-    public static class ContextExtensions
-    {
+        
         /// <summary>
-        /// Mutable version of the query. Can be edited.
+        /// Mutable version of the query.
         /// </summary>
         public static List<string> GetQuery(this IContext context)
         {

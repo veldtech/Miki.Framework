@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Miki.Framework.Commands.Attributes
 {
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
 	public class CommandAttribute : Attribute
 	{
-        public string Name { get; }
-
         public IEnumerable<string> Aliases { get; }
 
         public CommandAttribute() { }
-		public CommandAttribute(string name, params string[] aliases)
+		public CommandAttribute(params string[] aliases)
 		{
-            Name = name;
+            if(aliases.Count(x => string.IsNullOrWhiteSpace(x)) != 0)
+            {
+                throw new ArgumentNullException("Aliases",
+                    "Alias cannot be empty or null.");
+            }
             Aliases = aliases;
 		}
 
@@ -21,8 +24,7 @@ namespace Miki.Framework.Commands.Attributes
         {
             return new CommandMetadata
             {
-                Name = Name,
-                Aliases = Aliases
+                Identifiers = Aliases
             };
         }
 	}

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Miki.Framework.Arguments;
 using Miki.Framework.Events;
 
 namespace Miki.Framework.Commands.Nodes
 {
-    public class NodeNestedExecutable : NodeContainer
+    public class NodeNestedExecutable : NodeContainer, IExecutable
     {
-        public readonly List<ICommandRequirement> Requirements = new List<ICommandRequirement>();
-
         private Func<IContext, Task> runAsync;
 
         public NodeNestedExecutable(
@@ -18,6 +18,7 @@ namespace Miki.Framework.Commands.Nodes
             : base(metadata)
         {
             runAsync = defaultTask;
+            Requirements = new List<ICommandRequirement>();
         }
         public NodeNestedExecutable(
             CommandMetadata metadata, 
@@ -26,33 +27,48 @@ namespace Miki.Framework.Commands.Nodes
             : base(metadata, parent)
         {
             runAsync = defaultTask;
-        }
-
-        public override async Task RunAsync(IContext e)
-        {
-            if (e.GetArgumentPack().CanTake)
-            {
-                var command = e.GetArgumentPack().Pack
-                    .Peek().ToLowerInvariant();
-                foreach (var c in Children)
-                {
-                    if (c.Metadata.Name.ToLowerInvariant() == command)
-                    {
-                        await c.RunAsync(e);
-                        return;
-                    }
-                }
-            }
-
-            if (runAsync != null)
-            {
-                await runAsync(e);
-            }
+            Requirements = new List<ICommandRequirement>();
         }
 
         public void SetDefaultExecution(Func<IContext, Task> defaultTask)
         {
             runAsync = defaultTask;
+        }
+
+        public override Node FindCommand(IArgumentPack pack)
+        {
+            var arg = pack.Peek()
+                .ToLowerInvariant();
+
+            if (Metadata.Identifiers != null
+                && Metadata.Identifiers.Count() > 0)
+            {
+                if (Metadata.Identifiers.Any(x => x == arg))
+                {
+                    pack.Take();
+                    var cmd = base.FindCommand(pack);
+                    if(cmd != null)
+                    {
+                        return cmd;
+                    }
+                    return this;
+                }
+            }
+            return null;
+        }
+
+        public async Task RunAsync(IContext context)
+        {
+            foreach(var v in Requirements)
+            {
+                if(!await v.CheckAsync(context))
+                {
+                    await v.OnCheckFail(context);
+                    return;
+                }
+            }
+
+            await runAsync(context);
         }
     }
 }

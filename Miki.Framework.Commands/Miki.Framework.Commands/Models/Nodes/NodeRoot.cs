@@ -11,13 +11,5 @@ namespace Miki.Framework.Commands.Nodes
         public NodeRoot()
             : base(new CommandMetadata())
         { }
-
-        public override async Task RunAsync(IContext e)
-        {
-            foreach(var c in Children)
-            {
-                await c.RunAsync(e);
-            }
-        }
     }
 }
