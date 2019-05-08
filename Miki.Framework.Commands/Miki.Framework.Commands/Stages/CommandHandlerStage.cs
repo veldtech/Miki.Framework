@@ -12,7 +12,7 @@ namespace Miki.Framework.Commands.Stages
 {
     public class CommandHandlerStage : IPipelineStage
     {
-        private CommandMap _map;
+        private readonly CommandMap _map;
 
         public CommandHandlerStage(CommandMap map)
         {
@@ -22,7 +22,7 @@ namespace Miki.Framework.Commands.Stages
         public async Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next)
         {
             var command = GetCommand(e.GetArgumentPack().Pack);
-            if(command == null)
+            if (command == null)
             {
                 return;
             }
@@ -31,7 +31,10 @@ namespace Miki.Framework.Commands.Stages
             {
                 e.SetExecutable(exec);
             }
-            await next();
+            else
+            {
+                await next();
+            }
         }
 
         public Node GetCommand(string name)

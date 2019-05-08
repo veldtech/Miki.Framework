@@ -21,24 +21,26 @@ namespace Miki.Framework.Commands
         public Node(CommandMetadata metadata, NodeContainer parent)
             : this(metadata)
         {
-            if(parent == null)
-            {
-                throw new InvalidOperationException("Parent cannot be null when explicitly set up.");
-            }
-
-            Parent = parent;
+            Parent = parent ?? throw new InvalidOperationException("Parent cannot be null when explicitly set up.");
         }
 
         public override string ToString()
         {
-            if(Parent == null
-                || string.IsNullOrEmpty(Parent.ToString()))
+            if (Metadata.Identifiers == null
+                || Metadata.Identifiers.Count() == 0)
             {
-                return Metadata.Identifiers
-                    .FirstOrDefault()
-                    ?.ToLowerInvariant() ?? null;
+                return null;
             }
-            return $"{Parent.ToString()}.{Metadata.Identifiers.FirstOrDefault().ToLowerInvariant()}";
+
+            if (Parent != null
+                && !string.IsNullOrEmpty(Parent.ToString()))
+            {
+                return $"{Parent.ToString()}.{Metadata.Identifiers.FirstOrDefault().ToLowerInvariant()}";
+            }
+
+            return Metadata.Identifiers
+                .FirstOrDefault()
+                .ToLowerInvariant();
         }
     }
 }

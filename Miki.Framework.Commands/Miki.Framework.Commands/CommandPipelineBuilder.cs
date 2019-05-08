@@ -37,8 +37,8 @@ namespace Miki.Framework.Commands.Pipelines
     public class CommandPipeline
     {
         public IReadOnlyList<IPipelineStage> PipelineStages { get; }
-        private IServiceProvider _services;
-        private IServiceProvider _stageServices;
+        private readonly IServiceProvider _services;
+        private readonly IServiceProvider _stageServices;
 
         internal CommandPipeline(MikiApp app, ServiceCollection stageServices, List<IPipelineStage> stages)
         {
