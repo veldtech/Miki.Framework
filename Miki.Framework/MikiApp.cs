@@ -15,17 +15,15 @@ namespace Miki.Framework
 
         public IServiceProvider Services { get; }
 
-		internal MikiApp(ServiceProvider provider)
+		internal MikiApp(IServiceProvider provider)
 		{
             Services = provider;
-
             Discord = new DiscordClient(new DiscordClientConfigurations
             {
                 ApiClient = provider.GetService<IApiClient>(),
                 Gateway = provider.GetService<IGateway>(),
                 CacheClient = provider.GetService<IExtendedCacheClient>()
             });
-
             Instance = this;
 		}
 

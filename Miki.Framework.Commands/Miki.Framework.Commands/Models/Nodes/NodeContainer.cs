@@ -13,7 +13,7 @@ namespace Miki.Framework.Commands
         /// <summary>
         /// Instance object for reflection.
         /// </summary>
-        internal object Instance { get; set; }
+        public object Instance { get; internal set; }
 
         public NodeContainer(CommandMetadata metadata)
             : base(metadata) {}

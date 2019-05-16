@@ -10,7 +10,8 @@ namespace Miki.Framework
         IServiceProvider Services { get; }
 
         T GetContext<T>(string id);
-        T GetService<T>();
+        object GetStage(Type t);
+        object GetService(Type t);
     }
 
     public class ContextObject : IMutableContext, IDisposable
@@ -50,15 +51,15 @@ namespace Miki.Framework
         }
 
         public T GetService<T>()
-        {
-            var stage = _stageScope.ServiceProvider.GetService<T>();
-            if (stage == null)
-            {
-                return _scope.ServiceProvider
-                    .GetService<T>();
-            }
-            return stage;
-        }
+            => (T)GetService(typeof(T));
+
+        public object GetService(Type t)
+            => _scope.ServiceProvider
+                .GetService(t);
+
+        public object GetStage(Type t)
+            => _stageScope.ServiceProvider
+                .GetService(t);
 
         public void SetContext<T>(string id, T value)
         {
@@ -75,6 +76,18 @@ namespace Miki.Framework
         public void SetExecutable(IExecutable exec)
         {
             _executable = exec;
+        }
+    }
+
+    public static class Extensions
+    {
+        public static T GetService<T>(this IContext c)
+        {
+            return (T)c.GetService(typeof(T));
+        }
+        public static T GetStage<T>(this IContext c)
+        {
+            return (T)c.GetStage(typeof(T));
         }
     }
 }

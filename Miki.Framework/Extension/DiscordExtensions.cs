@@ -14,7 +14,7 @@ namespace Miki.Discord
 {
 	public static class DiscordExtensions
 	{
-        public static async Task<IMessageReference> QueueToChannelAsync(this DiscordEmbed embed, IDiscordTextChannel channel, string content = "")
+        public static async Task<IMessageReference> QueueAsync(this DiscordEmbed embed, IDiscordTextChannel channel, string content = "")
         {
             if (channel is IDiscordGuildChannel guildChannel)
             {

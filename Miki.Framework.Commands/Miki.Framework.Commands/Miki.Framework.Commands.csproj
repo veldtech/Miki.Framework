@@ -5,12 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Parser\**" />
-    <EmbeddedResource Remove="Parser\**" />
-    <None Remove="Parser\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Miki.Framework\Miki.Framework.csproj" />
   </ItemGroup>
 

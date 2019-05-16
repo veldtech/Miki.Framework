@@ -46,6 +46,7 @@ namespace Miki.Framework
 				if (queuedMessages.IsEmpty)
 				{
 					await Task.Delay(100);
+                    continue;
 				}
 
 				if (queuedMessages.TryDequeue(out MessageReference msg))

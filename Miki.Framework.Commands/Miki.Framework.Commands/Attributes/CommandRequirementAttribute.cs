@@ -1,5 +1,4 @@
 ﻿using Miki.Discord;
-using Miki.Framework.Events;
 using System;
 using System.Collections.Generic;
 using System.Text;

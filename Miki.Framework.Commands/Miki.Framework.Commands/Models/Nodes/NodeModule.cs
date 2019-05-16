@@ -5,11 +5,11 @@ namespace Miki.Framework.Commands.Nodes
 {
     public class NodeModule : NodeContainer
     {
-        public NodeModule()
-            : base(new CommandMetadata())
+        public NodeModule(string id)
+            : this(id, null)
         { }
-        public NodeModule(NodeContainer parent)
-            : base(new CommandMetadata(), parent)
+        public NodeModule(string id, NodeContainer parent)
+            : base(new CommandMetadata { Identifiers = new[] { id } }, parent)
         { }
     }
 }

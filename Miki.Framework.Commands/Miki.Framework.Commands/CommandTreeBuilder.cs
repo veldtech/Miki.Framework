@@ -1,7 +1,5 @@
-﻿using Miki.Framework.Arguments;
-using Miki.Framework.Commands.Attributes;
+﻿using Miki.Framework.Commands.Attributes;
 using Miki.Framework.Commands.Nodes;
-using Miki.Framework.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,69 +9,66 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework.Commands
 {
-    public class CommandMap
+    public delegate Task CommandDelegate(IContext c);
+
+    public class CommandTreeBuilder
     {
-        public NodeContainer Root { get; }
+        public event Func<NodeContainer, Task> OnContainerLoaded;
 
-        public CommandMap()
-        {
-            Root = new NodeRoot();
-        }
-
-        public Node GetCommand(IArgumentPack pack)
-        {
-            return Root.FindCommand(pack);
-        }
-
-        public static CommandMap FromAssembly(Assembly assembly)
+        public async Task<CommandTree> CreateAsync(Assembly assembly)
         {
             var allTypes = assembly.GetTypes()
                 .Where(x => x.GetCustomAttribute<ModuleAttribute>() != null);
-            var root = new CommandMap();
+            var root = new CommandTree();
             foreach (var t in allTypes)
             {
-                root.Root.Children.Add(LoadModule(t, root.Root));
+                var module = await LoadModuleAsync(t, root.Root);
+                if (module != null)
+                {
+                    root.Root.Children.Add(module);
+                }
             }
             return root;
         }
-       
-        private static NodeContainer LoadModule(Type t, NodeContainer parent)
+
+        private async Task<NodeContainer> LoadModuleAsync(Type t, NodeContainer parent)
         {
             var moduleAttrib = t.GetCustomAttribute<ModuleAttribute>();
-            if(moduleAttrib == null)
+            if (moduleAttrib == null)
             {
                 throw new InvalidOperationException("Modules must have a valid ModuleAttribute.");
             }
 
-            NodeContainer module = new NodeModule(parent);
+            NodeContainer module = new NodeModule(moduleAttrib.Name, parent);
             module.Instance = CreateInstance(t);
+            await OnContainerLoaded(module);
 
             var allCommands = t.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
                 .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
-            foreach(var c in allCommands)
+            foreach (var c in allCommands)
             {
-                module.Children.Add(LoadCommand(c, module));
+                module.Children.Add(await LoadCommandAsync(c, module));
             }
 
             var allSingleCommands = t.GetMethods()
                 .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
-            foreach(var c in allSingleCommands)
+            foreach (var c in allSingleCommands)
             {
-                module.Children.Add(LoadCommand(c, module));   
+                module.Children.Add(LoadCommand(c, module));
             }
 
             return module;
         }
-        private static Node LoadCommand(Type t, NodeContainer parent)
+        private async Task<Node> LoadCommandAsync(Type t, NodeContainer parent)
         {
             var commandAttrib = t.GetCustomAttribute<CommandAttribute>();
-            if(commandAttrib == null)
+            if (commandAttrib == null)
             {
                 throw new InvalidOperationException(
                     $"Multi command of type '{t.ToString()}' must have a valid CommandAttribute.");
             }
 
-            if(commandAttrib.Aliases?.Count() == 0)
+            if (commandAttrib.Aliases?.Count() == 0)
             {
                 throw new InvalidOperationException(
                     $"Multi commands cannot have an invalid name.");
@@ -82,12 +77,13 @@ namespace Miki.Framework.Commands
             var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, null);
             AddRequirements(t, multiCommand);
             multiCommand.Instance = CreateInstance(t);
+            await OnContainerLoaded(multiCommand);
 
             var allCommands = t.GetNestedTypes()
                 .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
             foreach (var c in allCommands)
             {
-                multiCommand.Children.Add(LoadCommand(c, multiCommand));
+                multiCommand.Children.Add(await LoadCommandAsync(c, multiCommand));
             }
 
             var allSingleCommands = t.GetMethods()
@@ -101,7 +97,7 @@ namespace Miki.Framework.Commands
                     var node = LoadCommand(c, multiCommand);
                     if (node is IExecutable execNode)
                     {
-                        multiCommand.SetDefaultExecution(async (e) 
+                        multiCommand.SetDefaultExecution(async (e)
                             => await execNode.RunAsync(e));
                     }
                 }
@@ -112,35 +108,31 @@ namespace Miki.Framework.Commands
             }
             return multiCommand;
         }
-        private static Node LoadCommand(MethodInfo m, NodeContainer parent)
+        private Node LoadCommand(MethodInfo m, NodeContainer parent)
         {
             var commandAttrib = m.GetCustomAttribute<CommandAttribute>();
             var command = new NodeExecutable(commandAttrib.AsMetadata(), parent);
             AddRequirements(m, command);
 
-            if (m.ReturnType == typeof(Task)
-                || m.ReturnType == typeof(Task<>)
-                || m.ReturnType == typeof(ValueTask<>))
+            if (m.ReturnType != typeof(Task))
             {
-                command.runAsync = async (e) =>
-                {
-                    await (m.Invoke(command.Parent.Instance, new[] { e }) as Task);
-                };
+                throw new Exception("Methods with attribute 'Command' require to be Tasks.");
             }
-            else
-            {
-                command.runAsync = (e) =>
-                {
-                    m.Invoke(parent.Instance, new[] { e });
-                    return Task.CompletedTask;
-                };
-            }
+
+            var d = (CommandDelegate)Delegate.CreateDelegate(
+                typeof(CommandDelegate),
+                parent.Instance,
+                m,
+                true);
+
+            command.runAsync = d;
+
             return command;
         }
 
         private static void AddRequirements(ICustomAttributeProvider t, Node e)
         {
-            if(e.Requirements == null)
+            if (e.Requirements == null)
             {
                 return;
             }

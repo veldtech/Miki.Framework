@@ -2,22 +2,21 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Miki.Framework.Events;
 using Miki.Logging;
 
 namespace Miki.Framework.Commands.Nodes
 {
     public class NodeExecutable : Node, IExecutable
     {
-        internal Func<IContext, Task> runAsync;
+        internal CommandDelegate runAsync;
 
-        public NodeExecutable(CommandMetadata metadata, Func<IContext, Task> task  = null)
+        public NodeExecutable(CommandMetadata metadata, CommandDelegate task  = null)
             : base(metadata)
         {
             runAsync = task;
             Requirements = new List<ICommandRequirement>();
         }
-        public NodeExecutable(CommandMetadata metadata, NodeContainer parent, Func<IContext, Task> task = null)
+        public NodeExecutable(CommandMetadata metadata, NodeContainer parent, CommandDelegate task = null)
             : base(metadata, parent)
         {
             runAsync = task;

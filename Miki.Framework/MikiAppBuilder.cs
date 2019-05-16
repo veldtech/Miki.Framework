@@ -28,13 +28,14 @@ namespace Miki.Framework
 
         public MikiAppBuilder AddSingletonService(Type t, object value)
         {
-            Services.AddSingleton(value.GetType(), value);
+            Services.AddSingleton(t, value);
             return this;
         }
 
         public MikiApp Build()
         {
-            return new MikiApp(Services.BuildServiceProvider());
+            var services = Services.BuildServiceProvider();
+            return new MikiApp(services);
         }
     }
 }

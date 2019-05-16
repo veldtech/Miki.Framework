@@ -37,6 +37,8 @@ namespace Miki.Framework.Commands.Pipelines
     public class CommandPipeline
     {
         public IReadOnlyList<IPipelineStage> PipelineStages { get; }
+        public Func<Exception, IContext, Task> OnError { get; set; }
+
         private readonly IServiceProvider _services;
         private readonly IServiceProvider _stageServices;
 
@@ -57,6 +59,10 @@ namespace Miki.Framework.Commands.Pipelines
                 {
                     if (index == PipelineStages.Count)
                     {
+                        if (c.Executable != null)
+                        {
+                            await c.Executable.RunAsync(c);
+                        }
                         return;
                     }
 
@@ -73,17 +79,22 @@ namespace Miki.Framework.Commands.Pipelines
                 try
                 {
                     await nextFunc();
-
-                    if (c.Executable != null)
-                    {
-                        await c.Executable.RunAsync(c);
-                    }
                 }
                 catch(Exception e)
                 {
-                    Log.Error(e);
+                    if (OnError != null)
+                    {
+                        await OnError(e, c);
+                    }
                 }
             }
+        }
+
+        public IEnumerable<T> GetPipelineStagesOfType<T>()
+            where T : class, IPipelineStage
+        {
+            return PipelineStages.Where(x => x is T)
+                .Select(x => x as T);
         }
     }
 }

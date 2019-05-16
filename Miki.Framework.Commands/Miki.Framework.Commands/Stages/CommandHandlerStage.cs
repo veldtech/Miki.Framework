@@ -12,9 +12,12 @@ namespace Miki.Framework.Commands.Stages
 {
     public class CommandHandlerStage : IPipelineStage
     {
-        private readonly CommandMap _map;
+        private readonly CommandTree _map;
 
-        public CommandHandlerStage(CommandMap map)
+        public IEnumerable<Node> Modules
+            => _map.Root.Children;
+
+        public CommandHandlerStage(CommandTree map)
         {
             _map = map;
         }
@@ -30,9 +33,6 @@ namespace Miki.Framework.Commands.Stages
             if (command is IExecutable exec)
             {
                 e.SetExecutable(exec);
-            }
-            else
-            {
                 await next();
             }
         }
@@ -48,11 +48,7 @@ namespace Miki.Framework.Commands
 {
     public static class CommandHandlerExtensions
     {
-        public static CommandPipelineBuilder UseCommandHandler(this CommandPipelineBuilder builder, Assembly assembly)
-        {
-            return UseCommandHandler(builder, CommandMap.FromAssembly(assembly));
-        }
-        public static CommandPipelineBuilder UseCommandHandler(this CommandPipelineBuilder builder, CommandMap map)
+        public static CommandPipelineBuilder UseCommandHandler(this CommandPipelineBuilder builder, CommandTree map)
         {
             builder.UseStage(new CommandHandlerStage(map));
             return builder;

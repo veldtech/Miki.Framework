@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Miki.Framework.Arguments;
-using Miki.Framework.Events;
 
 namespace Miki.Framework.Commands.Nodes
 {

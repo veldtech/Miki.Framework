@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Miki.Framework.Events;
 
 namespace Miki.Framework.Commands.Nodes
 {
