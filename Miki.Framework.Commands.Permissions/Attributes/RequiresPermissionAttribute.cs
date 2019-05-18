@@ -21,23 +21,22 @@ namespace Miki.Framework.Commands.Permissions.Attributes
             {
                 return _level <= 0;
             }
-            else
+
+            var db = e.GetService<DbContext>();
+            var permission = e.GetService<PermissionPipelineStage>();
+
+            long authorId = (long)e.GetMessage().Author.Id;
+            long guildId = (long)e.GetGuild().Id;
+
+            var i = await permission.GetForUserAsync(db, authorId, guildId);
+
+            if (e.GetGuild().OwnerId == e.GetMessage().Author.Id
+                && i < PermissionLevel.OWNER)
             {
-                var db = e.GetService<DbContext>();
-
-                long authorId = (long)e.GetMessage().Author.Id;
-                long guildId = (long)e.GetGuild().Id;
-
-                var i = await GetForUserAsync(db, authorId, guildId);
-
-                if (e.GetGuild().OwnerId == e.GetMessage().Author.Id
-                    && i < PermissionLevel.OWNER)
-                {
-                    return _level <= PermissionLevel.OWNER;
-                }
-
+                return _level <= PermissionLevel.OWNER;
             }
-            return new ValueTask<bool>(e.GetUserPermissions() >= _level); 
+
+            return e.GetUserPermissions() >= _level; 
         }
 
         public override Task OnCheckFail(IContext e)
