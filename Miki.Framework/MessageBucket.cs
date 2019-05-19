@@ -12,8 +12,10 @@ namespace Miki.Framework
 {
 	public interface IMessageReference
 	{
-		void ProcessAfterComplete(Func<IDiscordMessage, Task> fn);
-	}
+        void OnSuccess(Func<IDiscordMessage, Task> fn);
+
+        void OnException(Func<MessageExceptionArguments, Task> fn);
+    }
 
 	public class MessageBucketArgs
 	{
@@ -24,16 +26,37 @@ namespace Miki.Framework
 
 	public class MessageReference : IMessageReference
 	{
-		public List<Func<IDiscordMessage, Task>> AllActions = new List<Func<IDiscordMessage, Task>>();
+		public List<Func<IDiscordMessage, Task>> SuccessActions = new List<Func<IDiscordMessage, Task>>();
+        public List<Func<MessageExceptionArguments, Task>> ExceptionActions = new List<Func<MessageExceptionArguments, Task>>();
 
-		public MessageBucketArgs Arguments;
+        public MessageBucketArgs Arguments;
 
-		public void ProcessAfterComplete(Func<IDiscordMessage, Task> fn)
+		public void OnSuccess(Func<IDiscordMessage, Task> fn)
 		{
-			AllActions.Add(fn);
-		}
-	}
+			SuccessActions.Add(fn);
+        }
 
+        public void OnException(Func<MessageExceptionArguments, Task> fn)
+        {
+            ExceptionActions.Add(fn);
+        }
+    }
+
+    public class MessageExceptionArguments
+    {
+        public MessageExceptionArguments(IMessageReference reference, Exception exception)
+        {
+            Reference = reference;
+            Exception = exception;
+            LogException = true;
+        }
+
+        public IMessageReference Reference { get; }
+
+        public Exception Exception { get; }
+
+        public bool LogException { get; set; }
+    }
 
 	public class MessageBucket
 	{
@@ -64,31 +87,58 @@ namespace Miki.Framework
                             msg.Arguments.attachment.Dispose();
                         }
 
-                        if (msg.AllActions.Count > 0)
+                        if (msg.SuccessActions.Count > 0)
 						{
 							ProcessDecorators(msg, m);
 						}
 					}
 					catch (Exception e)
-					{
-						Log.Error(e);
-					}
+                    {
+                        ProcessExceptionDecorators(msg, new MessageExceptionArguments(msg, e));
+                    }
 				}
 			}
 		}
 
 		static void ProcessDecorators(MessageReference msgRef, IDiscordMessage msg)
-		{
-			Task.Run(async () =>
+        {
+            if (msgRef.SuccessActions.Count == 0)
+            {
+                return;
+            }
+
+            Task.Run(async () =>
 			{
-				foreach(var x in msgRef.AllActions)
+				foreach(var x in msgRef.SuccessActions)
 				{
 					await x(msg);
 				}
 			});
-		}
+        }
 
-		public static IMessageReference Add(MessageBucketArgs properties)
+        static void ProcessExceptionDecorators(MessageReference msgRef, MessageExceptionArguments args)
+        {
+            if (msgRef.ExceptionActions.Count == 0)
+            {
+                Log.Error(args.Exception);
+                return;
+            }
+
+            Task.Run(async () =>
+            {
+                foreach (var x in msgRef.ExceptionActions)
+                {
+                    await x(args);
+                }
+
+                if (args.LogException)
+                {
+                    Log.Error(args.Exception);
+                }
+            });
+        }
+
+        public static IMessageReference Add(MessageBucketArgs properties)
 		{
 			MessageReference msg = new MessageReference();
 			msg.Arguments = properties ?? throw new ArgumentNullException();

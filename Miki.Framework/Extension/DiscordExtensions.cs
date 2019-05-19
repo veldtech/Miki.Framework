@@ -14,6 +14,16 @@ namespace Miki.Discord
 {
 	public static class DiscordExtensions
 	{
+        public static Task<IMessageReference> RequeueAsync(this IMessageReference messageReference, IDiscordTextChannel channel, string content = null)
+        {
+            if (!(messageReference is MessageReference reference))
+            {
+                throw new NotSupportedException();
+            }
+
+            return QueueAsync(reference.Arguments.properties.embed, channel, content ?? reference.Arguments.properties.content);
+        }
+
         public static async Task<IMessageReference> QueueAsync(this DiscordEmbed embed, IDiscordTextChannel channel, string content = "")
         {
             if (channel is IDiscordGuildChannel guildChannel)
@@ -52,7 +62,7 @@ namespace Miki.Discord
 
 		public static IMessageReference ThenWait(this IMessageReference reference, int milliseconds)
 		{
-			reference.ProcessAfterComplete(async (msg) =>
+			reference.OnSuccess(async (msg) =>
 			{
 				await Task.Delay(milliseconds);
 			});
@@ -61,7 +71,7 @@ namespace Miki.Discord
 
 		public static IMessageReference ThenDelete(this IMessageReference reference)
 		{
-			reference.ProcessAfterComplete(async (msg) =>
+			reference.OnSuccess(async (msg) =>
 			{
 				await msg.DeleteAsync();
 			});
@@ -70,17 +80,38 @@ namespace Miki.Discord
 
 		public static IMessageReference ThenEdit(this IMessageReference reference, string message = "", DiscordEmbed embed = null)
 		{
-			reference.ProcessAfterComplete(async (x) => await x.EditAsync(new EditMessageArgs
+			reference.OnSuccess(async (x) => await x.EditAsync(new EditMessageArgs
 			{
 				content = message,
 				embed = embed
 			}));
 			return reference;
-		}
+        }
 
-		public static IMessageReference Then(this IMessageReference reference, Func<IDiscordMessage, Task> fn)
+        public static IMessageReference Catch(this IMessageReference reference, Func<MessageExceptionArguments, Task> fn)
+        {
+            reference.OnException(fn);
+            return reference;
+        }
+
+        public static Task<IMessageReference> Then(this Task<IMessageReference> reference, Func<IDiscordMessage, Task> fn)
+        {
+            return reference.ContinueWith(task => Then(task.Result, fn));
+        }
+
+        public static Task<IMessageReference> ThenWait(this Task<IMessageReference> reference,int milliseconds)
+        {
+            return reference.ContinueWith(task => ThenWait(task.Result, milliseconds));
+        }
+
+        public static Task<IMessageReference> Catch(this Task<IMessageReference> reference, Func<MessageExceptionArguments, Task> fn)
+        {
+            return reference.ContinueWith(task => Catch(task.Result, fn));
+        }
+
+        public static IMessageReference Then(this IMessageReference reference, Func<IDiscordMessage, Task> fn)
 		{
-			reference.ProcessAfterComplete(fn);
+			reference.OnSuccess(fn);
 			return reference;
 		}
 
