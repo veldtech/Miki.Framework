@@ -9,6 +9,6 @@ namespace Miki.Framework.Commands
         /// <summary>
         /// Aliases for this command.
         /// </summary>
-        public IEnumerable<string> Identifiers;
+        public IReadOnlyCollection<string> Identifiers;
     }
 }

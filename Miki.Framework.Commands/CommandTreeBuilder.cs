@@ -13,16 +13,16 @@ namespace Miki.Framework.Commands
 
     public class CommandTreeBuilder
     {
-        public event Func<NodeContainer, Task> OnContainerLoaded;
+        public event Action<NodeContainer> OnContainerLoaded;
 
-        public async Task<CommandTree> CreateAsync(Assembly assembly)
+        public CommandTree Create(Assembly assembly)
         {
             var allTypes = assembly.GetTypes()
                 .Where(x => x.GetCustomAttribute<ModuleAttribute>() != null);
             var root = new CommandTree();
             foreach (var t in allTypes)
             {
-                var module = await LoadModuleAsync(t, root.Root);
+                var module = LoadModule(t, root.Root);
                 if (module != null)
                 {
                     root.Root.Children.Add(module);
@@ -31,7 +31,7 @@ namespace Miki.Framework.Commands
             return root;
         }
 
-        private async Task<NodeContainer> LoadModuleAsync(Type t, NodeContainer parent)
+        private NodeContainer LoadModule(Type t, NodeContainer parent)
         {
             var moduleAttrib = t.GetCustomAttribute<ModuleAttribute>();
             if (moduleAttrib == null)
@@ -41,13 +41,13 @@ namespace Miki.Framework.Commands
 
             NodeContainer module = new NodeModule(moduleAttrib.Name, parent);
             module.Instance = CreateInstance(t);
-            await OnContainerLoaded(module);
+            OnContainerLoaded?.Invoke(module);
 
             var allCommands = t.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
                 .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
             foreach (var c in allCommands)
             {
-                module.Children.Add(await LoadCommandAsync(c, module));
+                module.Children.Add(LoadCommand(c, module));
             }
 
             var allSingleCommands = t.GetMethods()
@@ -59,7 +59,7 @@ namespace Miki.Framework.Commands
 
             return module;
         }
-        private async Task<Node> LoadCommandAsync(Type t, NodeContainer parent)
+        private Node LoadCommand(Type t, NodeContainer parent)
         {
             var commandAttrib = t.GetCustomAttribute<CommandAttribute>();
             if (commandAttrib == null)
@@ -77,13 +77,13 @@ namespace Miki.Framework.Commands
             var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, null);
             AddRequirements(t, multiCommand);
             multiCommand.Instance = CreateInstance(t);
-            await OnContainerLoaded(multiCommand);
+            OnContainerLoaded?.Invoke(multiCommand);
 
             var allCommands = t.GetNestedTypes()
                 .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
             foreach (var c in allCommands)
             {
-                multiCommand.Children.Add(await LoadCommandAsync(c, multiCommand));
+                multiCommand.Children.Add(LoadCommand(c, multiCommand));
             }
 
             var allSingleCommands = t.GetMethods()

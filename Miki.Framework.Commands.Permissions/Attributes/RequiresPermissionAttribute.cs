@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Miki.Framework.Commands.Permissions.Extensions;
 
 namespace Miki.Framework.Commands.Permissions.Attributes
 {
@@ -23,12 +24,11 @@ namespace Miki.Framework.Commands.Permissions.Attributes
             }
 
             var db = e.GetService<DbContext>();
-            var permission = e.GetService<PermissionPipelineStage>();
 
             long authorId = (long)e.GetMessage().Author.Id;
             long guildId = (long)e.GetGuild().Id;
-
-            var i = await permission.GetForUserAsync(db, authorId, guildId);
+            
+            var i = await db.GetUserPermissionLevelAsync(authorId, guildId);
 
             if (e.GetGuild().OwnerId == e.GetMessage().Author.Id
                 && i < PermissionLevel.OWNER)

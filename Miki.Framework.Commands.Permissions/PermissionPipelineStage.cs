@@ -5,6 +5,7 @@ using Miki.Framework.Commands.Permissions.Models;
 using Miki.Framework.Commands.Pipelines;
 using System;
 using System.Threading.Tasks;
+using Miki.Framework.Commands.Permissions.Extensions;
 
 namespace Miki.Framework.Commands.Permissions
 {
@@ -26,8 +27,6 @@ namespace Miki.Framework.Commands.Permissions
 
     public class PermissionPipelineStage : IPipelineStage
     {
-        private PermissionLevel _defaultPermissionLevel = 0;
-
         internal const string UserLevelKey = "user-level";
 
         public async Task CheckAsync(
@@ -35,7 +34,7 @@ namespace Miki.Framework.Commands.Permissions
         {
             if (e.GetGuild() == null)
             {
-                e.SetContext(UserLevelKey, _defaultPermissionLevel);
+                e.SetContext(UserLevelKey, PermissionLevel.DEFAULT);
             }
             else
             {
@@ -50,23 +49,10 @@ namespace Miki.Framework.Commands.Permissions
                     long authorId = (long)e.GetMessage().Author.Id;
                     long guildId = (long)e.GetGuild().Id;
 
-                    e.SetContext(
-                        UserLevelKey,
-                        await GetForUserAsync(db, authorId, guildId));
+                    e.SetContext(UserLevelKey, await db.GetUserPermissionLevelAsync(authorId, guildId));
                 }
             }
             await next();
-        }
-
-        public async Task<PermissionLevel> GetForUserAsync(
-            DbContext db, long userId, long guildId)
-        {
-            var p = await db.Set<Permission>()
-                .FirstOrDefaultAsync(x
-                    => x.UserId == userId
-                    && (x.GuildId == guildId || x.GuildId == 0));
-            return (PermissionLevel)(p?.PermissionLevel 
-                ?? (int)_defaultPermissionLevel);
         }
     }
 }
