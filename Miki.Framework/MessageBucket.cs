@@ -12,9 +12,9 @@ namespace Miki.Framework
 {
 	public interface IMessageReference
 	{
-        void OnSuccess(Func<IDiscordMessage, Task> fn);
+        void ProcessAfterComplete(Func<IDiscordMessage, Task> fn);
 
-        void OnException(Func<MessageExceptionArguments, Task> fn);
+        void ProcessOnException(Func<MessageExceptionArguments, Task> fn);
     }
 
 	public class MessageBucketArgs
@@ -31,12 +31,12 @@ namespace Miki.Framework
 
         public MessageBucketArgs Arguments;
 
-		public void OnSuccess(Func<IDiscordMessage, Task> fn)
+		public void ProcessAfterComplete(Func<IDiscordMessage, Task> fn)
 		{
 			SuccessActions.Add(fn);
         }
 
-        public void OnException(Func<MessageExceptionArguments, Task> fn)
+        public void ProcessOnException(Func<MessageExceptionArguments, Task> fn)
         {
             ExceptionActions.Add(fn);
         }

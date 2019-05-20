@@ -62,7 +62,7 @@ namespace Miki.Discord
 
 		public static IMessageReference ThenWait(this IMessageReference reference, int milliseconds)
 		{
-			reference.OnSuccess(async (msg) =>
+			reference.ProcessAfterComplete(async (msg) =>
 			{
 				await Task.Delay(milliseconds);
 			});
@@ -71,7 +71,7 @@ namespace Miki.Discord
 
 		public static IMessageReference ThenDelete(this IMessageReference reference)
 		{
-			reference.OnSuccess(async (msg) =>
+			reference.ProcessAfterComplete(async (msg) =>
 			{
 				await msg.DeleteAsync();
 			});
@@ -80,7 +80,7 @@ namespace Miki.Discord
 
 		public static IMessageReference ThenEdit(this IMessageReference reference, string message = "", DiscordEmbed embed = null)
 		{
-			reference.OnSuccess(async (x) => await x.EditAsync(new EditMessageArgs
+			reference.ProcessAfterComplete(async (x) => await x.EditAsync(new EditMessageArgs
 			{
 				content = message,
 				embed = embed
@@ -90,7 +90,7 @@ namespace Miki.Discord
 
         public static IMessageReference Catch(this IMessageReference reference, Func<MessageExceptionArguments, Task> fn)
         {
-            reference.OnException(fn);
+            reference.ProcessOnException(fn);
             return reference;
         }
 
@@ -111,7 +111,7 @@ namespace Miki.Discord
 
         public static IMessageReference Then(this IMessageReference reference, Func<IDiscordMessage, Task> fn)
 		{
-			reference.OnSuccess(fn);
+			reference.ProcessAfterComplete(fn);
 			return reference;
 		}
 
