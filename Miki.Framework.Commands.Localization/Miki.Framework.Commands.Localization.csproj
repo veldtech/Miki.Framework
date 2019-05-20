@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Miki\Miki.Framework\Miki.Framework.Commands\Miki.Framework.Commands\Miki.Framework.Commands.csproj" />
+    <ProjectReference Include="..\Miki.Framework.Commands\Miki.Framework.Commands.csproj" />
   </ItemGroup>
 
 </Project>
