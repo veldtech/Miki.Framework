@@ -16,9 +16,9 @@ namespace Miki.Framework.Commands.Attributes
             _t = t;
         }
 
-        public override ValueTask<bool> CheckAsync(IContext e)
+        public override Task<bool> CheckAsync(IContext e)
         {
-            return new ValueTask<bool>(e.GetStage(_t) != null);
+            return Task.FromResult(e.GetStage(_t) != null);
         }
 
         public override Task OnCheckFail(IContext e)

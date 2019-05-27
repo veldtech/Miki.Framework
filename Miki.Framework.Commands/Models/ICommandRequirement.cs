@@ -7,7 +7,7 @@ namespace Miki.Framework.Commands
 {
     public interface ICommandRequirement
     {
-        ValueTask<bool> CheckAsync(IContext e);
+        Task<bool> CheckAsync(IContext e);
         Task OnCheckFail(IContext e);
     }
 }

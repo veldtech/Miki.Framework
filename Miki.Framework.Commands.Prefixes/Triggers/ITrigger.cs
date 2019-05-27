@@ -8,6 +8,6 @@ namespace Miki.Framework.Events.Triggers
 {
     public interface ITrigger<T>
     {
-        ValueTask<string> CheckTriggerAsync(IMutableContext context, T packet);
+        Task<string> CheckTriggerAsync(IMutableContext context, T packet);
     }   
 }

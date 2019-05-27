@@ -10,7 +10,7 @@ namespace Miki.Framework.Commands.Filters
 {
     public interface IFilter
     {
-        ValueTask<bool> CheckAsync(IContext e);
+        Task<bool> CheckAsync(IContext e);
     }
 
     public class FilterPipelineStage : IPipelineStage

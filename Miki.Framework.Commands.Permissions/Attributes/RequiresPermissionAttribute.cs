@@ -16,7 +16,7 @@ namespace Miki.Framework.Commands.Permissions.Attributes
             _level = requiredPermission;
         }
 
-        public override async ValueTask<bool> CheckAsync(IContext e)
+        public override async Task<bool> CheckAsync(IContext e)
         {
             if (e.GetGuild() == null)
             {

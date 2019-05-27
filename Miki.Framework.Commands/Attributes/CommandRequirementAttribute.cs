@@ -8,7 +8,7 @@ namespace Miki.Framework.Commands
 {
     public abstract class CommandRequirementAttribute : Attribute, ICommandRequirement
     {
-        public abstract ValueTask<bool> CheckAsync(IContext e);
+        public abstract Task<bool> CheckAsync(IContext e);
         public abstract Task OnCheckFail(IContext e);
     }
 }

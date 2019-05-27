@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Miki.Framework.Arguments\Miki.Framework.Arguments.csproj" />
     <ProjectReference Include="..\Miki.Framework\Miki.Framework.csproj" />
   </ItemGroup>
 

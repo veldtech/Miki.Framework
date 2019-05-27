@@ -93,7 +93,7 @@ namespace Miki.Framework.Events
             return identifier.Value;
         }
 
-        public async ValueTask<string> CheckTriggerAsync(IMutableContext e, IDiscordMessage packet)
+        public async Task<string> CheckTriggerAsync(IMutableContext e, IDiscordMessage packet)
         {
             var channel = await packet.GetChannelAsync();
             if(channel == null)

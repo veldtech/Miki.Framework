@@ -11,19 +11,11 @@ namespace Miki.Framework
 	{
 		public static MikiApp Instance { get; internal set; }
 
-		public DiscordClient Discord { get; internal set; }
-
         public IServiceProvider Services { get; }
 
 		internal MikiApp(IServiceProvider provider)
 		{
             Services = provider;
-            Discord = new DiscordClient(new DiscordClientConfigurations
-            {
-                ApiClient = provider.GetService<IApiClient>(),
-                Gateway = provider.GetService<IGateway>(),
-                CacheClient = provider.GetService<IExtendedCacheClient>()
-            });
             Instance = this;
 		}
 
