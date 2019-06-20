@@ -46,6 +46,7 @@ namespace Miki.Framework
 				if (queuedMessages.IsEmpty)
 				{
 					await Task.Delay(100);
+                    continue;
 				}
 
 				if (queuedMessages.TryDequeue(out MessageReference msg))
@@ -55,11 +56,11 @@ namespace Miki.Framework
                         IDiscordMessage m = null;
                         if (msg.Arguments.attachment == null)
                         {
-                             m = await msg.Arguments.channel.SendMessageAsync(msg.Arguments.properties.content ?? "", false, msg.Arguments.properties.embed ?? null);
+                             m = await msg.Arguments.channel.SendMessageAsync(msg.Arguments.properties.Content ?? "", false, msg.Arguments.properties.Embed ?? null);
                         }
                         else
                         {
-                            m = await msg.Arguments.channel.SendFileAsync(msg.Arguments.attachment, "file.png", msg.Arguments.properties.content ?? "", false, msg.Arguments.properties.embed ?? null);
+                            m = await msg.Arguments.channel.SendFileAsync(msg.Arguments.attachment, "file.png", msg.Arguments.properties.Content ?? "", false, msg.Arguments.properties.Embed ?? null);
                             msg.Arguments.attachment.Dispose();
                         }
 

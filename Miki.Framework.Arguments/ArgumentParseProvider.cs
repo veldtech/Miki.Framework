@@ -12,6 +12,7 @@ namespace Miki.Framework.Arguments
 
 		public ArgumentParseProvider()
 		{
+            SeedAssembly(GetType().Assembly);
 		}
 
         public object Peek(IArgumentPack p, Type type)

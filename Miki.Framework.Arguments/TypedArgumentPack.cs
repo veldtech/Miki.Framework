@@ -30,14 +30,14 @@ namespace Miki.Framework.Arguments
         {
             if (!CanTake)
             {
-                value = default(T);
+                value = default;
                 return false;
             }
 
             var output = _parseProvider.Peek(Pack, typeof(T));
             if (output == null)
             {
-                value = default(T);
+                value = default;
                 return false;
             }
             value = (T)output;
@@ -48,14 +48,14 @@ namespace Miki.Framework.Arguments
         {
             if (!CanTake)
             {
-                value = default(T);
+                value = default;
                 return false;
             }
 
             var output = _parseProvider.Take(Pack, typeof(T));
             if (output == null) 
             {
-                value = default(T);
+                value = default;
                 return false;
             }
             value = (T)output;

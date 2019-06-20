@@ -2,7 +2,8 @@
 using Miki.Discord.Common;
 using Miki.Framework;
 using Miki.Framework.Exceptions;
-using Miki.Rest;
+using Miki.Logging;
+using Miki.Net.Http;
 using System;
 using System.IO;
 using System.Linq;
@@ -14,19 +15,22 @@ namespace Miki.Discord
 {
 	public static class DiscordExtensions
 	{
-        public static async Task<IMessageReference> QueueToChannelAsync(this DiscordEmbed embed, IDiscordTextChannel channel, string content = "")
+        public static async Task<IMessageReference> QueueAsync(this DiscordEmbed embed, IDiscordTextChannel channel, string content = "")
         {
             if (channel is IDiscordGuildChannel guildChannel)
             {
-                var currentUser = await MikiApp.Instance.Discord.GetCurrentUserAsync();
+                var currentUser = await MikiApp.Instance
+                    .GetService<DiscordClient>()
+                    .GetSelfAsync();
                 var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
                 var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
+                Log.Message(permissions.ToString());
 
                 if (!permissions.HasFlag(GuildPermission.EmbedLinks))
                 {
                     if (!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
                     {
-                        using (RestClient wc = new RestClient(embed.Image.Url))
+                        using (HttpClient wc = new HttpClient(embed.Image.Url))
                         {
                             Stream ms = await wc.GetStreamAsync();
                             return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
@@ -70,11 +74,8 @@ namespace Miki.Discord
 
 		public static IMessageReference ThenEdit(this IMessageReference reference, string message = "", DiscordEmbed embed = null)
 		{
-			reference.ProcessAfterComplete(async (x) => await x.EditAsync(new EditMessageArgs
-			{
-				content = message,
-				embed = embed
-			}));
+            reference.ProcessAfterComplete(async (x) 
+                => await x.EditAsync(new EditMessageArgs(message, embed)));
 			return reference;
 		}
 
@@ -89,23 +90,27 @@ namespace Miki.Discord
             var channel = await msg.GetChannelAsync();
             if (channel is IDiscordGuildChannel guildChannel)
             {
-                var currentUser = await MikiApp.Instance.Discord.GetCurrentUserAsync();
+                var currentUser = await MikiApp.Instance
+                    .GetService<DiscordClient>()
+                    .GetSelfAsync();
                 var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
                 var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
 
                 if (!permissions.HasFlag(GuildPermission.EmbedLinks))
                 {
-                    return await msg.EditAsync(new EditMessageArgs { content = embed.ToMessageBuilder().Build() });
+                    return await msg.EditAsync(new EditMessageArgs(embed.ToMessageBuilder().Build()));
                 }
             }
-            return await msg.EditAsync(new EditMessageArgs { content = "", embed = embed });
+            return await msg.EditAsync(new EditMessageArgs("", embed));
         }
 
 		public static async Task<IDiscordMessage> SendToChannel(this DiscordEmbed embed, IDiscordTextChannel channel)
 		{
             if (channel is IDiscordGuildChannel guildChannel)
             {
-                var currentUser = await MikiApp.Instance.Discord.GetCurrentUserAsync();
+                var currentUser = await MikiApp.Instance
+                    .GetService<DiscordClient>()
+                    .GetSelfAsync();
                 var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
                 var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
 
@@ -155,11 +160,7 @@ namespace Miki.Discord
             {
                 attachment = stream,
                 channel = channel,
-                properties = new MessageArgs()
-                {
-                    content = message,
-                    embed = embed
-                },
+                properties = new MessageArgs(message, embed)
             });
 
 		public static MessageBuilder ToMessageBuilder(this DiscordEmbed embed)

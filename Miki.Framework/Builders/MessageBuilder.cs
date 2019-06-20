@@ -4,7 +4,7 @@ namespace Miki.Common.Builders
 {
 	public class MessageBuilder
 	{
-		private StringBuilder _builder = new StringBuilder();
+		private readonly StringBuilder _builder = new StringBuilder();
 
 		public MessageBuilder AppendText(string text, MessageFormatting formatting = MessageFormatting.Plain, bool newLine = true, bool endWithSpace = false)
 		{

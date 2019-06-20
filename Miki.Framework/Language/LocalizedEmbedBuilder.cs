@@ -7,9 +7,9 @@ namespace Miki.Framework.Language
 {
 	public class LocalizedEmbedBuilder : EmbedBuilder
 	{
-		private readonly LocaleInstance _instance;
+		private readonly IResourceManager _instance;
 
-		public LocalizedEmbedBuilder(LocaleInstance instance)
+		public LocalizedEmbedBuilder(IResourceManager instance)
 		{
 			_instance = instance;
 		}

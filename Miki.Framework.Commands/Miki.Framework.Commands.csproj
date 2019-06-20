@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Miki.Framework.Arguments\Miki.Framework.Arguments.csproj" />
+    <ProjectReference Include="..\Miki.Framework\Miki.Framework.csproj" />
+  </ItemGroup>
+
+</Project>
