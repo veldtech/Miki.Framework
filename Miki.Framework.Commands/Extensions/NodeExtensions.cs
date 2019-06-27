@@ -21,7 +21,6 @@ namespace Miki.Framework.Commands
             {
                 return ValidateRequirementsAsync(node, context);
             }
-
             return Task.FromResult(true);
         }
 
@@ -40,7 +39,6 @@ namespace Miki.Framework.Commands
                     return false;
                 }
             }
-
             return true;
         }
 
@@ -79,7 +77,6 @@ namespace Miki.Framework.Commands
                     }
                 }
             }
-
             return executables;
         }
     }

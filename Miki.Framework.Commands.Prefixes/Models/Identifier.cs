@@ -1,17 +1,17 @@
-﻿using ProtoBuf;
+﻿using System.Runtime.Serialization;
 
 namespace Miki.Framework.Commands.Prefixes.Models
 {
-	[ProtoContract]
+	[DataContract]
 	public class Identifier
 	{
-		[ProtoMember(1)]
+		[DataMember(Name = "guild_id", Order = 1)]
 		public long GuildId { get; set; }
 
-		[ProtoMember(2)]
-		public string DefaultValue { get; set; }
+        [DataMember(Name = "default", Order = 2)]
+        public string DefaultValue { get; set; }
 
-		[ProtoMember(3)]
-		public string Value { get; set; }
+        [DataMember(Name = "current", Order = 3)]
+        public string Value { get; set; }
 	}
 }

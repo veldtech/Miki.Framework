@@ -24,25 +24,26 @@ namespace Miki.Discord
                     .GetSelfAsync();
                 var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
                 var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
-                Log.Message(permissions.ToString());
-
                 if (!permissions.HasFlag(GuildPermission.EmbedLinks))
                 {
                     if (!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
                     {
                         using (HttpClient wc = new HttpClient(embed.Image.Url))
                         {
-                            Stream ms = await wc.GetStreamAsync();
-                            return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
+                            using (Stream ms = await wc.GetStreamAsync())
+                            {
+                                return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
+                            }
                         }
                     }
                     else if (!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
                     {
-                        using (WebClient wc = new WebClient())
+                        using (HttpClient wc = new HttpClient(embed.Thumbnail.Url))
                         {
-                            byte[] image = wc.DownloadData(embed.Thumbnail.Url);
-                            MemoryStream ms = new MemoryStream(image);
-                            return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
+                            using (Stream ms = await wc.GetStreamAsync())
+                            {
+                                return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
+                            }
                         }
                     }
                     else
@@ -54,6 +55,8 @@ namespace Miki.Discord
             return QueueMessage(channel, embed, content);
         }
 
+        public static Task<IMessageReference> ThenWaitAsync(this Task<IMessageReference> reference, int milliseconds)
+            => reference.ContinueWith(x => x.Result.ThenWait(milliseconds));
 		public static IMessageReference ThenWait(this IMessageReference reference, int milliseconds)
 		{
 			reference.ProcessAfterComplete(async (msg) =>
@@ -63,7 +66,9 @@ namespace Miki.Discord
 			return reference;
 		}
 
-		public static IMessageReference ThenDelete(this IMessageReference reference)
+        public static Task<IMessageReference> ThenDeleteAsync(this Task<IMessageReference> reference)
+            => reference.ContinueWith(x => x.Result.ThenDelete());
+        public static IMessageReference ThenDelete(this IMessageReference reference)
 		{
 			reference.ProcessAfterComplete(async (msg) =>
 			{
@@ -72,14 +77,18 @@ namespace Miki.Discord
 			return reference;
 		}
 
-		public static IMessageReference ThenEdit(this IMessageReference reference, string message = "", DiscordEmbed embed = null)
+        public static Task<IMessageReference> ThenEditAsync(this Task<IMessageReference> reference, string message = "", DiscordEmbed embed = null)
+            => reference.ContinueWith(x => x.Result.ThenEdit(message, embed));
+        public static IMessageReference ThenEdit(this IMessageReference reference, string message = "", DiscordEmbed embed = null)
 		{
             reference.ProcessAfterComplete(async (x) 
                 => await x.EditAsync(new EditMessageArgs(message, embed)));
 			return reference;
 		}
 
-		public static IMessageReference Then(this IMessageReference reference, Func<IDiscordMessage, Task> fn)
+        public static Task<IMessageReference> ThenAsync(this Task<IMessageReference> reference, Func<IDiscordMessage, Task> fn)
+            => reference.ContinueWith(x => x.Result.Then(fn));
+        public static IMessageReference Then(this IMessageReference reference, Func<IDiscordMessage, Task> fn)
 		{
 			reference.ProcessAfterComplete(fn);
 			return reference;
@@ -147,9 +156,12 @@ namespace Miki.Discord
             return await channel.SendMessageAsync("", embed: embed);
 		}
 
-		public static async Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
+		public static Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
 		{
-			return await (await user.GetDMChannelAsync()).SendMessageAsync("", false, embed);
+            return user.GetDMChannelAsync()
+                .ContinueWith(x => {
+                    return x.Result.SendMessageAsync("", false, embed);
+                }).Unwrap();
 		}
 
         public static IMessageReference QueueMessage(this IDiscordTextChannel channel, string message)

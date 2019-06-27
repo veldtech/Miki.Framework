@@ -9,13 +9,12 @@ namespace Miki.Framework
 {
 	public class MikiApp
 	{
-		public static MikiApp Instance { get; internal set; }
+		public static MikiApp Instance { get; private set; }
 
-        public IServiceProvider Services { get; }
+        public IServiceProvider Services { get; internal set; }
 
-		internal MikiApp(IServiceProvider provider)
+		internal MikiApp()
 		{
-            Services = provider;
             Instance = this;
 		}
 

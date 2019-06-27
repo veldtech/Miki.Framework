@@ -36,6 +36,8 @@ namespace Miki.Framework.Commands.Pipelines
 
     public class CommandPipeline
     {
+        const string PipelineArgumentKey = "core-pipeline";
+
         public IReadOnlyList<IPipelineStage> PipelineStages { get; }
         public Func<Exception, IContext, Task> OnError { get; set; }
 

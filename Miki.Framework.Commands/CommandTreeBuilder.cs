@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Miki.Framework.Commands
 {
@@ -13,7 +14,14 @@ namespace Miki.Framework.Commands
 
     public class CommandTreeBuilder
     {
-        public event Action<NodeContainer> OnContainerLoaded;
+        public event Action<NodeContainer, IServiceProvider> OnContainerLoaded;
+
+        private readonly IServiceProvider _services;
+
+        public CommandTreeBuilder(MikiApp app)
+        {
+            _services = app.Services;
+        }
 
         public CommandTree Create(Assembly assembly)
         {
@@ -41,7 +49,7 @@ namespace Miki.Framework.Commands
 
             NodeContainer module = new NodeModule(moduleAttrib.Name, parent);
             module.Instance = CreateInstance(t);
-            OnContainerLoaded?.Invoke(module);
+            OnContainerLoaded?.Invoke(module, _services);
 
             var allCommands = t.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
                 .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
@@ -77,7 +85,7 @@ namespace Miki.Framework.Commands
             var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, null);
             AddRequirements(t, multiCommand);
             multiCommand.Instance = CreateInstance(t);
-            OnContainerLoaded?.Invoke(multiCommand);
+            OnContainerLoaded?.Invoke(multiCommand, _services);
 
             var allCommands = t.GetNestedTypes()
                 .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
@@ -142,19 +150,23 @@ namespace Miki.Framework.Commands
                     .Select(x => x as ICommandRequirement));
         }
 
-        private static object CreateInstance(Type type)
+        private object CreateInstance(Type type)
         {
-            var defaultConstructor = type.GetConstructors()
-                .FirstOrDefault(x => x.GetParameters().Count() == 0);
-            if (defaultConstructor != null)
+            var defaultConstructor = type
+                .GetConstructors()
+                .FirstOrDefault();
+
+            if (defaultConstructor != null
+                && defaultConstructor.GetParameters().Length != 0)
             {
-                return Activator.CreateInstance(type);
+                List<object> paramCollection = new List<object>();
+                foreach(var p in defaultConstructor.GetParameters())
+                {
+                    paramCollection.Add(_services.GetService(p.ParameterType));
+                }
+                return Activator.CreateInstance(type, paramCollection.ToArray());
             }
-            else
-            {
-                throw new InvalidOperationException(
-                    $"Module of type '{type.ToString()}' is missing a default constructor");
-            }
+            return Activator.CreateInstance(type);
         }
     }
 }
