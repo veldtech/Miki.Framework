@@ -29,7 +29,6 @@ namespace Miki.Framework.Commands.Permissions
 
 
             }
-            return 
         }
 
         public async Task SetForUserAsync(
