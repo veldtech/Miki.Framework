@@ -20,14 +20,19 @@ namespace Miki.Framework.Commands.Permissions
             IMutableContext e,
             Func<Task> next)
         {
-            if (e.GetMessage().Author is IDiscordGuildUser u)
+            if (!(e.GetMessage().Author is IDiscordGuildUser))
             {
-                if (await u.HasPermissionsAsync(GuildPermission.Administrator))
-                {
-                    await next();
-                }
+                // TODO: handle DM permissions by giving the default.
+            }
 
-
+            var guildUser = e.GetMessage().Author as IDiscordGuildUser;
+            if (await guildUser.HasPermissionsAsync(GuildPermission.Administrator))
+            {
+                await next();
+            }
+            else if(await GetAllowedForUser(e, data, e.Executable.ToString()))
+            {
+                await next();
             }
         }
 
