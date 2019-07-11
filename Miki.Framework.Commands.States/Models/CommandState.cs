@@ -1,17 +1,17 @@
-﻿using ProtoBuf;
+﻿using System.Runtime.Serialization;
 
 namespace Miki.Framework.Commands.States
 {
-	[ProtoContract]
-	public class CommandState
+    [DataContract]
+    public class CommandState
 	{
-		[ProtoMember(1)]
+		[DataMember(Order = 1)]
 		public string Name { get; set; }
 
-		[ProtoMember(2)]
-		public long ChannelId { get; set; }
+        [DataMember(Order = 2)]
+        public long ChannelId { get; set; }
 
-		[ProtoMember(3)]
-		public bool State { get; set; }
+        [DataMember(Order = 3)]
+        public bool State { get; set; }
 	}
 }

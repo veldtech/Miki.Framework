@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Miki.Logging;
 
 namespace Miki.Framework.Commands.Nodes
 {
+    public delegate Task CommandDelegate(IContext c);
+
     public class NodeExecutable : Node, IExecutable
     {
-        internal CommandDelegate runAsync;
+        private CommandDelegate runAsync;
 
-        public NodeExecutable(CommandMetadata metadata, CommandDelegate task  = null)
-            : base(metadata)
+        public NodeExecutable(CommandMetadata metadata, NodeContainer parent, MethodInfo method)
+            : base(metadata, parent, method)
         {
-            runAsync = task;
-            Requirements = new List<ICommandRequirement>();
-        }
-        public NodeExecutable(CommandMetadata metadata, NodeContainer parent, CommandDelegate task = null)
-            : base(metadata, parent)
-        {
-            runAsync = task;
-            Requirements = new List<ICommandRequirement>();
+            runAsync = (CommandDelegate)Delegate.CreateDelegate(
+                typeof(CommandDelegate),
+                parent.Instance,
+                method,
+                true);
         }
 
         public async Task RunAsync(IContext e)
@@ -30,7 +31,8 @@ namespace Miki.Framework.Commands.Nodes
                 throw new InvalidProgramException("Invalid method bindings for command " + ToString());
             }
 
-            foreach(var req in Requirements)
+            foreach(var req in Attributes
+                .OfType<ICommandRequirement>())
             {
                 if(!await req.CheckAsync(e))
                 {

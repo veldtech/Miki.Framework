@@ -21,7 +21,6 @@ namespace Miki.Framework.Commands
             {
                 return ValidateRequirementsAsync(node, context);
             }
-
             return Task.FromResult(true);
         }
 
@@ -33,14 +32,14 @@ namespace Miki.Framework.Commands
         /// <returns>True if the <see cref="context"/> has the requirements.</returns>
         public static async Task<bool> ValidateRequirementsAsync(this Node node, IContext context)
         {
-            foreach (var requirement in node.Requirements)
+            foreach (var requirement in node.Attributes
+                .OfType<ICommandRequirement>())
             {
                 if (!(await requirement.CheckAsync(context)))
                 {
                     return false;
                 }
             }
-
             return true;
         }
 
@@ -79,7 +78,6 @@ namespace Miki.Framework.Commands
                     }
                 }
             }
-
             return executables;
         }
     }

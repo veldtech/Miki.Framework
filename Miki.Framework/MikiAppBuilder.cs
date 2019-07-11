@@ -32,8 +32,11 @@ namespace Miki.Framework
 
         public MikiApp Build()
         {
+            var app = new MikiApp();
+            Services.AddSingleton(app);
             var services = Services.BuildServiceProvider();
-            return new MikiApp(services);
+            app.Services = services;
+            return app;
         }
     }
 }

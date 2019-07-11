@@ -129,7 +129,7 @@ namespace Miki.Framework.Commands.Localization
             }
 
             var cache = context.GetService<ICacheClient>();
-            if (cache == null)
+            if (cache != null)
             {
                 await cache.UpsertAsync(
                     GetCacheKeyForId(channelId), 

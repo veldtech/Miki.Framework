@@ -13,12 +13,20 @@ namespace Miki.Framework.Commands
         /// <summary>
         /// Instance object for reflection.
         /// </summary>
-        public object Instance { get; internal set; }
+        public object Instance { get; }
 
-        public NodeContainer(CommandMetadata metadata)
-            : base(metadata) {}
-        public NodeContainer(CommandMetadata metadata, NodeContainer parent)
-            : base(metadata, parent) {}
+        public NodeContainer(CommandMetadata metadata, Type t)
+            : base(metadata, t)
+        {
+        }
+        public NodeContainer(CommandMetadata metadata, NodeContainer parent, IServiceProvider provider, Type t)
+            : base(metadata, parent, t)
+        {
+            if (t != null)
+            {
+                Instance = CommandTreeHelpers.CreateInstance(t, provider);
+            }
+        }
 
         public virtual Node FindCommand(IArgumentPack pack)
         {
