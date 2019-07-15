@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Miki.Framework.Arguments;
+using Miki.Logging;
 
 namespace Miki.Framework.Commands.Nodes
 {
@@ -65,6 +66,12 @@ namespace Miki.Framework.Commands.Nodes
                     await v.OnCheckFail(context);
                     return;
                 }
+            }
+
+            if(_runAsync == null)
+            {
+                Log.Warning("Default executable not found; omitting request.");
+                return;
             }
 
             await _runAsync(context);

@@ -20,6 +20,7 @@ namespace Miki.Framework.Commands.Permissions
             IMutableContext e,
             Func<Task> next)
         {
+            var db = e.GetService<DbContext>();
             if (!(e.GetMessage().Author is IDiscordGuildUser))
             {
                 if((e.Executable as Node)
@@ -30,12 +31,11 @@ namespace Miki.Framework.Commands.Permissions
                 }
             }
 
-            var guildUser = e.GetMessage().Author as IDiscordGuildUser;
-            if (false && await guildUser.HasPermissionsAsync(GuildPermission.Administrator))
-            {
-                await next();
-            }
-            else if(await GetAllowedForUser(e, data, e.Executable.ToString()))
+            if(await GetAllowedForUser(
+                db, 
+                e.GetMessage().Author, 
+                e.GetChannel(), 
+                e.Executable))
             {
                 await next();
             }
@@ -46,7 +46,7 @@ namespace Miki.Framework.Commands.Permissions
             long entityId,
             EntityType type,
             string commandName,
-            bool allow)
+            PermissionStatus allow)
         {
             if (c.GetGuild() == null)
             {
@@ -65,7 +65,7 @@ namespace Miki.Framework.Commands.Permissions
                     CommandName = commandName,
                     EntityId = entityId,
                     GuildId = (long)c.GetGuild().Id,
-                    Status = allow ? PermissionStatus.Allow : PermissionStatus.Deny,
+                    Status = allow,
                     Type = type
                 });
             }
@@ -76,69 +76,73 @@ namespace Miki.Framework.Commands.Permissions
                     Log.Warning($"Set permission type for {{{entityId}, {commandName}}} does not match of (expected: {type}, actual: {entity.Type})");
                 }
 
-                entity.Status = allow ? PermissionStatus.Allow : PermissionStatus.Deny;
+                entity.Status = allow;
             }
 
             await db.SaveChangesAsync();
         }
 
         public async Task<bool> GetAllowedForUser(
-            IContext c,
-            IDiscordMessage request,
-            string commandName)
+            DbContext db,
+            IDiscordUser user,
+            IDiscordChannel channel,
+            IExecutable command)
         {
-            var db = c.GetService<DbContext>();
-            if(!(request.Author is IDiscordGuildUser guildUser))
+            string commandName = command.ToString();
+            if ((user is IDiscordGuildUser guildUser))
             {
-                return true;
+                if (await guildUser.HasPermissionsAsync(GuildPermission.Administrator))
+                {
+                    return true;
+                }
+
+                var userPermission = await db.Set<Permission>()
+                    .SingleOrDefaultAsync(x => x.EntityId == user.Id.ToDbLong()
+                        && x.GuildId == guildUser.GuildId.ToDbLong()
+                        && x.CommandName == commandName);
+                if (userPermission != null
+                    && userPermission.Status != PermissionStatus.Default)
+                {
+                    return userPermission.Status == PermissionStatus.Allow;
+                }
+
+                var channelPermission = await db.Set<Permission>()
+                    .SingleOrDefaultAsync(x => x.EntityId == channel.Id.ToDbLong()
+                        && x.GuildId == guildUser.GuildId.ToDbLong()
+                        && x.CommandName == commandName);
+                if (channelPermission != null
+                    && channelPermission.Status != PermissionStatus.Default)
+                {
+                    return channelPermission.Status == PermissionStatus.Allow;
+                }
+
+                var rolePermission = await db.Set<Permission>()
+                    .Where(x => guildUser.RoleIds.Any(z => z.ToDbLong() == x.EntityId)
+                        && x.GuildId == guildUser.GuildId.ToDbLong()
+                        && x.CommandName == commandName
+                        && x.Status != PermissionStatus.Default)
+                    .ToListAsync();
+                if (rolePermission.Any(x => x.Status == PermissionStatus.Deny))
+                {
+                    return false;
+                }
+                else if (rolePermission.Any(x => x.Status == PermissionStatus.Allow))
+                {
+                    return true;
+                }
+
+                var guildPermission = await db.Set<Permission>()
+                    .SingleOrDefaultAsync(x => x.EntityId == guildUser.GuildId.ToDbLong()
+                        && x.GuildId == guildUser.GuildId.ToDbLong()
+                        && x.CommandName == commandName);
+                if (guildPermission != null)
+                {
+                    return guildPermission.Status == PermissionStatus.Allow;
+                }
             }
 
-            var userPermission = await db.Set<Permission>()
-                .SingleOrDefaultAsync(x => x.EntityId == request.Author.Id.ToDbLong()
-                    && x.GuildId == guildUser.GuildId.ToDbLong()
-                    && x.CommandName == commandName);
-            if (userPermission != null
-                && userPermission.Status != PermissionStatus.Default)
-            {
-                return userPermission.Status == PermissionStatus.Allow;
-            }
-
-            var channelPermission = await db.Set<Permission>()
-                .SingleOrDefaultAsync(x => x.EntityId == request.ChannelId.ToDbLong()
-                    && x.GuildId == guildUser.GuildId.ToDbLong()
-                    && x.CommandName == commandName);
-            if(channelPermission != null 
-                && channelPermission.Status != PermissionStatus.Default)
-            {
-                return channelPermission.Status == PermissionStatus.Allow;
-            }
-
-            var rolePermission = await db.Set<Permission>()
-                .Where(x => guildUser.RoleIds.Any(z => z.ToDbLong() == x.EntityId)
-                    && x.GuildId == guildUser.GuildId.ToDbLong()
-                    && x.CommandName == commandName
-                    && x.Status != PermissionStatus.Default)
-                .ToListAsync();
-            if(rolePermission.Any(x => x.Status == PermissionStatus.Deny))
-            {
-                return false;
-            }
-            else if(rolePermission.Any(x => x.Status == PermissionStatus.Allow))
-            {
-                return true;
-            }
-
-            var guildPermission = await db.Set<Permission>()
-                .SingleOrDefaultAsync(x => x.EntityId == guildUser.GuildId.ToDbLong()
-                    && x.GuildId == guildUser.GuildId.ToDbLong()
-                    && x.CommandName == commandName);
-            if(guildPermission != null)
-            {
-                return guildPermission.Status == PermissionStatus.Allow;
-            }
-
-            var defaultDenied = (c.Executable as Node)
-                .Attributes.OfType<DefaultPermissionAttribute>()
+            var defaultDenied = (command as Node).Attributes
+                .OfType<DefaultPermissionAttribute>()
                 .Any(x => x.Status == PermissionStatus.Deny);
             return !defaultDenied;
         }

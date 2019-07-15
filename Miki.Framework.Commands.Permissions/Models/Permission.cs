@@ -13,7 +13,7 @@ namespace Miki.Framework.Commands.Permissions.Models
         Channel,
         Role,
         Guild,
-        Global,yeah
+        Global,
     }
 
     public enum PermissionStatus

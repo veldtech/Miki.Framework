@@ -38,6 +38,12 @@ namespace Miki.Framework.Commands
             var arg = pack.Peek()
                 .ToLowerInvariant();
 
+            // Take if this module starts.
+            if(Metadata.Identifiers?.Any(x => x.ToLowerInvariant() == arg.ToLowerInvariant()) ?? false)
+            {
+                pack.Take();
+            }
+
             foreach(var c in Children)
             {
                 if (c is NodeContainer nc)
