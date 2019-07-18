@@ -126,7 +126,7 @@ namespace Miki.Framework.Commands.Permissions
                 {
                     return false;
                 }
-                else if (rolePermission.Any(x => x.Status == PermissionStatus.Allow))
+                if (rolePermission.Any(x => x.Status == PermissionStatus.Allow))
                 {
                     return true;
                 }
