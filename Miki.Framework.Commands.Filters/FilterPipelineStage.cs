@@ -26,7 +26,7 @@ namespace Miki.Framework.Commands.Filters
             where T : class, IFilter
         {
             if(_filters == null 
-                || _filters.Count() == 0)
+                || !_filters.Any())
             {
                 return default;
             }

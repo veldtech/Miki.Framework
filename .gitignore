@@ -41,6 +41,7 @@ TestResult.xml
 [Dd]ebugPS/
 [Rr]eleasePS/
 dlldata.c
+.DS_Store
 
 # .NET Core
 project.lock.json
