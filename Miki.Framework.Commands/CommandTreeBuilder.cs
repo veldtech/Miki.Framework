@@ -10,8 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Miki.Framework.Commands
 {
-    public delegate Task CommandDelegate(IContext c);
-
     public class CommandTreeBuilder
     {
         public event Action<NodeContainer, IServiceProvider> OnContainerLoaded;
@@ -47,8 +45,7 @@ namespace Miki.Framework.Commands
                 throw new InvalidOperationException("Modules must have a valid ModuleAttribute.");
             }
 
-            NodeContainer module = new NodeModule(moduleAttrib.Name, parent);
-            module.Instance = CreateInstance(t);
+            NodeContainer module = new NodeModule(moduleAttrib.Name, parent, _services, t);
             OnContainerLoaded?.Invoke(module, _services);
 
             var allCommands = t.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
@@ -82,9 +79,7 @@ namespace Miki.Framework.Commands
                     $"Multi commands cannot have an invalid name.");
             }
 
-            var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, null);
-            AddRequirements(t, multiCommand);
-            multiCommand.Instance = CreateInstance(t);
+            var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, _services, t);
             OnContainerLoaded?.Invoke(multiCommand, _services);
 
             var allCommands = t.GetNestedTypes()
@@ -119,54 +114,13 @@ namespace Miki.Framework.Commands
         private Node LoadCommand(MethodInfo m, NodeContainer parent)
         {
             var commandAttrib = m.GetCustomAttribute<CommandAttribute>();
-            var command = new NodeExecutable(commandAttrib.AsMetadata(), parent);
-            AddRequirements(m, command);
+            var command = new NodeExecutable(commandAttrib.AsMetadata(), parent, m);
 
             if (m.ReturnType != typeof(Task))
             {
                 throw new Exception("Methods with attribute 'Command' require to be Tasks.");
             }
-
-            var d = (CommandDelegate)Delegate.CreateDelegate(
-                typeof(CommandDelegate),
-                parent.Instance,
-                m,
-                true);
-
-            command.runAsync = d;
-
             return command;
-        }
-
-        private static void AddRequirements(ICustomAttributeProvider t, Node e)
-        {
-            if (e.Requirements == null)
-            {
-                return;
-            }
-
-            e.Requirements.AddRange(
-                t.GetCustomAttributes(typeof(CommandRequirementAttribute), true)
-                    .Select(x => x as ICommandRequirement));
-        }
-
-        private object CreateInstance(Type type)
-        {
-            var defaultConstructor = type
-                .GetConstructors()
-                .FirstOrDefault();
-
-            if (defaultConstructor != null
-                && defaultConstructor.GetParameters().Length != 0)
-            {
-                List<object> paramCollection = new List<object>();
-                foreach(var p in defaultConstructor.GetParameters())
-                {
-                    paramCollection.Add(_services.GetService(p.ParameterType));
-                }
-                return Activator.CreateInstance(type, paramCollection.ToArray());
-            }
-            return Activator.CreateInstance(type);
         }
     }
 }

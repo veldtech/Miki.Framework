@@ -2,6 +2,7 @@
 using Miki.Framework.Arguments;
 using Miki.Framework.Commands.Pipelines;
 using Miki.Framework.Commands.Stages;
+using Miki.Logging;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -24,9 +25,12 @@ namespace Miki.Framework.Commands.Stages
 
         public async Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next)
         {
+            Log.Debug($"Starting command aggregation with query '{e.GetQuery()}'");
+
             var command = GetCommand(e.GetArgumentPack().Pack);
             if (command == null)
             {
+                Log.Warning($"No command was found with query '{string.Join(" ", e.GetQuery())}'");
                 return;
             }
 

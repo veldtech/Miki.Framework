@@ -3,35 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Miki.Framework.Arguments;
+using Miki.Logging;
 
 namespace Miki.Framework.Commands.Nodes
 {
     public class NodeNestedExecutable : NodeContainer, IExecutable
     {
-        private Func<IContext, Task> runAsync;
+        private CommandDelegate _runAsync;
 
         public NodeNestedExecutable(
-            CommandMetadata metadata, 
-            Func<IContext, Task> defaultTask = null)
-            : base(metadata)
+            CommandMetadata metadata,
+            IServiceProvider builder,
+            Type t)
+            : this(metadata, null, builder, t)
         {
-            runAsync = defaultTask;
-            Requirements = new List<ICommandRequirement>();
         }
         public NodeNestedExecutable(
-            CommandMetadata metadata, 
-            NodeContainer parent, 
-            Func<IContext, Task> defaultTask = null)
-            : base(metadata, parent)
+            CommandMetadata metadata,
+            NodeContainer parent,
+            IServiceProvider builder,
+            Type t)
+            : base(metadata, parent, builder, t)
         {
-            runAsync = defaultTask;
-            Requirements = new List<ICommandRequirement>();
         }
 
-        public void SetDefaultExecution(Func<IContext, Task> defaultTask)
+        public void SetDefaultExecution(CommandDelegate defaultTask)
         {
-            runAsync = defaultTask;
+            _runAsync = defaultTask;
         }
 
         public override Node FindCommand(IArgumentPack pack)
@@ -58,7 +58,8 @@ namespace Miki.Framework.Commands.Nodes
 
         public async Task RunAsync(IContext context)
         {
-            foreach(var v in Requirements)
+            foreach(var v in Attributes
+                .OfType<ICommandRequirement>())
             {
                 if(!await v.CheckAsync(context))
                 {
@@ -67,7 +68,13 @@ namespace Miki.Framework.Commands.Nodes
                 }
             }
 
-            await runAsync(context);
+            if(_runAsync == null)
+            {
+                Log.Warning("Default executable not found; omitting request.");
+                return;
+            }
+
+            await _runAsync(context);
         }
     }
 }

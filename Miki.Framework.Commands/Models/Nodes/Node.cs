@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,14 +12,19 @@ namespace Miki.Framework.Commands
         public CommandMetadata Metadata { get; }
         public NodeContainer Parent { get; }
 
-        public List<ICommandRequirement> Requirements { get; protected set; }
+        public IReadOnlyCollection<Attribute> Attributes => _type.GetCustomAttributes(false)
+                .OfType<Attribute>()
+                .ToList();
 
-        public Node(CommandMetadata metadata)
+        private MemberInfo _type { get; }
+
+        public Node(CommandMetadata metadata, MemberInfo type)
         {
             Metadata = metadata;
+            _type = type;
         }
-        public Node(CommandMetadata metadata, NodeContainer parent)
-            : this(metadata)
+        public Node(CommandMetadata metadata, NodeContainer parent, MemberInfo type)
+            : this(metadata, type)
         {
             Parent = parent ?? throw new InvalidOperationException("Parent cannot be null when explicitly set up.");
         }
