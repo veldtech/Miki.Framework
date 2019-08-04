@@ -1,14 +1,13 @@
-﻿using Miki.Discord.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Discord.Common;
 using Miki.Framework.Commands.Nodes;
 using Miki.Framework.Commands.Pipelines;
+using Miki.Framework.Commands.Scopes;
+using Miki.Framework.Commands.Scopes.Attributes;
+using Miki.Framework.Commands.Scopes.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
-using Miki.Framework.Commands.Scopes.Attributes;
-using Microsoft.EntityFrameworkCore;
-using Miki.Framework.Commands.Scopes.Models;
 
 namespace Miki.Framework.Commands.Scopes
 {
@@ -49,6 +48,10 @@ namespace Miki.Framework.Commands
 {
     public static class ScopeExtensions
     {
-
+        public static CommandPipelineBuilder UseScopes(this CommandPipelineBuilder builder)
+        {
+            builder.UseStage(new ScopePipelineStage());
+            return builder;
+        }
     }
 }
