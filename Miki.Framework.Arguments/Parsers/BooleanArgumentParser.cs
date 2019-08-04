@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Miki.Framework.Arguments
 {
 	public class BooleanArgumentParser : IArgumentParser
 	{
-        public Type OutputType
-            => typeof(bool);
+		public Type OutputType
+			=> typeof(bool);
 
 		public int Priority => 1;
 
@@ -16,16 +14,16 @@ namespace Miki.Framework.Arguments
 
 		public object Parse(IArgumentPack pack)
 		{
-            var item = pack.Take();
-            if (bool.TryParse(item, out bool valueBool))
-            {
-                return valueBool;
-            }
-            else if(int.TryParse(item, out int valueInt))
-            {
-                return valueInt > 0;
-            }
-            return null;
+			var item = pack.Take();
+			if(bool.TryParse(item, out bool valueBool))
+			{
+				return valueBool;
+			}
+			else if(int.TryParse(item, out int valueInt))
+			{
+				return valueInt > 0;
+			}
+			return null;
 		}
 	}
 }

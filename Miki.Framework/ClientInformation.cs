@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Miki.Discord;
-using System;
+﻿using Miki.Discord;
 
 namespace Miki.Common
 {

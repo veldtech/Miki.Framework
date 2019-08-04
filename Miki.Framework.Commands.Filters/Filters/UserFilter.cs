@@ -1,5 +1,4 @@
-﻿using Miki.Discord.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Miki.Framework.Commands.Filters

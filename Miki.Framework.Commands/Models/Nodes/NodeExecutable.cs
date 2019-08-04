@@ -1,46 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using Miki.Logging;
 
 namespace Miki.Framework.Commands.Nodes
 {
-    public delegate Task CommandDelegate(IContext c);
+	public delegate Task CommandDelegate(IContext c);
 
-    public class NodeExecutable : Node, IExecutable
-    {
-        private CommandDelegate runAsync;
+	public class NodeExecutable : Node, IExecutable
+	{
+		private CommandDelegate runAsync;
 
-        public NodeExecutable(CommandMetadata metadata, NodeContainer parent, MethodInfo method)
-            : base(metadata, parent, method)
-        {
-            runAsync = (CommandDelegate)Delegate.CreateDelegate(
-                typeof(CommandDelegate),
-                parent.Instance,
-                method,
-                true);
-        }
+		public NodeExecutable(CommandMetadata metadata, NodeContainer parent, MethodInfo method)
+			: base(metadata, parent, method)
+		{
+			runAsync = (CommandDelegate)Delegate.CreateDelegate(
+				typeof(CommandDelegate),
+				parent.Instance,
+				method,
+				true);
+		}
 
-        public async Task RunAsync(IContext e)
-        {
-            if(runAsync == null)
-            {
-                throw new InvalidProgramException("Invalid method bindings for command " + ToString());
-            }
+		public async Task RunAsync(IContext e)
+		{
+			if(runAsync == null)
+			{
+				throw new InvalidProgramException("Invalid method bindings for command " + ToString());
+			}
 
-            foreach(var req in Attributes
-                .OfType<ICommandRequirement>())
-            {
-                if(!await req.CheckAsync(e))
-                {
-                    await req.OnCheckFail(e);
-                    return;
-                }
-            }
-            await runAsync(e);
-        }
-    }
+			foreach(var req in Attributes
+				.OfType<ICommandRequirement>())
+			{
+				if(!await req.CheckAsync(e))
+				{
+					await req.OnCheckFail(e);
+					return;
+				}
+			}
+			await runAsync(e);
+		}
+	}
 }

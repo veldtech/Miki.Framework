@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Miki.Cache;
 using Miki.Discord.Common;
-using Miki.Framework.Arguments;
 using Miki.Framework.Commands;
-using Miki.Framework.Commands.Pipelines;
 using Miki.Framework.Commands.Prefixes.Models;
 using Miki.Framework.Events.Triggers;
 using System;
@@ -19,7 +17,7 @@ namespace Miki.Framework.Events
 		public bool Changable { get; internal set; }
 		public bool IsDefault { get; internal set; }
 
-        public Func<IContext, Task> OnTriggerReceived { get; set; }
+		public Func<IContext, Task> OnTriggerReceived { get; set; }
 
 		public PrefixTrigger(string value, bool isDefault, bool changable = false)
 		{
@@ -29,22 +27,23 @@ namespace Miki.Framework.Events
 			Changable = changable;
 		}
 
-        public async Task ChangeForGuildAsync(DbContext context, ICacheClient cache, ulong id, string prefix)
+		public async Task ChangeForGuildAsync(DbContext context, ICacheClient cache, ulong id, string prefix)
 		{
-			if (Changable)
+			if(Changable)
 			{
 				long guildId = id.ToDbLong();
 
 				Identifier i = await context.Set<Identifier>()
-                    .FindAsync(guildId, DefaultValue);
-				if (i == null)
+					.FindAsync(guildId, DefaultValue);
+				if(i == null)
 				{
 					await context.Set<Identifier>()
-						.AddAsync(new Identifier() {
-                            GuildId = guildId,
-                            DefaultValue = DefaultValue,
-                            Value = prefix
-                        });
+						.AddAsync(new Identifier()
+						{
+							GuildId = guildId,
+							DefaultValue = DefaultValue,
+							Value = prefix
+						});
 				}
 				else
 				{
@@ -66,9 +65,9 @@ namespace Miki.Framework.Events
 
 		public async Task<string> GetForGuildAsync(DbContext db, ICacheClient cache, ulong id)
 		{
-			if (Changable)
+			if(Changable)
 			{
-				if (await cache.ExistsAsync(GetCacheKey(id)))
+				if(await cache.ExistsAsync(GetCacheKey(id)))
 				{
 					return await cache.GetAsync<string>(GetCacheKey(id));
 				}
@@ -80,57 +79,57 @@ namespace Miki.Framework.Events
 			return DefaultValue;
 		}
 
-        public async Task<string> LoadFromDatabase(DbContext context, ulong id)
-        {
-            long guildId = id.ToDbLong();
-            var identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
-            if (identifier == null)
-            {
-                identifier = await CreateNewAsync(context, guildId);
-            }
+		public async Task<string> LoadFromDatabase(DbContext context, ulong id)
+		{
+			long guildId = id.ToDbLong();
+			var identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
+			if(identifier == null)
+			{
+				identifier = await CreateNewAsync(context, guildId);
+			}
 
-            await context.SaveChangesAsync();
-            return identifier.Value;
-        }
+			await context.SaveChangesAsync();
+			return identifier.Value;
+		}
 
-        public async Task<string> CheckTriggerAsync(IMutableContext e, IDiscordMessage packet)
-        {
-            var channel = await packet.GetChannelAsync();
-            if(channel == null)
-            {
-                return null;
-            }
+		public async Task<string> CheckTriggerAsync(IMutableContext e, IDiscordMessage packet)
+		{
+			var channel = await packet.GetChannelAsync();
+			if(channel == null)
+			{
+				return null;
+			}
 
-            var prefix = DefaultValue;
-            if (channel is IDiscordGuildChannel c)
-            {
-                prefix = await GetForGuildAsync(
-                    e.GetService<DbContext>(), 
-                    e.GetService<ICacheClient>(), 
-                    c.GuildId);
-            }
+			var prefix = DefaultValue;
+			if(channel is IDiscordGuildChannel c)
+			{
+				prefix = await GetForGuildAsync(
+					e.GetService<DbContext>(),
+					e.GetService<ICacheClient>(),
+					c.GuildId);
+			}
 
-            var query = e.GetQuery();
-            if (!query[0].StartsWith(prefix))
-            {
-                return null;
-            }
+			var query = e.GetQuery();
+			if(!query[0].StartsWith(prefix))
+			{
+				return null;
+			}
 
-            if (query[0].Length == prefix.Length)
-            {
-                query.RemoveAt(0);
-            }
-            else
-            {
-                query[0] = query[0].Substring(prefix.Length);
-            }
-            e.SetContext(CorePipelineStage.QueryArgumentKey, query);
+			if(query[0].Length == prefix.Length)
+			{
+				query.RemoveAt(0);
+			}
+			else
+			{
+				query[0] = query[0].Substring(prefix.Length);
+			}
+			e.SetContext(CorePipelineStage.QueryArgumentKey, query);
 
-            if (OnTriggerReceived != null)
-            {
-                await OnTriggerReceived(e);
-            }
-            return prefix;
-        }
-    }
+			if(OnTriggerReceived != null)
+			{
+				await OnTriggerReceived(e);
+			}
+			return prefix;
+		}
+	}
 }

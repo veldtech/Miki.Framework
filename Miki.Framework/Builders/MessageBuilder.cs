@@ -8,13 +8,13 @@ namespace Miki.Common.Builders
 
 		public MessageBuilder AppendText(string text, MessageFormatting formatting = MessageFormatting.Plain, bool newLine = true, bool endWithSpace = false)
 		{
-			if (string.IsNullOrWhiteSpace(text)) return this;
+			if(string.IsNullOrWhiteSpace(text)) return this;
 
 			text = ApplyFormatting(text, formatting);
 
-			if (endWithSpace) text += " ";
+			if(endWithSpace) text += " ";
 
-			if (newLine)
+			if(newLine)
 			{
 				_builder.AppendLine(text);
 			}
@@ -44,7 +44,7 @@ namespace Miki.Common.Builders
 
 		private string ApplyFormatting(string text, MessageFormatting formatting)
 		{
-			switch (formatting)
+			switch(formatting)
 			{
 				case MessageFormatting.Bold:
 					return "**" + text + "**";

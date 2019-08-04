@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Miki.Framework.Arguments
 {
 	public interface IArgumentParser
 	{
-        Type OutputType { get; }
+		Type OutputType { get; }
 
 		int Priority { get; }
 

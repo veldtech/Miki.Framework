@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Miki.Framework.Services
+﻿namespace Miki.Framework.Services
 {
-    public class Service
-    {
+	public class Service
+	{
 
-    }
+	}
 }

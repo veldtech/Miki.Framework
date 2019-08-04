@@ -1,11 +1,9 @@
-﻿using Miki.Discord;
-using Miki.Discord.Common;
+﻿using Miki.Discord.Common;
 using Miki.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Miki.Framework
@@ -17,8 +15,8 @@ namespace Miki.Framework
 
 	public class MessageBucketArgs
 	{
-        public Stream attachment;
-        public MessageArgs properties;
+		public Stream attachment;
+		public MessageArgs properties;
 		public IDiscordTextChannel channel;
 	}
 
@@ -41,35 +39,35 @@ namespace Miki.Framework
 
 		private static async Task Tick()
 		{
-			while (true)
+			while(true)
 			{
-				if (queuedMessages.IsEmpty)
+				if(queuedMessages.IsEmpty)
 				{
 					await Task.Delay(100);
-                    continue;
+					continue;
 				}
 
-				if (queuedMessages.TryDequeue(out MessageReference msg))
+				if(queuedMessages.TryDequeue(out MessageReference msg))
 				{
 					try
 					{
-                        IDiscordMessage m = null;
-                        if (msg.Arguments.attachment == null)
-                        {
-                             m = await msg.Arguments.channel.SendMessageAsync(msg.Arguments.properties.Content ?? "", false, msg.Arguments.properties.Embed ?? null);
-                        }
-                        else
-                        {
-                            m = await msg.Arguments.channel.SendFileAsync(msg.Arguments.attachment, "file.png", msg.Arguments.properties.Content ?? "", false, msg.Arguments.properties.Embed ?? null);
-                            msg.Arguments.attachment.Dispose();
-                        }
+						IDiscordMessage m = null;
+						if(msg.Arguments.attachment == null)
+						{
+							m = await msg.Arguments.channel.SendMessageAsync(msg.Arguments.properties.Content ?? "", false, msg.Arguments.properties.Embed ?? null);
+						}
+						else
+						{
+							m = await msg.Arguments.channel.SendFileAsync(msg.Arguments.attachment, "file.png", msg.Arguments.properties.Content ?? "", false, msg.Arguments.properties.Embed ?? null);
+							msg.Arguments.attachment.Dispose();
+						}
 
-                        if (msg.AllActions.Count > 0)
+						if(msg.AllActions.Count > 0)
 						{
 							ProcessDecorators(msg, m);
 						}
 					}
-					catch (Exception e)
+					catch(Exception e)
 					{
 						Log.Error(e);
 					}

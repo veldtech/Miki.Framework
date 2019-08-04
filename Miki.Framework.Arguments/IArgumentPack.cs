@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments
 {
 	public interface IArgumentPack
 	{
@@ -11,9 +7,9 @@ namespace Miki.Framework.Arguments
 		/// </summary>
 		bool CanTake { get; }
 
-        int Cursor { get; }
+		int Cursor { get; }
 
-        int Length { get; }
+		int Length { get; }
 
 		/// <summary>
 		/// Returns the string without consuming the argument.
@@ -21,7 +17,7 @@ namespace Miki.Framework.Arguments
 		/// <returns>current first argument</returns>
 		string Peek();
 
-        void SetCursor(int value);
+		void SetCursor(int value);
 
 		/// <summary>
 		/// Returns and consumes the argument.
