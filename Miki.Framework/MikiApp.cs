@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-
-namespace Miki.Framework
+﻿namespace Miki.Framework
 {
-	public class MikiApp
+    using Microsoft.Extensions.DependencyInjection;
+    using System;
+
+    public class MikiApp
 	{
 		public static MikiApp Instance { get; private set; }
 

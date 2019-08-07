@@ -1,61 +1,63 @@
 ﻿using Miki.Common.Builders;
 using Miki.Discord.Common;
 using Miki.Framework;
-using Miki.Framework.Exceptions;
-using Miki.Net.Http;
-using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
 namespace Miki.Discord
 {
-	public static class DiscordExtensions
+    using Miki.Framework.Exceptions;
+    using Miki.Net.Http;
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+
+    public static class DiscordExtensions
 	{
 		public static async Task<IMessageReference> QueueAsync(this DiscordEmbed embed, IDiscordTextChannel channel, string content = "")
 		{
 			if(channel is IDiscordGuildChannel guildChannel)
 			{
 				var currentUser = await MikiApp.Instance
-					.GetService<DiscordClient>()
+					.GetService<IDiscordClient>()
 					.GetSelfAsync();
 				var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
 				var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
-				if(!permissions.HasFlag(GuildPermission.EmbedLinks))
-				{
-					if(!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
-					{
-						using(HttpClient wc = new HttpClient(embed.Image.Url))
-						{
-							using(Stream ms = await wc.GetStreamAsync())
-							{
-								return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
-							}
-						}
-					}
-					else if(!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
-					{
-						using(HttpClient wc = new HttpClient(embed.Thumbnail.Url))
-						{
-							using(Stream ms = await wc.GetStreamAsync())
-							{
-								return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
-							}
-						}
-					}
-					else
-					{
-						return channel.QueueMessage(message: embed.ToMessageBuilder().Build());
-					}
-				}
-			}
+                if(permissions.HasFlag(GuildPermission.EmbedLinks))
+                {
+                    return QueueMessage(channel, embed, content);
+                }
+
+                if(!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
+                {
+                    using(HttpClient wc = new HttpClient(embed.Image.Url))
+                    {
+                        using(Stream ms = await wc.GetStreamAsync())
+                        {
+                            return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
+                        }
+                    }
+                }
+
+                if(!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
+                {
+                    using(HttpClient wc = new HttpClient(embed.Thumbnail.Url))
+                    {
+                        using(Stream ms = await wc.GetStreamAsync())
+                        {
+                            return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
+                        }
+                    }
+                }
+                return channel.QueueMessage(embed.ToMessageBuilder().Build());
+            }
 			return QueueMessage(channel, embed, content);
 		}
 
-		public static Task<IMessageReference> ThenWaitAsync(this Task<IMessageReference> reference, int milliseconds)
-			=> reference.ContinueWith(x => x.Result.ThenWait(milliseconds));
+        public static Task<IMessageReference> ThenWaitAsync(
+                this Task<IMessageReference> reference,
+                int milliseconds) 
+            => reference.ContinueWith(x => x.Result.ThenWait(milliseconds));
 		public static IMessageReference ThenWait(this IMessageReference reference, int milliseconds)
 		{
 			reference.ProcessAfterComplete(async (msg) =>
@@ -99,7 +101,7 @@ namespace Miki.Discord
 			if(channel is IDiscordGuildChannel guildChannel)
 			{
 				var currentUser = await MikiApp.Instance
-					.GetService<DiscordClient>()
+					.GetService<IDiscordClient>()
 					.GetSelfAsync();
 				var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
 				var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
@@ -158,10 +160,8 @@ namespace Miki.Discord
 		public static Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
 		{
 			return user.GetDMChannelAsync()
-				.ContinueWith(x =>
-				{
-					return x.Result.SendMessageAsync("", false, embed);
-				}).Unwrap();
+				.ContinueWith(x => x.Result.SendMessageAsync("", false, embed))
+                .Unwrap();
 		}
 
 		public static IMessageReference QueueMessage(this IDiscordTextChannel channel, string message)
@@ -209,8 +209,8 @@ namespace Miki.Discord
 		{
 			if(string.IsNullOrWhiteSpace(text))
 			{
-				return null;
-			}
+                throw new ArgObjectNullException();
+            }
 
 			IDiscordGuildUser guildUser = null;
 			if(Regex.IsMatch(text, "<@(!?)\\d+>"))

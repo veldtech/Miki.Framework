@@ -18,13 +18,25 @@ namespace Miki.Framework
 			Services.AddSingleton(factory);
 			return this;
 		}
+        public MikiAppBuilder AddSingletonService<T>()
+            where T : class
+        {
+            Services.AddSingleton<T>();
+            return this;
+        }
+        public MikiAppBuilder AddSingletonService<T, TImpl>()
+            where T : class
+            where TImpl : class, T
+        {
+            Services.AddSingleton<T, TImpl>();
+            return this;
+        }
 		public MikiAppBuilder AddSingletonService<T>(T value)
 		{
 			Services.AddSingleton(typeof(T), value);
 			return this;
 		}
-
-		public MikiAppBuilder AddSingletonService(Type t, object value)
+        public MikiAppBuilder AddSingletonService(Type t, object value)
 		{
 			Services.AddSingleton(t, value);
 			return this;
