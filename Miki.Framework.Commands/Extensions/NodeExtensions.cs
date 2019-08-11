@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands
+﻿namespace Miki.Framework.Commands
 {
-	public static class NodeExtensions
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    public static class NodeExtensions
 	{
 		/// <summary>
 		/// Validate if the <see cref="context"/> has all the requirements to execute the <see cref="executable"/>.
@@ -56,14 +56,14 @@ namespace Miki.Framework.Commands
 
 			foreach(var node in nodeContainer.Children)
 			{
-				if(!(await ValidateRequirementsAsync(node, context)))
+				if(!await ValidateRequirementsAsync(node, context))
 				{
 					continue;
 				}
 
 				switch(node)
 				{
-					case IExecutable executable:
+					case IExecutable _:
 					{
 						executables.Add(node);
 						break;

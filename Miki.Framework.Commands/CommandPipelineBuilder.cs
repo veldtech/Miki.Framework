@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Miki.Discord.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Pipelines
+﻿namespace Miki.Framework.Commands
 {
-	public class CommandPipelineBuilder
+    using Microsoft.Extensions.DependencyInjection;
+    using Miki.Discord.Common;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Miki.Framework.Commands.Pipelines;
+
+    public class CommandPipelineBuilder
 	{
 		private readonly List<IPipelineStage> _stages = new List<IPipelineStage>();
 		private readonly MikiApp _app;
@@ -35,15 +36,16 @@ namespace Miki.Framework.Commands.Pipelines
 
 	public class CommandPipeline
 	{
-		const string PipelineArgumentKey = "core-pipeline";
-
 		public IReadOnlyList<IPipelineStage> PipelineStages { get; }
-		public Func<Exception, IContext, Task> OnError { get; set; }
+
+        public Func<IContext, Task> CommandProcessed { get; set; }
+        public Func<Exception, IContext, Task> CommandError { get; set; }
+
 
 		private readonly IServiceProvider _services;
 		private readonly IServiceProvider _stageServices;
 
-		internal CommandPipeline(MikiApp app, ServiceCollection stageServices, List<IPipelineStage> stages)
+		internal CommandPipeline(MikiApp app, IServiceCollection stageServices, IReadOnlyList<IPipelineStage> stages)
 		{
 			PipelineStages = stages;
 			_services = app.Services;
@@ -56,7 +58,7 @@ namespace Miki.Framework.Commands.Pipelines
 			using(ContextObject c = new ContextObject(_services, _stageServices))
 			{
 				int index = 0;
-				async Task nextFunc()
+				async Task NextFunc()
 				{
 					if(index == PipelineStages.Count)
 					{
@@ -74,28 +76,21 @@ namespace Miki.Framework.Commands.Pipelines
 					{
 						return;
 					}
-					await stage.CheckAsync(data, c, nextFunc);
+					await stage.CheckAsync(data, c, NextFunc);
 				}
 
 				try
 				{
-					await nextFunc();
+					await NextFunc();
 				}
 				catch(Exception e)
 				{
-					if(OnError != null)
+					if(this.CommandError != null)
 					{
-						await OnError(e, c);
+						await this.CommandError(e, c);
 					}
 				}
 			}
 		}
-
-		public IEnumerable<T> GetPipelineStagesOfType<T>()
-			where T : class, IPipelineStage
-		{
-			return PipelineStages.Where(x => x is T)
-				.Select(x => x as T);
-		}
-	}
+    }
 }

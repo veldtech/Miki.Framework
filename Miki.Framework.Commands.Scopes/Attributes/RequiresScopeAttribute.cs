@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace Miki.Framework.Commands.Scopes.Attributes
+﻿namespace Miki.Framework.Commands.Scopes.Attributes
 {
-	public class RequiresScopeAttribute : Attribute
+    using System;
+
+    public class RequiresScopeAttribute : Attribute
 	{
 		public string ScopeId { get; }
 

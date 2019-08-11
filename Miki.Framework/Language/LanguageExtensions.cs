@@ -1,10 +1,10 @@
-﻿using Miki.Localization;
-
-namespace Miki.Framework.Language
+﻿namespace Miki.Framework.Language
 {
-	public static class LanguageExtensions
+    using Miki.Localization;
+
+    public static class LanguageExtensions
 	{
-		public static LanguageResource CreateResource(this IContext context, string resource, params object[] parameters)
+		public static LanguageResource CreateResource(this IContext _, string resource, params object[] parameters)
 			=> new LanguageResource(resource, parameters);
 	}
 }
