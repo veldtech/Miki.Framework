@@ -6,6 +6,7 @@ using Miki.Framework.Commands.Permissions.Models;
 using Miki.Framework.Commands.Pipelines;
 using Miki.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -146,6 +147,16 @@ namespace Miki.Framework.Commands.Permissions
 				.Any(x => x.Status == PermissionStatus.Deny);
 			return !defaultDenied;
 		}
+
+        public Task<List<Permission>> GetPermissionsForChannelAsync(
+            DbContext db,
+            long channelId)
+        {
+            return db.Set<Permission>()
+                .Where(x => x.EntityId == channelId
+                            && x.Type == EntityType.Channel)
+                .ToListAsync();
+        }
 	}
 }
 
