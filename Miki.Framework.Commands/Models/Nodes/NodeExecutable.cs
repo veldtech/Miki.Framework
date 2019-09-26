@@ -9,19 +9,16 @@ namespace Miki.Framework.Commands.Nodes
 
 	public class NodeExecutable : Node, IExecutable
 	{
-		private CommandDelegate runAsync;
+		private readonly CommandDelegate runAsync;
 
 		public NodeExecutable(CommandMetadata metadata, NodeContainer parent, MethodInfo method)
 			: base(metadata, parent, method)
 		{
 			runAsync = (CommandDelegate)Delegate.CreateDelegate(
-				typeof(CommandDelegate),
-				parent.Instance,
-				method,
-				true);
+				typeof(CommandDelegate), parent.Instance, method, true);
 		}
 
-		public async Task RunAsync(IContext e)
+		public async Task ExecuteAsync(IContext e)
 		{
 			if(runAsync == null)
 			{

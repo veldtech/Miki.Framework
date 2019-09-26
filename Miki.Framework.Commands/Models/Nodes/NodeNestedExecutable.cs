@@ -53,7 +53,7 @@ namespace Miki.Framework.Commands.Nodes
 			return null;
 		}
 
-		public async Task RunAsync(IContext context)
+		public async Task ExecuteAsync(IContext context)
 		{
 			foreach(var v in Attributes
 				.OfType<ICommandRequirement>())

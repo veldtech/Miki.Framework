@@ -13,9 +13,9 @@ namespace Miki.Framework.Commands
 
 		private readonly IServiceProvider _services;
 
-		public CommandTreeBuilder(MikiApp app)
+		public CommandTreeBuilder(IServiceProvider services)
 		{
-			_services = app.Services;
+			_services = services;
 		}
 
 		public CommandTree Create(Assembly assembly)
@@ -98,7 +98,7 @@ namespace Miki.Framework.Commands
 					if(node is IExecutable execNode)
 					{
 						multiCommand.SetDefaultExecution(async (e)
-							=> await execNode.RunAsync(e));
+							=> await execNode.ExecuteAsync(e));
 					}
 				}
 				else

@@ -1,4 +1,6 @@
-﻿namespace Miki.Framework.Commands.Scopes
+﻿using Miki.Logging;
+
+namespace Miki.Framework.Commands.Scopes
 {
     using Microsoft.EntityFrameworkCore;
     using Miki.Discord.Common;
@@ -51,15 +53,17 @@
 					.ToListAsync()
 					.ConfigureAwait(false);
 
-				if(scopesRequired.All(x => scopesGranted.Contains(x)))
-				{
-					await next()
-                        .ConfigureAwait(false);
-                    return;
-				}
-                throw new UnauthorizedAccessException();
-			}
-		}
+                if (scopesRequired.Any())
+                {
+                    if (!scopesRequired.All(x => scopesGranted.Contains(x)))
+                    {
+                        Log.Debug($"User '{e.GetMessage().Author}' tried to access {node}, but was not allowed to.");
+                        return;
+                    }
+                }
+                await next().ConfigureAwait(false);
+            }
+        }
 	}
 }
 

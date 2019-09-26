@@ -1,4 +1,5 @@
-﻿using Miki.Common.Builders;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Common.Builders;
 using Miki.Discord.Common;
 using Miki.Framework;
 namespace Miki.Discord
@@ -19,7 +20,7 @@ namespace Miki.Discord
 			if(channel is IDiscordGuildChannel guildChannel)
 			{
 				var currentUser = await MikiApp.Instance
-					.GetService<IDiscordClient>()
+					.Services.GetService<IDiscordClient>()
 					.GetSelfAsync();
 				var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
 				var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
@@ -101,7 +102,7 @@ namespace Miki.Discord
 			if(channel is IDiscordGuildChannel guildChannel)
 			{
 				var currentUser = await MikiApp.Instance
-					.GetService<IDiscordClient>()
+                    .Services.GetService<IDiscordClient>()
 					.GetSelfAsync();
 				var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
 				var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
@@ -119,7 +120,7 @@ namespace Miki.Discord
 			if(channel is IDiscordGuildChannel guildChannel)
 			{
 				var currentUser = await MikiApp.Instance
-					.GetService<DiscordClient>()
+					.Services.GetService<DiscordClient>()
 					.GetSelfAsync();
 				var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
 				var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);

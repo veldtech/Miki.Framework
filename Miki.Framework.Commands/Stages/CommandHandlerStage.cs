@@ -18,7 +18,7 @@ namespace Miki.Framework.Commands.Stages
 
 		public CommandHandlerStage(CommandTree map)
 		{
-			_map = map;
+            _map = map ?? throw new ArgumentNullException(nameof(map));
 		}
 
 		public async Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next)
@@ -50,7 +50,9 @@ namespace Miki.Framework.Commands
 {
 	public static class CommandHandlerExtensions
 	{
-		public static CommandPipelineBuilder UseCommandHandler(this CommandPipelineBuilder builder, CommandTree map)
+		public static CommandPipelineBuilder UseCommandHandler(
+            this CommandPipelineBuilder builder, 
+            CommandTree map)
 		{
 			builder.UseStage(new CommandHandlerStage(map));
 			return builder;

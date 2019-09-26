@@ -7,8 +7,7 @@ namespace Miki.Framework
 		string GetIdentifier();
 	}
 
-	public interface IExecutable
+	public interface IExecutable : IAsyncExecutor<IContext>
 	{
-		Task RunAsync(IContext context);
 	}
 }

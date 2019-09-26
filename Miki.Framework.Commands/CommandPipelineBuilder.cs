@@ -11,19 +11,19 @@
     public class CommandPipelineBuilder
 	{
 		private readonly List<IPipelineStage> _stages = new List<IPipelineStage>();
-		private readonly MikiApp _app;
+		private readonly IServiceProvider _services;
 		private readonly ServiceCollection _serviceCollection;
 
-		public CommandPipelineBuilder(MikiApp app)
+		public CommandPipelineBuilder(IServiceProvider services)
 		{
-			_app = app;
+            _services = services;
 			_serviceCollection = new ServiceCollection();
 		}
 
 		public CommandPipeline Build()
 		{
 			return new CommandPipeline(
-				_app, _serviceCollection, _stages);
+                _services, _serviceCollection, _stages);
 		}
 
 		public CommandPipelineBuilder UseStage(IPipelineStage stage)
@@ -34,7 +34,7 @@
 		}
 	}
 
-	public class CommandPipeline
+	public class CommandPipeline : IAsyncExecutor<IDiscordMessage>
 	{
 		public IReadOnlyList<IPipelineStage> PipelineStages { get; }
 
@@ -45,52 +45,50 @@
 		private readonly IServiceProvider _services;
 		private readonly IServiceProvider _stageServices;
 
-		internal CommandPipeline(MikiApp app, IServiceCollection stageServices, IReadOnlyList<IPipelineStage> stages)
+		internal CommandPipeline(IServiceProvider app, IServiceCollection stageServices, IReadOnlyList<IPipelineStage> stages)
 		{
 			PipelineStages = stages;
-			_services = app.Services;
+			_services = app;
 			_stageServices = stageServices.BuildServiceProvider();
 		}
 
 		// TODO (Veld): Move IDiscordMessage to abstraction for a library-free solution.
-		public async Task CheckAsync(IDiscordMessage data)
-		{
-			using(ContextObject c = new ContextObject(_services, _stageServices))
-			{
-				int index = 0;
-				async Task NextFunc()
-				{
-					if(index == PipelineStages.Count)
-					{
-						if(c.Executable != null)
-						{
-							await c.Executable.RunAsync(c);
-						}
-						return;
-					}
+		public async Task ExecuteAsync(IDiscordMessage data)
+        {
+            using ContextObject c = new ContextObject(_services, _stageServices);
+            int index = 0;
+            async Task NextFunc()
+            {
+                if(index == PipelineStages.Count)
+                {
+                    if(c.Executable != null)
+                    {
+                        await c.Executable.ExecuteAsync(c);
+                    }
+                    return;
+                }
 
-					var stage = PipelineStages.ElementAtOrDefault(index);
-					index++;
+                var stage = PipelineStages.ElementAtOrDefault(index);
+                index++;
 
-					if(stage == null)
-					{
-						return;
-					}
-					await stage.CheckAsync(data, c, NextFunc);
-				}
+                if(stage == null)
+                {
+                    return;
+                }
+                await stage.CheckAsync(data, c, NextFunc);
+            }
 
-				try
-				{
-					await NextFunc();
-				}
-				catch(Exception e)
-				{
-					if(this.CommandError != null)
-					{
-						await this.CommandError(e, c);
-					}
-				}
-			}
-		}
+            try
+            {
+                await NextFunc();
+            }
+            catch(Exception e)
+            {
+                if(this.CommandError != null)
+                {
+                    await this.CommandError(e, c);
+                }
+            }
+        }
     }
 }

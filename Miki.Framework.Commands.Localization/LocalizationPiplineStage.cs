@@ -16,35 +16,7 @@ namespace Miki.Framework.Commands.Localization
 	public class LocalizationPipelineStage : IPipelineStage
 	{
 		public Dictionary<string, string> LocaleNames = new Dictionary<string, string>();
-		/*private readonly Dictionary<string, string> _compatibilityLayer = new Dictionary<string, string>()
-        {
-            { "uk-ae", "ara" },
-            { "bg-bg", "bul" },
-            { "cz-cz", "ces" },
-            { "da-dk", "dan" },
-            { "en-us", "eng" },
-            { "nl-nl", "dut" },
-            { "fi-fi", "fin" },
-            { "fr-fr", "fra" },
-            { "de-de", "ger" },
-            { "he-he", "heb" },
-            { "hi-hi", "hin" },
-            { "it-it", "ita" },
-            { "ja-ja", "jpn" },
-            { "lt-lt", "lit" },
-            { "ms-ms", "may" },
-            { "no-no", "nor" },
-            { "pl-pl", "pol" },
-            { "pt-pt", "por" },
-            { "pt-br", "por" },
-            { "ru-ru", "rus" },
-            { "es-es", "spa" },
-            { "sv-se", "swe" },
-            { "tl-ph", "tgl" },
-            { "uk-ua", "ukr" },
-            { "zh-chs", "zhs" },
-            { "zh-cht", "zht" },
-        };*/
+
 		private string _defaultLocale = null;
 
 		internal const string LocaleContext = "framework-localization";

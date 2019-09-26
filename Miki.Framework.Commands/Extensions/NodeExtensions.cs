@@ -46,12 +46,10 @@
 		/// <param name="nodeContainer">The node container.</param>
 		/// <param name="context">The context.</param>
 		/// <returns>All the identifiers within the node container.</returns>
-		public static async Task<IEnumerable<Node>> GetAllExecutableAsync(this NodeContainer nodeContainer, IContext context)
+		public static async IAsyncEnumerable<Node> GetAllExecutableAsync(
+            this NodeContainer nodeContainer, 
+            IContext context)
 		{
-#if NETSTANDARD2_1 || NETCOREAPP3_0
-#error This method should be rewritten using IAsyncEnumerable (https://github.com/dotnet/csharplang/blob/master/proposals/csharp-8.0/async-streams.md)
-#endif
-
 			var executables = new List<Node>();
 
 			foreach(var node in nodeContainer.Children)
@@ -65,17 +63,19 @@
 				{
 					case IExecutable _:
 					{
-						executables.Add(node);
+						yield return node;
 						break;
 					}
 					case NodeContainer container:
 					{
-						executables.AddRange(await GetAllExecutableAsync(container, context));
+                        await foreach (var i in GetAllExecutableAsync(container, context))
+                        {
+                            yield return i;
+                        }
 						break;
 					}
 				}
 			}
-			return executables;
-		}
+        }
 	}
 }

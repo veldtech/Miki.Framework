@@ -21,15 +21,16 @@ namespace Miki.Framework.Commands.Permissions.Models
 
 	public class Permission
 	{
-		[Key]
-		[Column]
+
+        [Key]
+        public long PermissionId { get; set; }
+
+        [Column]
 		public long EntityId { get; set; }
 
-		[Key]
 		[Column]
 		public string CommandName { get; set; }
 
-		[Key]
 		[Column]
 		public long GuildId { get; set; }
 
