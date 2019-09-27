@@ -50,8 +50,6 @@
             this NodeContainer nodeContainer, 
             IContext context)
 		{
-			var executables = new List<Node>();
-
 			foreach(var node in nodeContainer.Children)
 			{
 				if(!await ValidateRequirementsAsync(node, context))

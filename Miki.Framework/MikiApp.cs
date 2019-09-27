@@ -13,7 +13,7 @@ namespace Miki.Framework
 
 		public IServiceProvider Services { get; private set; }
 
-        public IAsyncExecutor<IDiscordMessage> Pipeline { get; private set; }
+        public IAsyncEventingExecutor<IDiscordMessage> Pipeline { get; private set; }
 
 		protected MikiApp()
 		{
@@ -35,9 +35,9 @@ namespace Miki.Framework
 
         public abstract ProviderCollection ConfigureProviders(
             IServiceProvider services,
-            IAsyncExecutor<IDiscordMessage> pipeline);
+            IAsyncEventingExecutor<IDiscordMessage> pipeline);
 
-        public abstract IAsyncExecutor<IDiscordMessage> ConfigurePipeline(IServiceProvider collection);
+        public abstract IAsyncEventingExecutor<IDiscordMessage> ConfigurePipeline(IServiceProvider collection);
 
         public abstract void Configure(ServiceCollection collection);
     }

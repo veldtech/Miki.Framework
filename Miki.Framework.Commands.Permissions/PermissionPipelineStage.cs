@@ -102,6 +102,7 @@
 			{
 				if(await guildUser.HasPermissionsAsync(GuildPermission.Administrator))
 				{
+                    // TODO(velddev): Revert this once done with testing.
 					//return true;
 				}
 
@@ -126,7 +127,7 @@
 				}
 
 				var rolePermission = await db.Set<Permission>()
-					.Where(x => guildUser.RoleIds.Any(z => z.ToDbLong() == x.EntityId)
+					.Where(x => guildUser.RoleIds.Contains((ulong)x.EntityId)
 						&& x.GuildId == guildUser.GuildId.ToDbLong()
 						&& x.CommandName == commandName
 						&& x.Status != PermissionStatus.Default)

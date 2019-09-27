@@ -5,9 +5,20 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework
 {
+    public interface IExecutionResult<out T>
+    {
+        bool Success { get; }
+
+        Exception Error { get; }
+
+        T Result { get; }
+
+        IContext Context { get; }
+    }
+
     public interface IAsyncEventingExecutor<TRequest> : IAsyncExecutor<TRequest>
     {
-        Func<TRequest, Task> OnExecuted { get; set; }
+        Func<IExecutionResult<TRequest>, ValueTask> OnExecuted { get; set; }
     }
 
     public interface IAsyncExecutor<in TRequest>
