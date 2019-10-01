@@ -1,5 +1,4 @@
-﻿using Miki.Logging;
-
+﻿
 namespace Miki.Framework.Commands.Scopes
 {
     using Microsoft.EntityFrameworkCore;
@@ -8,6 +7,7 @@ namespace Miki.Framework.Commands.Scopes
     using Miki.Framework.Commands.Pipelines;
     using Miki.Framework.Commands.Scopes.Attributes;
     using Miki.Framework.Commands.Scopes.Models;
+    using Miki.Logging;
     using System;
     using System.Linq;
     using System.Threading.Tasks;
@@ -30,7 +30,7 @@ namespace Miki.Framework.Commands.Scopes
             }
         }
 
-        public async Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next)
+        public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
 		{
 			if(e.Executable == null)
 			{

@@ -1,6 +1,7 @@
 ﻿namespace Miki.Framework.Language
 {
     using Miki.Localization;
+    using Miki.Localization.Models;
 
     public static class LanguageExtensions
 	{

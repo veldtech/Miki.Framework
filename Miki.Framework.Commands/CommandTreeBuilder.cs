@@ -1,6 +1,7 @@
 ﻿using Miki.Framework.Commands.Attributes;
 using Miki.Framework.Commands.Nodes;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -9,14 +10,27 @@ namespace Miki.Framework.Commands
 {
 	public class CommandTreeBuilder
 	{
+        [Obsolete("use 'CommandTreeBuilder::AddCommandBuildStep()' intead")]
 		public event Action<NodeContainer, IServiceProvider> OnContainerLoaded;
 
-		private readonly IServiceProvider _services;
+		private readonly IServiceProvider services;
+
+        private List<ICommandBuildStep> buildSteps;
 
 		public CommandTreeBuilder(IServiceProvider services)
 		{
-			_services = services;
-		}
+			this.services = services;
+        }
+
+        public CommandTreeBuilder AddCommandBuildStep(ICommandBuildStep buildStep)
+        {
+            if(buildSteps == null)
+            {
+                buildSteps = new List<ICommandBuildStep>();
+            }
+            buildSteps.Add(buildStep);
+            return this;
+        }
 
 		public CommandTree Create(Assembly assembly)
 		{
@@ -42,8 +56,8 @@ namespace Miki.Framework.Commands
 				throw new InvalidOperationException("Modules must have a valid ModuleAttribute.");
 			}
 
-			NodeContainer module = new NodeModule(moduleAttrib.Name, parent, _services, t);
-			OnContainerLoaded?.Invoke(module, _services);
+			NodeContainer module = new NodeModule(moduleAttrib.Name, parent, services, t);
+			OnContainerLoaded?.Invoke(module, services);
 
 			var allCommands = t.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
 				.Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
@@ -76,8 +90,8 @@ namespace Miki.Framework.Commands
 					$"Multi commands cannot have an invalid name.");
 			}
 
-			var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, _services, t);
-			OnContainerLoaded?.Invoke(multiCommand, _services);
+			var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, services, t);
+			OnContainerLoaded?.Invoke(multiCommand, services);
 
 			var allCommands = t.GetNestedTypes()
 				.Where(x => x.GetCustomAttribute<CommandAttribute>() != null);

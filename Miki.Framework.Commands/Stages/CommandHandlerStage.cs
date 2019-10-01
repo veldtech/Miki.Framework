@@ -21,7 +21,7 @@ namespace Miki.Framework.Commands.Stages
             _map = map ?? throw new ArgumentNullException(nameof(map));
 		}
 
-		public async Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next)
+		public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
 		{
 			Log.Debug($"Starting command aggregation with query '{e.GetQuery()}'");
 

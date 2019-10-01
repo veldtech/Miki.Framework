@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Miki.Patterns.Repositories" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Miki.Framework.Commands\Miki.Framework.Commands.csproj" />
   </ItemGroup>
 

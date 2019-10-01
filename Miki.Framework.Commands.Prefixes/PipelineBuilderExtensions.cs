@@ -54,7 +54,7 @@ namespace Miki.Framework.Commands
 				.FirstOrDefault(x => x.IsDefault);
 		}
 
-		public async Task CheckAsync(IDiscordMessage msg, IMutableContext e, Func<Task> next)
+		public async ValueTask CheckAsync(IDiscordMessage msg, IMutableContext e, Func<ValueTask> next)
 		{
 			foreach(var i in _triggers)
 			{

@@ -29,7 +29,7 @@ namespace Miki.Framework.Arguments
 		{
 			var value = pack.Take();
 			return (int)(int.Parse(value.Substring(0, value.Length - 1))
-				* _suffixes[char.ToLowerInvariant(value[value.Length - 1])]);
+				* _suffixes[char.ToLowerInvariant(value[^1])]);
 		}
 	}
 }

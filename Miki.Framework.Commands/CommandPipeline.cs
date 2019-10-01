@@ -2,11 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
     using Miki.Discord.Common;
     using Miki.Framework.Commands.Pipelines;
+    using Miki.Logging;
 
     public class CommandPipeline : IAsyncEventingExecutor<IDiscordMessage>
     {
@@ -28,38 +30,57 @@
             _stageServices = stageServices.BuildServiceProvider();
         }
 
-        // TODO (Veld): Move IDiscordMessage to abstraction for a library-free solution.
-        public async Task ExecuteAsync(IDiscordMessage data)
+        public ValueTask BenchmarkTask(Type t, Func<ValueTask> innerTask, Stopwatch sw = null)
         {
+            if(sw == null)
+            {
+                sw = Stopwatch.StartNew();
+            }
+            Log.Debug($"Task '{t.Name}' took {sw.Elapsed.TotalMilliseconds}ms.");
+            sw.Restart();
+            return innerTask();    
+        }
+
+        // TODO (Veld): Move IDiscordMessage to abstraction for a library-free solution.
+        public async ValueTask ExecuteAsync(IDiscordMessage data)
+        {
+            var sw = Stopwatch.StartNew();
             using ContextObject contextObj = new ContextObject(_services, _stageServices);
             int index = 0;
 
-            async Task NextFunc()
+            Func<ValueTask> nextFunc = null;
+            ValueTask NextFunc()
             {
                 if (index == PipelineStages.Count)
                 {
                     if (contextObj.Executable != null)
                     {
-                        await contextObj.Executable.ExecuteAsync(contextObj);
+                        return contextObj.Executable.ExecuteAsync(contextObj);
                     }
-
-                    return;
+                    return default;
                 }
-
-                var stage = PipelineStages.ElementAtOrDefault(index);
+                var stage = PipelineStages[index];
                 index++;
-
                 if (stage == null)
                 {
-                    return;
+                    return default;
                 }
-
-                await stage.CheckAsync(data, contextObj, NextFunc);
+                return stage.CheckAsync(data, contextObj, nextFunc);
             }
+            nextFunc = () => NextFunc();
+#if DEBUG
+            nextFunc = () => BenchmarkTask(
+                PipelineStages.ElementAtOrDefault(index - 1)?.GetType() ?? contextObj.Executable.GetType(),
+                () => NextFunc(), 
+                sw);
+#endif
 
             try
             {
+                var totalTime = Stopwatch.StartNew();
+                sw.Start();
                 await NextFunc();
+                Log.Message($"request {data.ChannelId} - {data.Author.Username} took {totalTime.Elapsed.TotalMilliseconds}ms.");
             }
             catch (Exception e)
             {

@@ -6,6 +6,6 @@ namespace Miki.Framework.Commands.Pipelines
 {
 	public interface IPipelineStage
 	{
-		Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next);
+		ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next);
 	}
 }

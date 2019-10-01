@@ -21,7 +21,7 @@ namespace Miki.Framework.Commands.Pipelines
 			_provider = provider;
 		}
 
-		public async Task CheckAsync(IDiscordMessage message, IMutableContext e, Func<Task> next)
+		public async ValueTask CheckAsync(IDiscordMessage message, IMutableContext e, Func<ValueTask> next)
 		{
 			e.SetContext<ITypedArgumentPack>(
 				ArgumentKey,

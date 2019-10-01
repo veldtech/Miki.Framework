@@ -2,6 +2,7 @@
 {
     using Microsoft.EntityFrameworkCore;
     using Miki.Discord.Common;
+    using Miki.Framework.Commands.Nodes;
     using Miki.Framework.Commands.Permissions.Attributes;
     using Miki.Framework.Commands.Permissions.Models;
     using Miki.Framework.Commands.Pipelines;
@@ -13,174 +14,66 @@
 
     public class PermissionPipelineStage : IPipelineStage
 	{
-        public async Task CheckAsync(
+        private readonly PermissionService service;
+
+        public PermissionPipelineStage(PermissionService service)
+        {
+            this.service = service;
+        }
+
+        public async ValueTask CheckAsync(
             IDiscordMessage data,
             IMutableContext e,
-            Func<Task> next)
+            Func<ValueTask> next)
         {
             if (e.Executable == null)
             {
+                Log.Debug("No executable found to perform permission check on.");
                 return;
             }
 
             var message = e.GetMessage();
-            var db = e.GetService<DbContext>();
-            if (!(message.Author is IDiscordGuildUser))
+            if(message.Author is IDiscordGuildUser gu)
             {
-                if (e.Executable.GetType()
-                    .GetCustomAttributes(false)
-                    .OfType<DefaultPermissionAttribute>()
-                    .Any(x => x.Status == PermissionStatus.Deny))
+                var permission = await service.GetPriorityPermissionAsync(e);
+                if(permission == null)
                 {
-                    Log.Debug($"User '{e.GetMessage().Author}' did not have permissions to use {e.Executable}");
+                    var attribs = (e.Executable as NodeExecutable).Attributes;
+
+                    permission = new Permission()
+                    {
+                        GuildId = (long)e.GetGuild().Id,
+                        CommandName = e.Executable.ToString(),
+                        EntityId = 0,
+                        Status = attribs.OfType<DefaultPermissionAttribute>()
+                            .FirstOrDefault()?.Status ?? PermissionStatus.Allow,
+                        Type = 0
+                    };
+                }
+                Log.Debug(permission.ToString());
+
+                if(permission.Status == PermissionStatus.Allow)
+                {
+                    await next();
                     return;
                 }
             }
-
-            if (await GetAllowedForUser(
-                db,
-                e.GetMessage().Author,
-                e.GetChannel(),
-                e.Executable))
+            else
             {
-                await next();
-                return;
+                var attribs = (e.Executable as NodeExecutable).Attributes;
+                if(attribs.OfType<DefaultPermissionAttribute>()
+                    .Any(x => x.Status == PermissionStatus.Deny))
+                {
+                    return;
+                }
             }
-
-            Log.Debug($"User '{e.GetMessage().Author}' did not have permissions to use {e.Executable}");
-        }
-
-        public async Task SetForUserAsync(
-			IContext c,
-			long entityId,
-			EntityType type,
-			string commandName,
-			PermissionStatus allow)
-		{
-			if(c.GetGuild() == null)
-			{
-				return;
-			}
-
-			var db = c.GetService<DbContext>();
-
-			var entity = await db.Set<Permission>()
-				.SingleOrDefaultAsync(x => x.EntityId == entityId && x.CommandName == commandName);
-
-			if(entity == null)
-			{
-				db.Add(new Permission
-				{
-					CommandName = commandName,
-					EntityId = entityId,
-					GuildId = (long)c.GetGuild().Id,
-					Status = allow,
-					Type = type
-				});
-			}
-			else
-			{
-				if(entity.Type != type)
-				{
-					Log.Warning($"Set permission type for {{{entityId}, {commandName}}} does not match of (expected: {type}, actual: {entity.Type})");
-				}
-
-				entity.Status = allow;
-			}
-
-			await db.SaveChangesAsync();
-		}
-
-		public async Task<bool> GetAllowedForUser(
-			DbContext db,
-			IDiscordUser user,
-			IDiscordChannel channel,
-			IExecutable command)
-		{
-			string commandName = command.ToString();
-			if((user is IDiscordGuildUser guildUser))
-			{
-				if(await guildUser.HasPermissionsAsync(GuildPermission.Administrator))
-				{
-                    // TODO(velddev): Revert this once done with testing.
-					//return true;
-				}
-
-                var userPermission = await db.Set<Permission>()
-					.SingleOrDefaultAsync(x => x.EntityId == user.Id.ToDbLong()
-						&& x.GuildId == guildUser.GuildId.ToDbLong()
-						&& x.CommandName == commandName);
-				if(userPermission != null
-					&& userPermission.Status != PermissionStatus.Default)
-				{
-					return userPermission.Status == PermissionStatus.Allow;
-				}
-
-				var channelPermission = await db.Set<Permission>()
-					.SingleOrDefaultAsync(x => x.EntityId == channel.Id.ToDbLong()
-						&& x.GuildId == guildUser.GuildId.ToDbLong()
-						&& x.CommandName == commandName);
-				if(channelPermission != null
-					&& channelPermission.Status != PermissionStatus.Default)
-				{
-					return channelPermission.Status == PermissionStatus.Allow;
-				}
-
-				var rolePermission = await db.Set<Permission>()
-					.Where(x => guildUser.RoleIds.Contains((ulong)x.EntityId)
-						&& x.GuildId == guildUser.GuildId.ToDbLong()
-						&& x.CommandName == commandName
-						&& x.Status != PermissionStatus.Default)
-					.ToListAsync();
-				if(rolePermission.Any(x => x.Status == PermissionStatus.Deny))
-				{
-					return false;
-				}
-				if(rolePermission.Any(x => x.Status == PermissionStatus.Allow))
-				{
-					return true;
-				}
-
-				var guildPermission = await db.Set<Permission>()
-					.SingleOrDefaultAsync(x => x.EntityId == guildUser.GuildId.ToDbLong()
-						&& x.GuildId == guildUser.GuildId.ToDbLong()
-						&& x.CommandName == commandName);
-				if(guildPermission != null)
-				{
-					return guildPermission.Status == PermissionStatus.Allow;
-				}
-			}
-
-			var defaultDenied = command.GetType().GetCustomAttributes(false)
-				.OfType<DefaultPermissionAttribute>()
-				.Any(x => x.Status == PermissionStatus.Deny);
-			return !defaultDenied;
-		}
-
-        /// <summary>
-        /// Lists all permissions in from a guild and that exist in the <paramref name="entityIds"/>
-        /// list.
-        /// </summary>
-        /// <param name="db">Database connection.</param>
-        /// <param name="guildId">The guild in context.</param>
-        /// <param name="entityIds">All entities you'd like to list from.</param>
-        /// <returns>All related permissions to the entities</returns>
-        public Task<List<Permission>> ListPermissionsAsync(
-            DbContext db,
-            long guildId,
-            params long[] entityIds)
-        {
-            return db.Set<Permission>()
-                .Where(x => entityIds
-                    .Any(y => y == x.EntityId 
-                              && x.GuildId == guildId))
-                .ToListAsync();
         }
     }
 }
 
 namespace Miki.Framework.Commands
 {
+    using Microsoft.Extensions.DependencyInjection;
     using Miki.Framework.Commands.Permissions;
 
     public static class Extensions
@@ -188,7 +81,9 @@ namespace Miki.Framework.Commands
 		public static CommandPipelineBuilder UsePermissions(
 			this CommandPipelineBuilder builder)
 		{
-			builder.UseStage(new PermissionPipelineStage());
+			builder.UseStage(
+                new PermissionPipelineStage(
+                    builder.Services.GetRequiredService<PermissionService>()));
 			return builder;
 		}
 	}

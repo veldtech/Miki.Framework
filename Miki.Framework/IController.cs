@@ -23,11 +23,11 @@ namespace Miki.Framework
 
     public interface IAsyncExecutor<in TRequest>
     {
-        Task ExecuteAsync(TRequest request);
+        ValueTask ExecuteAsync(TRequest request);
     }
 
     public interface IAsyncController<in TRequest, TResponse>
     {
-        Task<TResponse> ExecuteAsync(TRequest request);
+        ValueTask<TResponse> ExecuteAsync(TRequest request);
     }
 }

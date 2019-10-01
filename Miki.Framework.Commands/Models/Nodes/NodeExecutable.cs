@@ -18,7 +18,7 @@ namespace Miki.Framework.Commands.Nodes
 				typeof(CommandDelegate), parent.Instance, method, true);
 		}
 
-		public async Task ExecuteAsync(IContext e)
+		public async ValueTask ExecuteAsync(IContext e)
 		{
 			if(runAsync == null)
 			{

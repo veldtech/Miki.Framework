@@ -1,9 +1,10 @@
-﻿using Miki.Localization;
-using Miki.Localization.Exceptions;
-
-namespace Miki.Framework.Exceptions
+﻿namespace Miki.Framework.Exceptions
 {
-	public class SessionInUseException : LocalizedException
+    using Miki.Localization;
+    using Miki.Localization.Exceptions;
+    using Miki.Localization.Models;
+
+    public class SessionInUseException : LocalizedException
 	{
 		public override IResource LocaleResource
 			=> new LanguageResource("error_session_in_use");

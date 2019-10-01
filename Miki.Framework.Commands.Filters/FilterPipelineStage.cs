@@ -10,7 +10,7 @@ namespace Miki.Framework.Commands.Filters
 {
 	public interface IFilter
 	{
-		Task<bool> CheckAsync(IContext e);
+		ValueTask<bool> CheckAsync(IContext e);
 	}
 
 	public class FilterPipelineStage : IPipelineStage
@@ -35,7 +35,7 @@ namespace Miki.Framework.Commands.Filters
 				.FirstOrDefault();
 		}
 
-		public async Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next)
+		public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
 		{
 			foreach(var f in _filters)
 			{

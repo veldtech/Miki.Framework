@@ -21,23 +21,27 @@ namespace Miki.Framework.Commands.Permissions.Models
 
 	public class Permission
 	{
-
-        [Key]
-        public long PermissionId { get; set; }
-
         [Column]
+        [Key]
 		public long EntityId { get; set; }
 
 		[Column]
-		public string CommandName { get; set; }
+        [Key]
+        public string CommandName { get; set; }
 
 		[Column]
-		public long GuildId { get; set; }
+        [Key]
+        public long GuildId { get; set; }
 
 		[Column]
 		public EntityType Type { get; set; }
 
 		[Column]
 		public PermissionStatus Status { get; set; }
-	}
+
+        public override string ToString()
+        {
+            return $"Permission - {Status} {Type} {EntityId} for {CommandName} ({GuildId})";
+        }
+    }
 }

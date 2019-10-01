@@ -7,9 +7,9 @@ namespace Miki.Framework.Commands.Filters.Filters
 	/// </summary>
 	public class BotFilter : IFilter
 	{
-		public Task<bool> CheckAsync(IContext e)
+		public ValueTask<bool> CheckAsync(IContext e)
 		{
-			return Task.FromResult(!e.GetMessage().Author.IsBot);
+			return new ValueTask<bool>(!e.GetMessage().Author.IsBot);
 		}
 	}
 }

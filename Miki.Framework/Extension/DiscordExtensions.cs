@@ -31,24 +31,16 @@ namespace Miki.Discord
 
                 if(!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
                 {
-                    using(HttpClient wc = new HttpClient(embed.Image.Url))
-                    {
-                        using(Stream ms = await wc.GetStreamAsync())
-                        {
-                            return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
-                        }
-                    }
+                    using HttpClient wc = new HttpClient(embed.Image.Url);
+                    using Stream ms = await wc.GetStreamAsync();
+                    return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
                 }
 
                 if(!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
                 {
-                    using(HttpClient wc = new HttpClient(embed.Thumbnail.Url))
-                    {
-                        using(Stream ms = await wc.GetStreamAsync())
-                        {
-                            return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
-                        }
-                    }
+                    using HttpClient wc = new HttpClient(embed.Thumbnail.Url);
+                    using Stream ms = await wc.GetStreamAsync();
+                    return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
                 }
                 return channel.QueueMessage(embed.ToMessageBuilder().Build());
             }
@@ -129,26 +121,18 @@ namespace Miki.Discord
 				{
 					if(!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
 					{
-						using(WebClient wc = new WebClient())
-						{
-							byte[] image = wc.DownloadData(embed.Image.Url);
-							using(MemoryStream ms = new MemoryStream(image))
-							{
-								return await channel.SendFileAsync(ms, "output.png", embed.ToMessageBuilder().Build());
-							}
-						}
-					}
+                        using WebClient wc = new WebClient();
+                        byte[] image = wc.DownloadData(embed.Image.Url);
+                        using MemoryStream ms = new MemoryStream(image);
+                        return await channel.SendFileAsync(ms, "output.png", embed.ToMessageBuilder().Build());
+                    }
 					else if(!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
 					{
-						using(WebClient wc = new WebClient())
-						{
-							byte[] image = wc.DownloadData(embed.Thumbnail.Url);
-							using(MemoryStream ms = new MemoryStream(image))
-							{
-								return await channel.SendFileAsync(ms, "output.png", embed.ToMessageBuilder().Build());
-							}
-						}
-					}
+                        using WebClient wc = new WebClient();
+                        byte[] image = wc.DownloadData(embed.Thumbnail.Url);
+                        using MemoryStream ms = new MemoryStream(image);
+                        return await channel.SendFileAsync(ms, "output.png", embed.ToMessageBuilder().Build());
+                    }
 					else
 					{
 						return await channel.SendMessageAsync(embed.ToMessageBuilder().Build());

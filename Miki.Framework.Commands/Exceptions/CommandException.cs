@@ -1,6 +1,7 @@
 ﻿using Miki.Framework.Commands;
 using Miki.Localization;
 using Miki.Localization.Exceptions;
+using Miki.Localization.Models;
 
 namespace Miki.Framework.Exceptions
 {

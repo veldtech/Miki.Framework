@@ -10,20 +10,21 @@
 
     public class CommandPipelineBuilder
 	{
-		private readonly List<IPipelineStage> _stages = new List<IPipelineStage>();
-		private readonly IServiceProvider _services;
+        public IServiceProvider Services { get; }
+
+        private readonly List<IPipelineStage> _stages = new List<IPipelineStage>();
 		private readonly ServiceCollection _serviceCollection;
 
 		public CommandPipelineBuilder(IServiceProvider services)
 		{
-            _services = services;
+            Services = services;
 			_serviceCollection = new ServiceCollection();
 		}
 
 		public CommandPipeline Build()
 		{
 			return new CommandPipeline(
-                _services, _serviceCollection, _stages);
+                Services, _serviceCollection, _stages);
 		}
 
 		public CommandPipelineBuilder UseStage(IPipelineStage stage)

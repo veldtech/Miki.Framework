@@ -7,7 +7,7 @@ namespace Miki.Framework.Commands.Filters
 	{
 		public HashSet<long> Users { get; private set; } = new HashSet<long>();
 
-		public Task<bool> CheckAsync(IContext msg)
-			=> Task.FromResult(!Users.Contains((long)msg.GetMessage().Author.Id));
+		public ValueTask<bool> CheckAsync(IContext msg)
+			=> new ValueTask<bool>(!Users.Contains((long)msg.GetMessage().Author.Id));
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Miki.Framework.Arguments;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Framework.Arguments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Miki.Framework.Commands
 		{
 			if(t != null)
 			{
-				Instance = CommandTreeHelpers.CreateInstance(t, provider);
+				Instance = ActivatorUtilities.CreateInstance(provider, t);
 			}
 		}
 
