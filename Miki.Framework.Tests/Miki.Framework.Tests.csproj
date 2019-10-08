@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\submodules\miki.bot.models\Miki.Bot.Models.csproj" />
-    <ProjectReference Include="..\..\submodules\miki.framework\Miki.Framework.Commands.Filters\Miki.Framework.Commands.Filters.csproj" />
-    <ProjectReference Include="..\..\submodules\miki.framework\Miki.Framework.Commands.Localization\Miki.Framework.Commands.Localization.csproj" />
-    <ProjectReference Include="..\..\submodules\miki.framework\Miki.Framework.Commands.Permissions\Miki.Framework.Commands.Permissions.csproj" />
+    <ProjectReference Include="..\Miki.Framework.Commands.Filters\Miki.Framework.Commands.Filters.csproj" />
+    <ProjectReference Include="..\Miki.Framework.Commands.Localization\Miki.Framework.Commands.Localization.csproj" />
+    <ProjectReference Include="..\Miki.Framework.Commands.Permissions\Miki.Framework.Commands.Permissions.csproj" />
+    <ProjectReference Include="..\Miki.Framework\Miki.Framework.csproj" />
   </ItemGroup>
 
 </Project>
