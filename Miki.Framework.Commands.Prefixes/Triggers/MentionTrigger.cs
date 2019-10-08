@@ -6,7 +6,7 @@ namespace Miki.Framework.Events.Triggers
 {
 	public class MentionTrigger : ITrigger<IDiscordMessage>
 	{
-		public async Task<string> CheckTriggerAsync(IMutableContext context, IDiscordMessage packet)
+		public async Task<string> CheckTriggerAsync(IContext context, IDiscordMessage packet)
 		{
 			var result = Regex.Match(packet.Content, "^<@!?(\\d+)> ");
 			if(!result.Success)

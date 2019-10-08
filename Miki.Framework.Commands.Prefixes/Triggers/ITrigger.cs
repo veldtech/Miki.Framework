@@ -2,8 +2,8 @@
 
 namespace Miki.Framework.Events.Triggers
 {
-	public interface ITrigger<T>
+	public interface ITrigger<in T>
 	{
-		Task<string> CheckTriggerAsync(IMutableContext context, T packet);
+		Task<string> CheckTriggerAsync(IContext context, T packet);
 	}
 }

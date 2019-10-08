@@ -1,4 +1,6 @@
-﻿namespace Miki.Services.Localization
+﻿using System.Linq;
+
+namespace Miki.Services.Localization
 {
     using System;
     using System.Collections.Generic;
@@ -13,14 +15,15 @@
 
     public class LocalizationService : ILocalizationService
     {
-        readonly DbContext context;
-        readonly ICacheClient cache;
-        readonly Config config;
-        readonly HashSet<Locale> localeSet = new HashSet<Locale>();
+        private readonly DbContext context;
+        private readonly ICacheClient cache;
+        private readonly Config config;
+
+        private readonly HashSet<Locale> localeSet = new HashSet<Locale>();
 
         public LocalizationService(
             DbContext context,
-            ICacheClient cache,
+            ICacheClient cache = null,
             Config config = null)
         {
             this.context = context;
@@ -41,6 +44,12 @@
             {
                 return locale;
             }
+
+            var defaultLocaleRef = new Locale(config.DefaultIso3, null);
+            if(localeSet.TryGetValue(defaultLocaleRef, out var defaultLocale))
+            {
+                return defaultLocale;
+            }
             throw new LocaleNotFoundException(iso);
         }
 
@@ -55,6 +64,11 @@
 
         public async ValueTask SetLocaleAsync(long id, string iso3)
         {
+            if (!IsValidIso(iso3))
+            {
+                throw new LocaleNotFoundException(iso3);
+            }
+
             var language = await context.Set<ChannelLanguage>().FindAsync(id);
             if(language == null)
             {
@@ -70,24 +84,45 @@
                 language.Language = iso3;
             }
 
-            await cache.UpsertAsync(GetLanguageCacheKey(id), iso3, config.CacheLifetime);
+            if (cache != null)
+            {
+                await cache.UpsertAsync(GetLanguageCacheKey(id), iso3, config.CacheLifetime);
+            }
 
             await context.SaveChangesAsync();
         }
 
         private async ValueTask<string> FetchLanguageIsoAsync(long id)
         {
-            var iso = await cache.GetAsync<string>(GetLanguageCacheKey(id));
+            string iso = null;
+            if (cache != null)
+            {
+                iso = await cache.GetAsync<string>(GetLanguageCacheKey(id));
+            }
+
             if(iso == null)
             {
                 var language = await context.Set<ChannelLanguage>().FindAsync(id);
                 iso = language?.Language ?? config.DefaultIso3;
-                await cache.UpsertAsync(
-                    GetLanguageCacheKey(id),
-                    iso,
-                    config.CacheLifetime);
+                if (cache != null)
+                {
+                    await cache.UpsertAsync(
+                        GetLanguageCacheKey(id),
+                        iso,
+                        config.CacheLifetime);
+                }
             }
             return iso;
+        }
+
+        private bool IsValidIso(string iso3)
+        {
+            return IsValidIso(new Locale(iso3, null));
+        }
+
+        private bool IsValidIso(Locale locale)
+        {
+            return localeSet.Contains(locale);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

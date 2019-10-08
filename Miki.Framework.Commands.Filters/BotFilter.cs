@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Filters.Filters
+﻿namespace Miki.Framework.Commands.Filters
 {
-	/// <summary>
+    using System.Threading.Tasks;
+
+    /// <summary>
 	/// Filters bot accounts
 	/// </summary>
 	public class BotFilter : IFilter

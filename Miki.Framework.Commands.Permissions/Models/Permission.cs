@@ -39,9 +39,25 @@ namespace Miki.Framework.Commands.Permissions.Models
 		[Column]
 		public PermissionStatus Status { get; set; }
 
+        public override bool Equals(object obj)
+        {
+            switch (obj)
+            {
+                case null:
+                    return false;
+                case Permission p:
+                    return p.EntityId == EntityId
+                           && p.CommandName == CommandName
+                           && p.GuildId == GuildId
+                           && p.Status == Status;
+                default:
+                    return false;
+            }
+        }
+
         public override string ToString()
         {
-            return $"Permission - {Status} {Type} {EntityId} for {CommandName} ({GuildId})";
+            return $"Permission: {Status} {CommandName} for {Type} {EntityId} ({GuildId})";
         }
     }
 }

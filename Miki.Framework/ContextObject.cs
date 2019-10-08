@@ -10,40 +10,34 @@ namespace Miki.Framework
 		IServiceProvider Services { get; }
 
 		T GetContext<T>(string id);
-		object GetStage(Type t);
+
 		object GetService(Type t);
 	}
 
 	public class ContextObject : IMutableContext, IDisposable
 	{
-		private readonly Dictionary<string, object> _contextObjects;
-		private readonly IServiceScope _scope;
-		private readonly IServiceScope _stageScope;
+		private readonly Dictionary<string, object> contextObjects;
+		private readonly IServiceScope scope;
 
-		private IExecutable _executable;
+        public IServiceProvider Services
+			=> scope.ServiceProvider;
 
-		public IServiceProvider Services
-			=> _scope.ServiceProvider;
+		public IExecutable Executable { get; private set; }
 
-		public IExecutable Executable
-			=> _executable;
-
-		public ContextObject(IServiceProvider p, IServiceProvider stages)
+        public ContextObject(IServiceProvider p, IServiceProvider stages)
 		{
-			_contextObjects = new Dictionary<string, object>();
-			_scope = p.CreateScope();
-			_stageScope = stages.CreateScope();
+			contextObjects = new Dictionary<string, object>();
+			scope = p.CreateScope();
 		}
 
 		public void Dispose()
 		{
-			_scope.Dispose();
-			_stageScope.Dispose();
+			scope.Dispose();
 		}
 
 		public T GetContext<T>(string id)
 		{
-			if(_contextObjects.TryGetValue(id, out var value))
+			if(contextObjects.TryGetValue(id, out var value))
 			{
 				return (T)value;
 			}
@@ -54,28 +48,24 @@ namespace Miki.Framework
 			=> (T)GetService(typeof(T));
 
 		public object GetService(Type t)
-			=> _scope.ServiceProvider
+			=> scope.ServiceProvider
 				.GetService(t);
 
-		public object GetStage(Type t)
-			=> _stageScope.ServiceProvider
-				.GetService(t);
-
-		public void SetContext<T>(string id, T value)
+        public void SetContext<T>(string id, T value)
 		{
-			if(_contextObjects.ContainsKey(id))
+			if(contextObjects.ContainsKey(id))
 			{
-				_contextObjects[id] = value;
+				contextObjects[id] = value;
 			}
 			else
 			{
-				_contextObjects.Add(id, value);
+				contextObjects.Add(id, value);
 			}
 		}
 
 		public void SetExecutable(IExecutable exec)
 		{
-			_executable = exec;
+			Executable = exec;
 		}
 	}
 
@@ -85,9 +75,5 @@ namespace Miki.Framework
 		{
 			return (T)c.GetService(typeof(T));
 		}
-		public static T GetStage<T>(this IContext c)
-		{
-			return (T)c.GetStage(typeof(T));
-		}
-	}
+    }
 }

@@ -55,7 +55,6 @@
                 if(permission.Status == PermissionStatus.Allow)
                 {
                     await next();
-                    return;
                 }
             }
             else
@@ -66,6 +65,8 @@
                 {
                     return;
                 }
+
+                await next();
             }
         }
     }

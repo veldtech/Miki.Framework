@@ -8,36 +8,30 @@ using System.Threading.Tasks;
 
 namespace Miki.Framework.Commands.Filters
 {
-	public interface IFilter
-	{
-		ValueTask<bool> CheckAsync(IContext e);
-	}
-
 	public class FilterPipelineStage : IPipelineStage
 	{
-		private readonly IEnumerable<IFilter> _filters;
+		private readonly IEnumerable<IFilter> filters;
 
 		public FilterPipelineStage(IEnumerable<IFilter> filters)
 		{
-			_filters = filters;
+			this.filters = filters;
 		}
 
 		public T GetFilterOfType<T>()
 			where T : class, IFilter
 		{
-			if(_filters == null
-				|| !_filters.Any())
+			if(filters == null
+				|| !filters.Any())
 			{
 				return default;
 			}
-			return _filters.Where(x => x is T)
-				.Select(x => x as T)
-				.FirstOrDefault();
+			return filters.OfType<T>()
+                .FirstOrDefault();
 		}
 
 		public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
 		{
-			foreach(var f in _filters)
+			foreach(var f in filters)
 			{
 				if(!await f.CheckAsync(e))
 				{

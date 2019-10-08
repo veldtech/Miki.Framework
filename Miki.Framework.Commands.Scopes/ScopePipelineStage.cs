@@ -3,7 +3,6 @@ namespace Miki.Framework.Commands.Scopes
 {
     using Microsoft.EntityFrameworkCore;
     using Miki.Discord.Common;
-    using Miki.Framework.Commands.Nodes;
     using Miki.Framework.Commands.Pipelines;
     using Miki.Framework.Commands.Scopes.Attributes;
     using Miki.Framework.Commands.Scopes.Models;
@@ -32,39 +31,35 @@ namespace Miki.Framework.Commands.Scopes
 
         public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
 		{
-			if(e.Executable == null)
-			{
-				return;
-			}
-
-			if(e.Executable is NodeExecutable node)
-			{
-				var db = e.GetService<DbContext>();
+            if (e.Executable is Node node)
+            {
+                var db = e.GetService<DbContext>();
 
                 var scopesRequired = node.Attributes
                     .OfType<RequiresScopeAttribute>()
                     .Select(x => x.ScopeId)
                     .ToList();
 
-				var scopesGranted = await db.Set<Scope>()
-					.Where(x => x.UserId == e.GetMessage().Author.Id.ToDbLong()
-						        && scopesRequired.Contains(x.ScopeId))
-					.Select(x => x.ScopeId)
-					.ToListAsync()
-					.ConfigureAwait(false);
-
                 if (scopesRequired.Any())
                 {
+                    var scopesGranted = await db.Set<Scope>()
+                        .Where(x => x.UserId == e.GetMessage().Author.Id.ToDbLong()
+                                    && scopesRequired.Contains(x.ScopeId))
+                        .Select(x => x.ScopeId)
+                        .ToListAsync()
+                        .ConfigureAwait(false);
+
                     if (!scopesRequired.All(x => scopesGranted.Contains(x)))
                     {
                         Log.Debug($"User '{e.GetMessage().Author}' tried to access {node}, but was not allowed to.");
                         return;
                     }
                 }
-                await next().ConfigureAwait(false);
             }
+
+            await next().ConfigureAwait(false);
         }
-	}
+    }
 }
 
 namespace Miki.Framework.Commands

@@ -1,13 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Miki.Cache;
 using Miki.Discord.Common;
-using Miki.Framework.Commands;
 using Miki.Framework.Commands.Prefixes.Models;
 using Miki.Framework.Events.Triggers;
-using System;
-using System.Threading.Tasks;
 
-namespace Miki.Framework.Events
+namespace Miki.Framework.Commands.Prefixes.Triggers
 {
 	public class PrefixTrigger : ITrigger<IDiscordMessage>
 	{
@@ -33,12 +32,12 @@ namespace Miki.Framework.Events
 			{
 				long guildId = id.ToDbLong();
 
-				Identifier i = await context.Set<Identifier>()
+				Prefix i = await context.Set<Prefix>()
 					.FindAsync(guildId, DefaultValue);
 				if(i == null)
 				{
-					await context.Set<Identifier>()
-						.AddAsync(new Identifier()
+					await context.Set<Prefix>()
+						.AddAsync(new Prefix()
 						{
 							GuildId = guildId,
 							DefaultValue = DefaultValue,
@@ -54,10 +53,10 @@ namespace Miki.Framework.Events
 			}
 		}
 
-		private async Task<Identifier> CreateNewAsync(DbContext context, long id)
+		private async Task<Prefix> CreateNewAsync(DbContext context, long id)
 		{
-			return (await context.Set<Identifier>()
-				.AddAsync(new Identifier() { GuildId = id, DefaultValue = DefaultValue, Value = DefaultValue })).Entity;
+			return (await context.Set<Prefix>()
+				.AddAsync(new Prefix() { GuildId = id, DefaultValue = DefaultValue, Value = DefaultValue })).Entity;
 		}
 
 		private string GetCacheKey(ulong id)
@@ -82,7 +81,7 @@ namespace Miki.Framework.Events
 		public async Task<string> LoadFromDatabase(DbContext context, ulong id)
 		{
 			long guildId = id.ToDbLong();
-			var identifier = await context.Set<Identifier>().FindAsync(guildId, DefaultValue);
+			var identifier = await context.Set<Prefix>().FindAsync(guildId, DefaultValue);
 			if(identifier == null)
 			{
 				identifier = await CreateNewAsync(context, guildId);
@@ -92,7 +91,7 @@ namespace Miki.Framework.Events
 			return identifier.Value;
 		}
 
-		public async Task<string> CheckTriggerAsync(IMutableContext e, IDiscordMessage packet)
+		public async Task<string> CheckTriggerAsync(IContext e, IDiscordMessage packet)
 		{
 			var channel = await packet.GetChannelAsync();
 			if(channel == null)
@@ -123,7 +122,6 @@ namespace Miki.Framework.Events
 			{
 				query[0] = query[0].Substring(prefix.Length);
 			}
-			e.SetContext(CorePipelineStage.QueryArgumentKey, query);
 
 			if(OnTriggerReceived != null)
 			{

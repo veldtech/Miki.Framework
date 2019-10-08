@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using Miki.Framework.Arguments;
 using Miki.Framework.Commands.Nodes;
 
@@ -8,7 +9,7 @@ namespace Miki.Framework.Commands
 	{
 		public NodeContainer Root { get; }
 
-		public CommandTree()
+        public CommandTree()
 		{
 			Root = new NodeRoot();
 		}
@@ -17,5 +18,7 @@ namespace Miki.Framework.Commands
 		{
 			return Root.FindCommand(pack);
 		}
-	}
+        public Node GetCommand(string name)
+            => GetCommand(new ArgumentPack(name.Split(' ')));
+    }
 }

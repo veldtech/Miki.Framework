@@ -3,7 +3,7 @@
 namespace Miki.Framework.Commands.Prefixes.Models
 {
 	[DataContract]
-	public class Identifier
+	public class Prefix
 	{
 		[DataMember(Name = "guild_id", Order = 1)]
 		public long GuildId { get; set; }

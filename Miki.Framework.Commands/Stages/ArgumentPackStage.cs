@@ -1,24 +1,22 @@
-﻿using Miki.Discord.Common;
-using Miki.Framework.Arguments;
-using Miki.Framework.Commands.Pipelines;
-using System;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Pipelines
+﻿namespace Miki.Framework.Commands.Pipelines
 {
-	public class ArgumentPackBuilder : IPipelineStage
+    using Miki.Discord.Common;
+    using Miki.Framework.Arguments;
+    using System;
+    using System.Threading.Tasks;
+
+    public class ArgumentPackBuilder : IPipelineStage
 	{
 		public const string ArgumentKey = "framework-arguments";
 
-		private readonly ArgumentParseProvider _provider;
+		private readonly ArgumentParseProvider provider;
 
 		public ArgumentPackBuilder()
-		{
-			_provider = new ArgumentParseProvider();
-		}
+            : this(new ArgumentParseProvider())
+		{ }
 		public ArgumentPackBuilder(ArgumentParseProvider provider)
 		{
-			_provider = provider;
+			this.provider = provider;
 		}
 
 		public async ValueTask CheckAsync(IDiscordMessage message, IMutableContext e, Func<ValueTask> next)
@@ -27,7 +25,7 @@ namespace Miki.Framework.Commands.Pipelines
 				ArgumentKey,
 				new TypedArgumentPack(
 					new ArgumentPack(e.GetQuery()),
-					_provider));
+					provider));
 			await next();
 		}
 	}
@@ -35,7 +33,10 @@ namespace Miki.Framework.Commands.Pipelines
 
 namespace Miki.Framework.Commands
 {
-	public static class ArgumentPackCommandPipelineExtensions
+    using Miki.Framework.Arguments;
+    using Miki.Framework.Commands.Pipelines;
+
+    public static class ArgumentPackCommandPipelineExtensions
 	{
 		public static CommandPipelineBuilder UseArgumentPack(this CommandPipelineBuilder builder)
 		{
@@ -50,7 +51,10 @@ namespace Miki.Framework.Commands
 
 namespace Miki.Framework
 {
-	public static class ArgumentPackContextExtensions
+    using Miki.Framework.Arguments;
+    using Miki.Framework.Commands.Pipelines;
+
+    public static class ArgumentPackContextExtensions
 	{
 		public static ITypedArgumentPack GetArgumentPack(this IContext context)
 		{

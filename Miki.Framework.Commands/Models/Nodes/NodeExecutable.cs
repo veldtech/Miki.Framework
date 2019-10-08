@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Nodes
+﻿namespace Miki.Framework.Commands.Nodes
 {
-	public delegate Task CommandDelegate(IContext c);
+    using System;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
+
+    public delegate Task CommandDelegate(IContext c);
 
 	public class NodeExecutable : Node, IExecutable
 	{
