@@ -1,7 +1,6 @@
 namespace Miki.Framework.Tests.Commands.Permissions
 {
     using Microsoft.EntityFrameworkCore;
-    using Miki.Bot.Models.Repositories;
     using System.Threading.Tasks;
     using Miki.Framework.Commands.Permissions;
     using Miki.Framework.Commands.Permissions.Models;
@@ -54,7 +53,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
-        {
+        {   
             builder?.Entity<Permission>()
                 .HasKey(x => new {x.EntityId, x.CommandName, x.GuildId});
         }
@@ -62,7 +61,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         [Fact]
         public async Task ListPermissionsTest()
         {
-            using var unit = NewContext();
+            await using var unit = NewContext();
             var service = new PermissionService(unit);
 
             var permissions = await service.ListPermissionsAsync(ValidGuildEntity);
@@ -72,7 +71,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         [Fact]
         public async Task GetPriorityPermissionTest()
         {
-            using var unit = NewContext();
+            await using var unit = NewContext();
             var service = new PermissionService(unit);
 
             var bestPermission = await service.GetPriorityPermissionAsync(
@@ -124,7 +123,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
                 Type = EntityType.Role
             };
 
-            using (var unit = NewContext())
+            await using(var unit = NewContext())
             {
                 var service = new PermissionService(unit);
                 var permission = await service.GetPermissionAsync(
@@ -138,7 +137,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
                     .ConfigureAwait(false);
             }
 
-            using (var unit = NewContext())
+            await using(var unit = NewContext())
             {
                 var service = new PermissionService(unit);
                 var permission = await service.GetPermissionAsync(
@@ -150,7 +149,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         [Fact]
         public async Task DeletePermissionTest()
         {
-            using (var context = NewContext())
+            await using(var context = NewContext())
             {
                 var service = new PermissionService(context);
 
@@ -167,7 +166,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
                     .ConfigureAwait(false);
             }
 
-            using (var context = NewContext())
+            await using(var context = NewContext())
             {
                 var service = new PermissionService(context);
 

@@ -6,8 +6,8 @@ using System.Reflection;
 namespace Miki.Framework.Arguments
 {
 	public class ArgumentParseProvider
-	{
-		private readonly List<IArgumentParser> _parsers = new List<IArgumentParser>();
+    {
+		private static readonly List<IArgumentParser> parsers = new List<IArgumentParser>();
 
 		public ArgumentParseProvider()
 		{
@@ -17,7 +17,7 @@ namespace Miki.Framework.Arguments
 		public object Peek(IArgumentPack p, Type type)
 		{
 			int cursor = p.Cursor;
-			object output = _parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
+			object output = parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
 				.Where(x => x.CanParse(p))
 				.OrderByDescending(x => x.Priority)
 				.FirstOrDefault()?
@@ -30,7 +30,7 @@ namespace Miki.Framework.Arguments
 			=> (T)Peek(p, typeof(T));
 
 		public object Take(IArgumentPack p, Type type)
-			=> _parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
+			=> parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
 				.Where(x => x.CanParse(p))
 				.OrderByDescending(x => x.Priority)
 				.FirstOrDefault()?
@@ -41,16 +41,21 @@ namespace Miki.Framework.Arguments
 
 		public void SeedAssembly(Assembly a)
 		{
-			Type[] allParsers = a.GetTypes()
-				.Where(x => x.GetTypeInfo().IsClass && typeof(IArgumentParser).GetTypeInfo().IsAssignableFrom(x))
-				.ToArray();
+            if (parsers.Count != 0)
+            {
+                return;
+            }
 
-			foreach(var t in allParsers)
-			{
-				IArgumentParser p = (IArgumentParser)Activator.CreateInstance(t);
-				_parsers.Add(p);
-			}
-		}
+            Type[] types = a.GetTypes()
+                .Where(x => x.GetTypeInfo().IsClass && typeof(IArgumentParser).GetTypeInfo().IsAssignableFrom(x))
+                .ToArray();
+
+            foreach (var t in types)
+            {
+                IArgumentParser p = (IArgumentParser) Activator.CreateInstance(t);
+                parsers.Add(p);
+            }
+        }
 	}
 
 }

@@ -1,9 +1,9 @@
-﻿namespace Miki.Bot.Models.Repositories
+﻿namespace Miki.Framework
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
-    using Miki.Patterns.Repositories;
+    using Patterns.Repositories;
 
     public class EntityRepository<T> : IAsyncRepository<T>
         where T : class

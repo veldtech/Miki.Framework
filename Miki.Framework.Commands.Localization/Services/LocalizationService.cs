@@ -1,33 +1,32 @@
-﻿using System.Linq;
-
-namespace Miki.Services.Localization
+﻿namespace Miki.Framework.Commands.Localization.Services
 {
     using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    using Miki.Cache;
-    using Miki.Framework.Commands.Localization.Models;
-    using Miki.Framework.Commands.Localization.Models.Exceptions;
+    using Cache;
+    using Framework;
     using Miki.Localization;
     using Miki.Localization.Models;
+    using Models;
+    using Models.Exceptions;
+    using Patterns.Repositories;
 
     public class LocalizationService : ILocalizationService
     {
-        private readonly DbContext context;
-        private readonly ICacheClient cache;
+        private readonly IUnitOfWork context;
+        private readonly IAsyncRepository<ChannelLanguage> repository;
+
         private readonly Config config;
 
         private readonly HashSet<Locale> localeSet = new HashSet<Locale>();
 
         public LocalizationService(
-            DbContext context,
-            ICacheClient cache = null,
+            IUnitOfWork context,
             Config config = null)
         {
             this.context = context;
-            this.cache = cache;
+            this.repository = context.GetRepository<ChannelLanguage>();
             this.config = config ?? new Config();
         }
 
@@ -55,7 +54,6 @@ namespace Miki.Services.Localization
 
         public async IAsyncEnumerable<string> ListLocalesAsync()
         {
-            await Task.Yield();
             foreach(var set in localeSet)
             {
                 yield return set.CountryCode;
@@ -69,11 +67,11 @@ namespace Miki.Services.Localization
                 throw new LocaleNotFoundException(iso3);
             }
 
-            var language = await context.Set<ChannelLanguage>().FindAsync(id);
+            var language = await repository.GetAsync(id);
             if(language == null)
             {
-                context.Set<ChannelLanguage>()
-                    .Add(new ChannelLanguage
+                await repository.AddAsync(
+                    new ChannelLanguage
                     {
                         EntityId = id,
                         Language = iso3
@@ -83,36 +81,13 @@ namespace Miki.Services.Localization
             {
                 language.Language = iso3;
             }
-
-            if (cache != null)
-            {
-                await cache.UpsertAsync(GetLanguageCacheKey(id), iso3, config.CacheLifetime);
-            }
-
-            await context.SaveChangesAsync();
+            await context.CommitAsync();
         }
 
         private async ValueTask<string> FetchLanguageIsoAsync(long id)
         {
-            string iso = null;
-            if (cache != null)
-            {
-                iso = await cache.GetAsync<string>(GetLanguageCacheKey(id));
-            }
-
-            if(iso == null)
-            {
-                var language = await context.Set<ChannelLanguage>().FindAsync(id);
-                iso = language?.Language ?? config.DefaultIso3;
-                if (cache != null)
-                {
-                    await cache.UpsertAsync(
-                        GetLanguageCacheKey(id),
-                        iso,
-                        config.CacheLifetime);
-                }
-            }
-            return iso;
+            var language = await repository.GetAsync(id);
+            return language?.Language ?? config.DefaultIso3;
         }
 
         private bool IsValidIso(string iso3)
@@ -124,18 +99,9 @@ namespace Miki.Services.Localization
         {
             return localeSet.Contains(locale);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private string GetLanguageCacheKey(long channelId)
-            => $"miki:language:{channelId}";
-
+        
         public class Config
         {
-            /// <summary>
-            /// Time until cache ejects unused objects.
-            /// </summary>
-            public TimeSpan CacheLifetime { get; set; } = new TimeSpan(1, 0, 0);
-
             /// <summary>
             /// Default language for when users do not have a locale set up.
             /// </summary>

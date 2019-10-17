@@ -7,7 +7,7 @@ using Miki.Framework.Commands.Permissions.Models;
 
 namespace Miki.Framework.Tests
 {
-    using Bot.Models.Repositories;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Creates a test environment with a single-column sqlite database.
@@ -40,7 +40,7 @@ namespace Miki.Framework.Tests
             return new TestContext<T>(options, OnModelCreating);
         }
 
-        protected virtual void OnModelCreating(ModelBuilder builder)
+        protected virtual void OnModelCreating([NotNull] ModelBuilder builder)
         {
 
         }

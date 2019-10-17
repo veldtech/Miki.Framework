@@ -1,7 +1,6 @@
-﻿namespace Miki.Bot.Models.Repositories
+﻿namespace Miki.Framework
 {
     using System.Threading.Tasks;
-    using Framework;
     using Microsoft.EntityFrameworkCore;
     using Patterns.Repositories;
 
@@ -27,9 +26,16 @@
             return new ValueTask(context.SaveChangesAsync());
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             context.Dispose();
+        }
+
+        /// <inheritdoc />
+        public ValueTask DisposeAsync()
+        {
+            return context.DisposeAsync();
         }
     }
 }

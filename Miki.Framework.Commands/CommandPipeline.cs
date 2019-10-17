@@ -17,6 +17,7 @@
         public Func<IExecutionResult<IDiscordMessage>, ValueTask> OnExecuted { get; set; }
 
         private readonly IServiceProvider services;
+        [Obsolete("Use direct services instead.")]
         private readonly IServiceProvider stageServices;
 
         internal CommandPipeline(
