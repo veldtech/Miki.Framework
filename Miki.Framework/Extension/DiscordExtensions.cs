@@ -1,90 +1,97 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Miki.Common.Builders;
-using Miki.Discord.Common;
-using Miki.Framework;
-namespace Miki.Discord
+﻿namespace Miki.Framework.Extension
 {
-    using Miki.Framework.Exceptions;
-    using Miki.Net.Http;
     using System;
     using System.IO;
     using System.Linq;
     using System.Net;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using Common.Builders;
+    using Discord;
+    using Discord.Common;
+    using Exceptions;
+    using Framework;
+    using Microsoft.Extensions.DependencyInjection;
+    using Net.Http;
 
     public static class DiscordExtensions
-	{
-		public static async Task<IMessageReference> QueueAsync(this DiscordEmbed embed, IDiscordTextChannel channel, string content = "")
-		{
-			if(channel is IDiscordGuildChannel guildChannel)
-			{
-				var currentUser = await MikiApp.Instance
-					.Services.GetService<IDiscordClient>()
-					.GetSelfAsync();
-				var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
-				var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
-                if(permissions.HasFlag(GuildPermission.EmbedLinks))
-                {
-                    return QueueMessage(channel, embed, content);
-                }
+    {
+        public static Task QueueAsync(
+            this DiscordEmbed embed,
+            IContext context,
+            IDiscordTextChannel channel,
+            string content = "",
+            Func<IMessageReference<IDiscordMessage>, IMessageReference<IDiscordMessage>> modifier = null)
+        {
+            return QueueAsync(
+                embed,
+                context.GetService<IMessageWorker<IDiscordMessage>>(),
+                context.GetService<IDiscordClient>(),
+                channel,
+                content,
+                modifier);
+        }
 
-                if(!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
-                {
-                    using HttpClient wc = new HttpClient(embed.Image.Url);
-                    using Stream ms = await wc.GetStreamAsync();
-                    return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
-                }
-
-                if(!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
-                {
-                    using HttpClient wc = new HttpClient(embed.Thumbnail.Url);
-                    using Stream ms = await wc.GetStreamAsync();
-                    return channel.QueueMessage(stream: ms, message: embed.ToMessageBuilder().Build());
-                }
-                return channel.QueueMessage(embed.ToMessageBuilder().Build());
+        public static Task QueueAsync(
+            this DiscordEmbed embed,
+            IMessageWorker<IDiscordMessage> worker,
+            IDiscordClient client,
+            IDiscordTextChannel channel,
+            string content = "",
+            Func<IMessageReference<IDiscordMessage>, IMessageReference<IDiscordMessage>> modifier = null)
+        {
+            /*var currentUser = await client.GetSelfAsync();
+            var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
+            var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
+            if(permissions.HasFlag(GuildPermission.EmbedLinks))
+            {
+                        if(!string.IsNullOrEmpty(embed.Image?.Url ?? ""))
+            {
+                using HttpClient wc = new HttpClient(embed.Image.Url);
+                await using Stream ms = await wc.GetStreamAsync();
+                return channel.QueueMessage(worker, stream: ms, message: embed.ToMessageBuilder().Build());
             }
-			return QueueMessage(channel, embed, content);
-		}
 
-        public static Task<IMessageReference> ThenWaitAsync(
-                this Task<IMessageReference> reference,
-                int milliseconds) 
-            => reference.ContinueWith(x => x.Result.ThenWait(milliseconds));
-		public static IMessageReference ThenWait(this IMessageReference reference, int milliseconds)
+            if(!string.IsNullOrEmpty(embed.Thumbnail?.Url ?? ""))
+            {
+                using HttpClient wc = new HttpClient(embed.Thumbnail.Url);
+                await using Stream ms = await wc.GetStreamAsync();
+                return channel.QueueMessage(worker, stream: ms, message: embed.ToMessageBuilder().Build());
+            }
+
+            return channel.QueueMessage(worker, message: embed.ToMessageBuilder().Build());
+            }*/
+            QueueMessage(channel, worker, embed, content, modifier: modifier);
+            return Task.CompletedTask;
+        }
+
+        public static IMessageReference<T> ThenWait<T>(this IMessageReference<T> reference, int milliseconds)
+            where T : class
+        {
+            reference.PushDecorator(_ => Task.Delay(milliseconds));
+            return reference;
+        }
+
+        public static IMessageReference<IDiscordMessage> ThenDelete(this IMessageReference<IDiscordMessage> reference)
+        {
+            reference.PushDecorator(async (msg) => { await msg.DeleteAsync(); });
+            return reference;
+        }
+
+        public static IMessageReference<IDiscordMessage> ThenEdit(
+            this IMessageReference<IDiscordMessage> reference, 
+            string message = "", 
+            DiscordEmbed embed = null)
 		{
-			reference.ProcessAfterComplete(async (msg) =>
-			{
-				await Task.Delay(milliseconds);
-			});
+			reference.PushDecorator(x
+				=> x.EditAsync(new EditMessageArgs(message, embed)));
 			return reference;
 		}
 
-		public static Task<IMessageReference> ThenDeleteAsync(this Task<IMessageReference> reference)
-			=> reference.ContinueWith(x => x.Result.ThenDelete());
-		public static IMessageReference ThenDelete(this IMessageReference reference)
+		public static IMessageReference<T> Then<T>(this IMessageReference<T> reference, Func<T, Task> fn)
+            where T : class
 		{
-			reference.ProcessAfterComplete(async (msg) =>
-			{
-				await msg.DeleteAsync();
-			});
-			return reference;
-		}
-
-		public static Task<IMessageReference> ThenEditAsync(this Task<IMessageReference> reference, string message = "", DiscordEmbed embed = null)
-			=> reference.ContinueWith(x => x.Result.ThenEdit(message, embed));
-		public static IMessageReference ThenEdit(this IMessageReference reference, string message = "", DiscordEmbed embed = null)
-		{
-			reference.ProcessAfterComplete(async (x)
-				=> await x.EditAsync(new EditMessageArgs(message, embed)));
-			return reference;
-		}
-
-		public static Task<IMessageReference> ThenAsync(this Task<IMessageReference> reference, Func<IDiscordMessage, Task> fn)
-			=> reference.ContinueWith(x => x.Result.Then(fn));
-		public static IMessageReference Then(this IMessageReference reference, Func<IDiscordMessage, Task> fn)
-		{
-			reference.ProcessAfterComplete(fn);
+			reference.PushDecorator(fn);
 			return reference;
 		}
 
@@ -149,18 +156,51 @@ namespace Miki.Discord
                 .Unwrap();
 		}
 
-		public static IMessageReference QueueMessage(this IDiscordTextChannel channel, string message)
-			=> QueueMessage(channel, null, message: message);
+        [Obsolete("Consider using the full method.")]
+		public static void QueueMessage(
+            this IDiscordTextChannel channel, 
+            IContext context, 
+            string message)
+			=> QueueMessage(channel, context, null, message);
 
-		public static IMessageReference QueueMessage(this IDiscordTextChannel channel, DiscordEmbed embed = null, string message = "", Stream stream = null)
-			=> MessageBucket.Add(new MessageBucketArgs()
-			{
-				attachment = stream,
-				channel = channel,
-				properties = new MessageArgs(message, embed)
-			});
+        public static void QueueMessage(
+            this IDiscordTextChannel channel,
+            IContext context,
+            DiscordEmbed embed = null,
+            string message = "",
+            Stream stream = null,
+            Func<IMessageReference<IDiscordMessage>, IMessageReference<IDiscordMessage>> modifier = null)
+        {
+            var worker = context.GetService<IMessageWorker<IDiscordMessage>>();
+            QueueMessage(channel, worker, embed, message, stream, modifier);
+        }
 
-		public static MessageBuilder ToMessageBuilder(this DiscordEmbed embed)
+        public static void QueueMessage(
+            this IDiscordTextChannel channel,
+            IMessageWorker<IDiscordMessage> worker,
+            DiscordEmbed embed = null,
+            string message = "",
+            Stream stream = null,
+            Func<IMessageReference<IDiscordMessage>, IMessageReference<IDiscordMessage>> modifier = null)
+        {
+            if (worker == null)
+            {
+                throw new ArgumentNullException(nameof(worker));
+            }
+            var @ref = worker.CreateRef(new MessageBucketArgs()
+            {
+                Attachment = stream,
+                Channel = channel,
+                Properties = new MessageArgs(message, embed)
+            });
+            if (modifier != null)
+            {
+                @ref = modifier(@ref);
+            }
+            worker.Execute(@ref);
+        }
+
+        public static MessageBuilder ToMessageBuilder(this DiscordEmbed embed)
 		{
 			MessageBuilder b = new MessageBuilder();
 

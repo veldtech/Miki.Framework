@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments.Parsers
 {
-	public class IntArgumentParser : IArgumentParser
+    using System;
+
+    public class IntArgumentParser : IArgumentParser
 	{
 		public Type OutputType
 			=> typeof(int);

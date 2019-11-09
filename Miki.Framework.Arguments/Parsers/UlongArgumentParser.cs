@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments.Parsers
 {
-	public class UlongArgumentParser : IArgumentParser
+    using System;
+
+    public class UlongArgumentParser : IArgumentParser
 	{
 		public Type OutputType
 			=> typeof(ulong);

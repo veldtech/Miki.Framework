@@ -1,0 +1,16 @@
+﻿[*.cs]
+
+# IDE0009: Member access should be qualified.
+dotnet_style_qualification_for_method = true:silent
+
+# IDE0009: Member access should be qualified.
+dotnet_style_qualification_for_field = true:silent
+
+# IDE0009: Member access should be qualified.
+dotnet_style_qualification_for_event = true:silent
+
+# IDE0009: Member access should be qualified.
+dotnet_style_qualification_for_property = true:silent
+
+# CA2000: Dispose objects before losing scope
+dotnet_diagnostic.CA2000.severity = none

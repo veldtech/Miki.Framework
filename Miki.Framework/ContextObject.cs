@@ -24,7 +24,7 @@ namespace Miki.Framework
 
 		public IExecutable Executable { get; private set; }
 
-        public ContextObject(IServiceProvider p, IServiceProvider stages)
+        public ContextObject(IServiceProvider p)
 		{
 			contextObjects = new Dictionary<string, object>();
 			scope = p.CreateScope();

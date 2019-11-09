@@ -12,25 +12,21 @@
 	{
         public IServiceProvider Services { get; }
 
-        private readonly List<IPipelineStage> _stages = new List<IPipelineStage>();
-		private readonly ServiceCollection _serviceCollection;
+        private readonly List<IPipelineStage> stages = new List<IPipelineStage>();
 
 		public CommandPipelineBuilder(IServiceProvider services)
 		{
             Services = services;
-			_serviceCollection = new ServiceCollection();
 		}
 
 		public CommandPipeline Build()
 		{
-			return new CommandPipeline(
-                Services, _serviceCollection, _stages);
+			return new CommandPipeline(Services, stages);
 		}
 
 		public CommandPipelineBuilder UseStage(IPipelineStage stage)
 		{
-			_serviceCollection.AddSingleton(stage.GetType(), stage);
-			_stages.Add(stage);
+			stages.Add(stage);
 			return this;
 		}
 	}

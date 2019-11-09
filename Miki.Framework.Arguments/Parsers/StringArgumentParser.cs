@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments.Parsers
 {
-	public class StringArgumentParser : IArgumentParser
+    using System;
+    using System.Collections.Generic;
+
+    public class StringArgumentParser : IArgumentParser
 	{
 		public Type OutputType
 			=> typeof(string);
@@ -23,7 +23,7 @@ namespace Miki.Framework.Arguments
 				do
 				{
 					allItems.Add(pack.Take());
-				} while(!allItems[allItems.Count - 1].EndsWithAny("\"", "“", "”"));
+				} while(!allItems[^1].EndsWithAny("\"", "“", "”"));
 				return string.Join(" ", allItems).TrimStart('"', '“', '”').TrimEnd('"', '“', '”');
 			}
 			else

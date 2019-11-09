@@ -9,7 +9,7 @@
         where T : class
     {
         private readonly DbContext context;
-
+        
         public EntityRepository(DbContext context)
         {
             this.context = context;
@@ -29,7 +29,6 @@
 
         public ValueTask EditAsync(T entity)
         {
-
             context.Entry(entity).DetectChanges();
             return default;
         }
@@ -42,6 +41,15 @@
         public ValueTask<IEnumerable<T>> ListAsync()
         {
             return new ValueTask<IEnumerable<T>>(context.Set<T>());
+        }
+    }
+
+    public class EntityRepositoryFactory<T> : IRepositoryFactory<T>
+        where T : class
+    {
+        public IAsyncRepository<T> Build(DbContext context)
+        {
+            return new EntityRepository<T>(context);
         }
     }
 }

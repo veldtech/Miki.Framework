@@ -53,7 +53,7 @@
         [InlineData(1L, false)]
         public async Task RunPipelineTest(ulong id, bool success)
         {
-            Semaphore @lock = new Semaphore(0, 1);
+            using var @lock = new Semaphore(0, 1);
 
             var pipelineStage = new Mock<IPipelineStage>();
             pipelineStage.Setup(x => x.CheckAsync(

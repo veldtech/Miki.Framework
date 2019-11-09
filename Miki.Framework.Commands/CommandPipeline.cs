@@ -17,24 +17,20 @@
         public Func<IExecutionResult<IDiscordMessage>, ValueTask> OnExecuted { get; set; }
 
         private readonly IServiceProvider services;
-        [Obsolete("Use direct services instead.")]
-        private readonly IServiceProvider stageServices;
 
         internal CommandPipeline(
             IServiceProvider app,
-            IServiceCollection stageServices,
             IReadOnlyList<IPipelineStage> stages)
         {
             PipelineStages = stages;
             services = app;
-            this.stageServices = stageServices.BuildServiceProvider();
         }
 
         // TODO (velddev): Move IDiscordMessage to abstraction for a library-free solution.
         public async ValueTask ExecuteAsync(IDiscordMessage data)
         {
             var sw = Stopwatch.StartNew();
-            using ContextObject contextObj = new ContextObject(services, stageServices);
+            using ContextObject contextObj = new ContextObject(services);
             int index = 0;
 
             Func<ValueTask> nextFunc = null;
@@ -55,19 +51,24 @@
             }
             nextFunc = NextFunc;
 
+            Exception exception = null;
             try
             {
                 var totalTime = Stopwatch.StartNew();
                 sw.Start();
                 await NextFunc();
-                Log.Message($"request {data.ChannelId} - {data.Author.Username} took {totalTime.Elapsed.TotalMilliseconds}ms.");
+                Log.Message($"request {contextObj.Executable} took {totalTime.Elapsed.TotalMilliseconds}ms.");
             }
             catch (Exception e)
             {
-                if (this.OnExecuted != null)
+                exception = e;
+            }
+            finally
+            {
+                if(this.OnExecuted != null)
                 {
                     await this.OnExecuted(
-                        new ExecutionResult<IDiscordMessage>(contextObj, data, e));
+                        new ExecutionResult<IDiscordMessage>(contextObj, data, exception));
                 }
             }
         }

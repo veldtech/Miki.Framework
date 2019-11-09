@@ -1,5 +1,7 @@
 ﻿namespace Miki.Framework
 {
+    using System;
+    using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Patterns.Repositories;
@@ -14,10 +16,15 @@
         }
 
         /// <inheritdoc />
-        public IAsyncRepository<T> GetRepository<T>()
+        public IAsyncRepository<T> GetRepository<T>([Optional] IRepositoryFactory<T> factory)
             where T : class
         {
-            return new EntityRepository<T>(context);
+            if (factory == null)
+            {
+                return new EntityRepository<T>(context);
+            }
+
+            return factory.Build(context);
         }
 
         /// <inheritdoc />

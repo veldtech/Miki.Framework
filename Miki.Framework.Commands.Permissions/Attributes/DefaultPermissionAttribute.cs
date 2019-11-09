@@ -3,6 +3,7 @@ using System;
 
 namespace Miki.Framework.Commands.Permissions.Attributes
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 	public class DefaultPermissionAttribute : Attribute
 	{
 		public PermissionStatus Status { get; }

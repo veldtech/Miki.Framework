@@ -54,6 +54,7 @@
 
         public async IAsyncEnumerable<string> ListLocalesAsync()
         {
+            await Task.Yield();
             foreach(var set in localeSet)
             {
                 yield return set.CountryCode;

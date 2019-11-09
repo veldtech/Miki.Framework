@@ -6,12 +6,13 @@ namespace Miki.Framework
 {
     using Microsoft.Extensions.DependencyInjection;
     using System;
+    using Logging;
 
     public abstract class MikiApp
 	{
 		public static MikiApp Instance { get; private set; }
 
-		public IServiceProvider Services { get; private set; }
+		public IServiceProvider Services { get; protected set; }
 
         public IAsyncEventingExecutor<IDiscordMessage> Pipeline { get; private set; }
 
@@ -26,6 +27,12 @@ namespace Miki.Framework
             Configure(serviceCollection);
             serviceCollection.AddSingleton(this);
             Services = serviceCollection.BuildServiceProvider();
+
+            if (Services.GetService<MessageWorker>() == null)
+            {
+                Log.Warning("No message worker setup. Messages will not send to data platforms.");
+            }
+
             Pipeline = ConfigurePipeline(Services);
             var providers = ConfigureProviders(Services, Pipeline);
 

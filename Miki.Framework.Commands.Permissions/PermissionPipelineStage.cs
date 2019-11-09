@@ -8,7 +8,6 @@
     using Miki.Framework.Commands.Pipelines;
     using Miki.Logging;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -38,14 +37,14 @@
                 var permission = await service.GetPriorityPermissionAsync(e);
                 if(permission == null)
                 {
-                    var attribs = (e.Executable as NodeExecutable).Attributes;
+                    var attribs = (e.Executable as NodeExecutable)?.Attributes;
 
                     permission = new Permission()
                     {
                         GuildId = (long)e.GetGuild().Id,
                         CommandName = e.Executable.ToString(),
                         EntityId = 0,
-                        Status = attribs.OfType<DefaultPermissionAttribute>()
+                        Status = attribs?.OfType<DefaultPermissionAttribute>()
                             .FirstOrDefault()?.Status ?? PermissionStatus.Allow,
                         Type = 0
                     };
@@ -59,7 +58,7 @@
             }
             else
             {
-                var attribs = (e.Executable as NodeExecutable).Attributes;
+                var attribs = (e.Executable as NodeExecutable)?.Attributes;
                 if(attribs.OfType<DefaultPermissionAttribute>()
                     .Any(x => x.Status == PermissionStatus.Deny))
                 {
@@ -77,12 +76,12 @@ namespace Miki.Framework.Commands
     using Microsoft.Extensions.DependencyInjection;
     using Miki.Framework.Commands.Permissions;
 
-    public static class Extensions
+    public static class PermissionExtensions
 	{
 		public static CommandPipelineBuilder UsePermissions(
 			this CommandPipelineBuilder builder)
 		{
-			builder.UseStage(
+            builder?.UseStage(
                 new PermissionPipelineStage(
                     builder.Services.GetRequiredService<PermissionService>()));
 			return builder;

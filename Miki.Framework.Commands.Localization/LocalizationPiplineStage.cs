@@ -8,7 +8,7 @@
 
     public class LocalizationPipelineStage : IPipelineStage
 	{
-		internal const string LocaleContext = "framework-localization";
+		public const string LocaleContext = "framework-localization";
 
         private readonly ILocalizationService service;
 

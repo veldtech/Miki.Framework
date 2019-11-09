@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments.Parsers
 {
-	internal class SuffixedIntArgumentParser : IArgumentParser
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    internal class SuffixedIntArgumentParser : IArgumentParser
 	{
-		private readonly Dictionary<char, long> _suffixes = new Dictionary<char, long>
+		private readonly Dictionary<char, long> suffixes = new Dictionary<char, long>
 		{
 			{ 'k', 1000 },
 			{ 'm', 1000000 },
@@ -21,7 +21,7 @@ namespace Miki.Framework.Arguments
 		public bool CanParse(IArgumentPack pack)
 		{
 			var value = pack.Peek();
-			return _suffixes.ContainsKey(char.ToLowerInvariant(value.Last()))
+			return suffixes.ContainsKey(char.ToLowerInvariant(value.Last()))
 				&& int.TryParse(value.Substring(0, value.Length - 1), out _);
 		}
 
@@ -29,7 +29,7 @@ namespace Miki.Framework.Arguments
 		{
 			var value = pack.Take();
 			return (int)(int.Parse(value.Substring(0, value.Length - 1))
-				* _suffixes[char.ToLowerInvariant(value[^1])]);
+				* suffixes[char.ToLowerInvariant(value[^1])]);
 		}
 	}
 }

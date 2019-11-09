@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments.Parsers
 {
-	public class BooleanArgumentParser : IArgumentParser
+    using System;
+
+    public class BooleanArgumentParser : IArgumentParser
 	{
 		public Type OutputType
 			=> typeof(bool);
@@ -19,11 +19,12 @@ namespace Miki.Framework.Arguments
 			{
 				return valueBool;
 			}
-			else if(int.TryParse(item, out int valueInt))
-			{
-				return valueInt > 0;
-			}
-			return null;
+
+            if(int.TryParse(item, out int valueInt))
+            {
+                return valueInt > 0;
+            }
+            return null;
 		}
 	}
 }

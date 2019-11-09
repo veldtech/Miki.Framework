@@ -42,7 +42,6 @@ namespace Miki.Framework.Tests
 
         protected virtual void OnModelCreating([NotNull] ModelBuilder builder)
         {
-
         }
     }
 }
