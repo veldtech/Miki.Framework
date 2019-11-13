@@ -1,16 +1,12 @@
-﻿using Miki.Discord.Common;
-using Miki.Framework.Arguments;
-using Miki.Framework.Commands.Pipelines;
-using Miki.Framework.Commands.Stages;
-using Miki.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Miki.Framework.Commands.Stages
+﻿namespace Miki.Framework.Commands.Stages
 {
-	public class CommandHandlerStage : IPipelineStage
+    using Miki.Discord.Common;
+    using Miki.Framework.Commands.Pipelines;
+    using Miki.Logging;
+    using System;
+    using System.Threading.Tasks;
+
+    public class CommandHandlerStage : IPipelineStage
 	{
 		private readonly CommandTree map;
 
@@ -40,7 +36,10 @@ namespace Miki.Framework.Commands.Stages
 
 namespace Miki.Framework.Commands
 {
-	public static class CommandHandlerExtensions
+    using Microsoft.Extensions.DependencyInjection;
+    using Miki.Framework.Commands.Stages;
+
+    public static class CommandHandlerExtensions
 	{
 		public static CommandPipelineBuilder UseCommandHandler(
             this CommandPipelineBuilder builder)

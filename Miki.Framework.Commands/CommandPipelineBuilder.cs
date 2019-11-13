@@ -1,11 +1,7 @@
 ﻿namespace Miki.Framework.Commands
 {
-    using Microsoft.Extensions.DependencyInjection;
-    using Miki.Discord.Common;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Miki.Framework.Commands.Pipelines;
 
     public class CommandPipelineBuilder

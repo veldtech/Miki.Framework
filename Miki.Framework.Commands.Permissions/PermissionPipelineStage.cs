@@ -1,6 +1,5 @@
 ﻿namespace Miki.Framework.Commands.Permissions
 {
-    using Microsoft.EntityFrameworkCore;
     using Miki.Discord.Common;
     using Miki.Framework.Commands.Nodes;
     using Miki.Framework.Commands.Permissions.Attributes;

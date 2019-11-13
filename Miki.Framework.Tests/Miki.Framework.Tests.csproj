@@ -22,13 +22,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Miki.Framework.Commands.Filters\Miki.Framework.Commands.Filters.csproj" />
-    <ProjectReference Include="..\Miki.Framework.Commands.Localization\Miki.Framework.Commands.Localization.csproj" />
-    <ProjectReference Include="..\Miki.Framework.Commands.Permissions\Miki.Framework.Commands.Permissions.csproj" />
-    <ProjectReference Include="..\Miki.Framework.Commands.Prefixes\Miki.Framework.Commands.Prefixes.csproj" />
-    <ProjectReference Include="..\Miki.Framework.Commands.Scopes\Miki.Framework.Commands.Scopes.csproj" />
-    <ProjectReference Include="..\Miki.Framework\Miki.Framework.csproj" />
-  </ItemGroup>
-
 </Project>
