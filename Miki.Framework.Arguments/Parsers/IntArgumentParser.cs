@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments.Parsers
 {
-	public class IntArgumentParser : IArgumentParser
+    using System;
+
+    public class IntArgumentParser : IArgumentParser
 	{
-        public Type OutputType
-            => typeof(int);
+		public Type OutputType
+			=> typeof(int);
 
 		public int Priority => 1;
 
@@ -16,13 +14,13 @@ namespace Miki.Framework.Arguments
 
 		public object Parse(IArgumentPack pack)
 		{
-            var value = pack.Take();
+			var value = pack.Take();
 
-            if (int.TryParse(value, out int result))
-            {
-                return result;
-            }
-            return null;
+			if(int.TryParse(value, out int result))
+			{
+				return result;
+			}
+			return null;
 		}
 	}
 }

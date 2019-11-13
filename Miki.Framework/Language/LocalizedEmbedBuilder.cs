@@ -2,14 +2,15 @@
 using Miki.Discord.Common;
 using Miki.Discord.Rest;
 using Miki.Localization;
+using Miki.Localization.Models;
 
 namespace Miki.Framework.Language
 {
 	public class LocalizedEmbedBuilder : EmbedBuilder
 	{
-		private readonly IResourceManager _instance;
+		private readonly Locale _instance;
 
-		public LocalizedEmbedBuilder(IResourceManager instance)
+		public LocalizedEmbedBuilder(Locale instance)
 		{
 			_instance = instance;
 		}

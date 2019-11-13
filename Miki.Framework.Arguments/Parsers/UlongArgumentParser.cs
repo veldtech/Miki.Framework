@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments.Parsers
 {
-	public class UlongArgumentParser : IArgumentParser
+    using System;
+
+    public class UlongArgumentParser : IArgumentParser
 	{
-        public Type OutputType
-            => typeof(ulong);
+		public Type OutputType
+			=> typeof(ulong);
 
 		public int Priority => 1;
 
@@ -16,13 +14,13 @@ namespace Miki.Framework.Arguments
 
 		public object Parse(IArgumentPack pack)
 		{
-            var value = pack.Take();
+			var value = pack.Take();
 
-            if (ulong.TryParse(value, out ulong result))
-            {
-                return result;
-            }
-            return null;
+			if(ulong.TryParse(value, out ulong result))
+			{
+				return result;
+			}
+			return null;
 		}
 	}
 }

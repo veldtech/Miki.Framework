@@ -1,10 +1,9 @@
-﻿using Miki.Framework.Commands;
-using Miki.Localization;
-using Miki.Localization.Exceptions;
-
-namespace Miki.Framework.Exceptions
+﻿namespace Miki.Framework.Commands
 {
-	public class CommandException : LocalizedException
+    using Miki.Localization.Exceptions;
+    using Miki.Localization.Models;
+
+    public class CommandException : LocalizedException
 	{
 		public override IResource LocaleResource
 			=> new LanguageResource("error_default_command");

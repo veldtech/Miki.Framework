@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Miki.Framework.Arguments
 {
@@ -9,13 +8,13 @@ namespace Miki.Framework.Arguments
 	{
 		private readonly IReadOnlyList<string> _arguments;
 
-        public bool CanTake => Cursor < _arguments.Count && Cursor >= 0;
+		public bool CanTake => Cursor < _arguments.Count && Cursor >= 0;
 
-        public int Cursor { get; private set; } = 0;
+		public int Cursor { get; private set; } = 0;
 
-        public int Length => _arguments.Count;
+		public int Length => _arguments.Count;
 
-        public ArgumentPack(IEnumerable<string> arguments)
+		public ArgumentPack(IEnumerable<string> arguments)
 		{
 			_arguments = arguments.ToList();
 		}
@@ -34,22 +33,22 @@ namespace Miki.Framework.Arguments
 
 		private string Get(int index)
 		{
-			if (!CanTake)
+			if(!CanTake)
 			{
-                throw new IndexOutOfRangeException();
-            }
+				throw new IndexOutOfRangeException();
+			}
 			return _arguments[index];
 		}
 
-        public void SetCursor(int value)
-        {
-            if (value < 0)
-                throw new ArgumentOutOfRangeException();
+		public void SetCursor(int value)
+		{
+			if(value < 0)
+				throw new ArgumentOutOfRangeException();
 
-            if (value > Length)
-                throw new ArgumentOutOfRangeException();
+			if(value > Length)
+				throw new ArgumentOutOfRangeException();
 
-            Cursor = value;
-        }
-    }
+			Cursor = value;
+		}
+	}
 }

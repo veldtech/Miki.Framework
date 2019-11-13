@@ -1,61 +1,52 @@
-﻿using Miki.Discord.Common;
-using Miki.Framework.Arguments;
-using Miki.Framework.Commands.Pipelines;
-using Miki.Framework.Commands.Stages;
-using Miki.Logging;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Stages
+﻿﻿namespace Miki.Framework.Commands.Stages
 {
-    public class CommandHandlerStage : IPipelineStage
-    {
-        private readonly CommandTree _map;
+    using Miki.Discord.Common;
+    using Miki.Framework.Commands.Pipelines;
+    using Miki.Logging;
+    using System;
+    using System.Threading.Tasks;
 
-        public IEnumerable<Node> Modules
-            => _map.Root.Children;
+    public class CommandHandlerStage : IPipelineStage
+	{
+		private readonly CommandTree map;
 
         public CommandHandlerStage(CommandTree map)
-        {
-            _map = map;
-        }
+		{
+            this.map = map ?? throw new ArgumentNullException(nameof(map));
+		}
 
-        public async Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next)
-        {
-            Log.Debug($"Starting command aggregation with query '{e.GetQuery()}'");
+		public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
+		{
+			Log.Debug($"Starting command aggregation with query '{e.GetQuery()}'");
 
-            var command = GetCommand(e.GetArgumentPack().Pack);
-            if (command == null)
-            {
-                Log.Warning($"No command was found with query '{string.Join(" ", e.GetQuery())}'");
-                return;
-            }
-
-            if (command is IExecutable exec)
-            {
-                e.SetExecutable(exec);
-                await next();
-            }
-        }
-
-        public Node GetCommand(string name)
-            => GetCommand(new ArgumentPack(name.Split(' ')));
-        public Node GetCommand(IArgumentPack pack)
-            => _map.GetCommand(pack);
+			var command = map.GetCommand(e.GetArgumentPack().Pack);
+			if(command == null)
+			{
+				Log.Warning($"No command was found with query '{string.Join(" ", e.GetQuery())}'");
+				return;
+			}
+            if(command is IExecutable exec)
+			{
+				e.SetExecutable(exec);
+				await next();
+			}
+		}
     }
 }
 
 namespace Miki.Framework.Commands
 {
+    using Microsoft.Extensions.DependencyInjection;
+    using Miki.Framework.Commands.Stages;
+
     public static class CommandHandlerExtensions
-    {
-        public static CommandPipelineBuilder UseCommandHandler(this CommandPipelineBuilder builder, CommandTree map)
-        {
-            builder.UseStage(new CommandHandlerStage(map));
-            return builder;
-        }
-    }
+	{
+		public static CommandPipelineBuilder UseCommandHandler(
+            this CommandPipelineBuilder builder)
+		{
+			builder.UseStage(new CommandHandlerStage(
+                builder.Services.GetService<CommandTree>()));
+			return builder;
+		}
+	}
 }

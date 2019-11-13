@@ -1,13 +1,12 @@
-﻿using Miki.Discord.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Pipelines
+﻿namespace Miki.Framework.Commands.Pipelines
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Threading.Tasks;
+    using Discord.Common;
+
     public interface IPipelineStage
-    {
-        Task CheckAsync(IDiscordMessage data, IMutableContext e, Func<Task> next);
-    }
+	{
+		ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, [NotNull] Func<ValueTask> next);
+	}
 }

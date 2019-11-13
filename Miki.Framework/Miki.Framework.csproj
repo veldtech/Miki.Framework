@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Configurations>Debug;Release;Debug Production;Prod</Configurations>
   </PropertyGroup>
 
@@ -11,38 +11,36 @@
     <Company />
     <Description>Miki discord bot framework</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.4.0</Version>
+    <Version>2.0.0</Version>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageIconUrl></PackageIconUrl>
     <PackageProjectUrl>https://github.com/mikibot/miki.framework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mikibot/miki.framework</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Copyright>Velddev</Copyright>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>7.3</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Prod|AnyCPU'">
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Legacy\**" />
     <EmbeddedResource Remove="Legacy\**" />
     <None Remove="Legacy\**" />
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.2.0" />
-    <PackageReference Include="Miki.Localization" Version="1.3.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.0.0" />
+    <PackageReference Include="Miki.Cache" Version="1.3.0" />
+    <PackageReference Include="Miki.Discord" Version="3.1.2" />
+    <PackageReference Include="Miki.Discord.Common" Version="3.1.2" />
+    <PackageReference Include="Miki.Localization" Version="2.0.1" />
     <PackageReference Include="Miki.Logging" Version="1.4.2" />
     <PackageReference Include="Miki.Net.Http" Version="2.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\miki.discord\Miki.Discord\Miki.Discord.csproj" />
+    <PackageReference Include="Miki.Patterns.Repositories" Version="1.0.0" />
   </ItemGroup>
   
 </Project>

@@ -4,123 +4,135 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Miki.Framework.Commands
 {
-    public class CommandTreeBuilder
-    {
-        public event Action<NodeContainer, IServiceProvider> OnContainerLoaded;
+	public class CommandTreeBuilder
+	{
+        [Obsolete("use 'CommandTreeBuilder::AddCommandBuildStep()' intead")]
+		public event Action<NodeContainer, IServiceProvider> OnContainerLoaded;
 
-        private readonly IServiceProvider _services;
+		private readonly IServiceProvider services;
 
-        public CommandTreeBuilder(MikiApp app)
-        {
-            _services = app.Services;
+        private List<ICommandBuildStep> buildSteps;
+
+		public CommandTreeBuilder(IServiceProvider services)
+		{
+			this.services = services;
         }
 
-        public CommandTree Create(Assembly assembly)
+        public CommandTreeBuilder AddCommandBuildStep(ICommandBuildStep buildStep)
         {
-            var allTypes = assembly.GetTypes()
-                .Where(x => x.GetCustomAttribute<ModuleAttribute>() != null);
-            var root = new CommandTree();
-            foreach (var t in allTypes)
+            if(buildSteps == null)
             {
-                var module = LoadModule(t, root.Root);
-                if (module != null)
-                {
-                    root.Root.Children.Add(module);
-                }
+                buildSteps = new List<ICommandBuildStep>();
             }
-            return root;
+            buildSteps.Add(buildStep);
+            return this;
         }
 
-        private NodeContainer LoadModule(Type t, NodeContainer parent)
-        {
-            var moduleAttrib = t.GetCustomAttribute<ModuleAttribute>();
-            if (moduleAttrib == null)
-            {
-                throw new InvalidOperationException("Modules must have a valid ModuleAttribute.");
-            }
+		public CommandTree Create(Assembly assembly)
+		{
+			var allTypes = assembly.GetTypes()
+				.Where(x => x.GetCustomAttribute<ModuleAttribute>() != null);
+			var root = new CommandTree();
+			foreach(var t in allTypes)
+			{
+				var module = LoadModule(t, root.Root);
+				if(module != null)
+				{
+					root.Root.Children.Add(module);
+				}
+			}
+			return root;
+		}
 
-            NodeContainer module = new NodeModule(moduleAttrib.Name, parent, _services, t);
-            OnContainerLoaded?.Invoke(module, _services);
+		private NodeContainer LoadModule(Type t, NodeContainer parent)
+		{
+			var moduleAttrib = t.GetCustomAttribute<ModuleAttribute>();
+			if(moduleAttrib == null)
+			{
+				throw new InvalidOperationException("Modules must have a valid ModuleAttribute.");
+			}
 
-            var allCommands = t.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
-                .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
-            foreach (var c in allCommands)
-            {
-                module.Children.Add(LoadCommand(c, module));
-            }
+			NodeContainer module = new NodeModule(moduleAttrib.Name, parent, services, t);
+			OnContainerLoaded?.Invoke(module, services);
 
-            var allSingleCommands = t.GetMethods()
-                .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
-            foreach (var c in allSingleCommands)
-            {
-                module.Children.Add(LoadCommand(c, module));
-            }
+			var allCommands = t.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Public)
+				.Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
+			foreach(var c in allCommands)
+			{
+				module.Children.Add(LoadCommand(c, module));
+			}
 
-            return module;
-        }
-        private Node LoadCommand(Type t, NodeContainer parent)
-        {
-            var commandAttrib = t.GetCustomAttribute<CommandAttribute>();
-            if (commandAttrib == null)
-            {
-                throw new InvalidOperationException(
-                    $"Multi command of type '{t.ToString()}' must have a valid CommandAttribute.");
-            }
+			var allSingleCommands = t.GetMethods()
+				.Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
+			foreach(var c in allSingleCommands)
+			{
+				module.Children.Add(LoadCommand(c, module));
+			}
 
-            if (commandAttrib.Aliases?.Count() == 0)
-            {
-                throw new InvalidOperationException(
-                    $"Multi commands cannot have an invalid name.");
-            }
+			return module;
+		}
+		private Node LoadCommand(Type t, NodeContainer parent)
+		{
+			var commandAttrib = t.GetCustomAttribute<CommandAttribute>();
+			if(commandAttrib == null)
+			{
+				throw new InvalidOperationException(
+					$"Multi command of type '{t.ToString()}' must have a valid CommandAttribute.");
+			}
 
-            var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, _services, t);
-            OnContainerLoaded?.Invoke(multiCommand, _services);
+			if(commandAttrib.Aliases?.Count() == 0)
+			{
+				throw new InvalidOperationException(
+					$"Multi commands cannot have an invalid name.");
+			}
 
-            var allCommands = t.GetNestedTypes()
-                .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
-            foreach (var c in allCommands)
-            {
-                multiCommand.Children.Add(LoadCommand(c, multiCommand));
-            }
+			var multiCommand = new NodeNestedExecutable(commandAttrib.AsMetadata(), parent, services, t);
+			OnContainerLoaded?.Invoke(multiCommand, services);
 
-            var allSingleCommands = t.GetMethods()
-                .Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
-            foreach (var c in allSingleCommands)
-            {
-                var attrib = c.GetCustomAttribute<CommandAttribute>();
-                if (attrib.Aliases == null
-                    || attrib.Aliases.Count() == 0)
-                {
-                    var node = LoadCommand(c, multiCommand);
-                    if (node is IExecutable execNode)
-                    {
-                        multiCommand.SetDefaultExecution(async (e)
-                            => await execNode.RunAsync(e));
-                    }
-                }
-                else
-                {
-                    multiCommand.Children.Add(LoadCommand(c, multiCommand));
-                }
-            }
-            return multiCommand;
-        }
-        private Node LoadCommand(MethodInfo m, NodeContainer parent)
-        {
-            var commandAttrib = m.GetCustomAttribute<CommandAttribute>();
-            var command = new NodeExecutable(commandAttrib.AsMetadata(), parent, m);
+			var allCommands = t.GetNestedTypes()
+				.Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
+			foreach(var c in allCommands)
+			{
+				multiCommand.Children.Add(LoadCommand(c, multiCommand));
+			}
 
-            if (m.ReturnType != typeof(Task))
-            {
-                throw new Exception("Methods with attribute 'Command' require to be Tasks.");
-            }
-            return command;
-        }
-    }
+			var allSingleCommands = t.GetMethods()
+				.Where(x => x.GetCustomAttribute<CommandAttribute>() != null);
+			foreach(var c in allSingleCommands)
+			{
+				var attrib = c.GetCustomAttribute<CommandAttribute>();
+				if(attrib.Aliases == null
+					|| attrib.Aliases.Count() == 0)
+				{
+					var node = LoadCommand(c, multiCommand);
+					if(node is IExecutable execNode)
+					{
+						multiCommand.SetDefaultExecution(async (e)
+							=> await execNode.ExecuteAsync(e));
+					}
+				}
+				else
+				{
+					multiCommand.Children.Add(LoadCommand(c, multiCommand));
+				}
+			}
+			return multiCommand;
+		}
+		private Node LoadCommand(MethodInfo m, NodeContainer parent)
+		{
+			var commandAttrib = m.GetCustomAttribute<CommandAttribute>();
+			var command = new NodeExecutable(commandAttrib.AsMetadata(), parent, m);
+
+			if(m.ReturnType != typeof(Task))
+			{
+				throw new Exception("Methods with attribute 'Command' require to be Tasks.");
+			}
+			return command;
+		}
+	}
 }
