@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <Version>2.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Miki.Discord" Version="3.1.2" />
+    <PackageReference Include="Miki.Localization" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Miki.Framework.Arguments\Miki.Framework.Arguments.csproj" />
+    <ProjectReference Include="..\Miki.Framework\Miki.Framework.csproj" />
+  </ItemGroup>
+
+</Project>
