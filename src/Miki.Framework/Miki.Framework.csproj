@@ -11,8 +11,8 @@
     <Company />
     <Description>Miki discord bot framework</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.0</Version>
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <Version>2.0.1</Version>
+    <PackageReleaseNotes>- Resolved issue where</PackageReleaseNotes>
     <PackageIconUrl></PackageIconUrl>
     <PackageProjectUrl>https://github.com/mikibot/miki.framework</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mikibot/miki.framework</RepositoryUrl>
@@ -39,7 +39,6 @@
     <PackageReference Include="Miki.Discord.Common" Version="3.1.2" />
     <PackageReference Include="Miki.Localization" Version="2.0.1" />
     <PackageReference Include="Miki.Logging" Version="1.4.2" />
-    <PackageReference Include="Miki.Net.Http" Version="2.1.0" />
     <PackageReference Include="Miki.Patterns.Repositories" Version="1.0.0" />
   </ItemGroup>
   

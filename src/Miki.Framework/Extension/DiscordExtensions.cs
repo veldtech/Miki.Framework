@@ -12,8 +12,6 @@
     using Exceptions;
     using Framework;
     using Microsoft.Extensions.DependencyInjection;
-    using Net.Http;
-
     public static class DiscordExtensions
     {
         public static Task QueueAsync(
