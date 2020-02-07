@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Miki.Framework
+﻿namespace Miki.Framework
 {
 	public interface IExecutableCommand : IExecutable
 	{

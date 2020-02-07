@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace Miki.Framework
+﻿namespace Miki.Framework
 {
-	public class Mathm
+    using System;
+    
+    public class Mathm
 	{
 		public static float Clamp(float value, float min, float max)
 		{

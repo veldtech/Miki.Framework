@@ -1,4 +1,4 @@
-﻿namespace Miki.Framework.Extension
+﻿namespace Miki.Framework
 {
     using System;
     using System.IO;

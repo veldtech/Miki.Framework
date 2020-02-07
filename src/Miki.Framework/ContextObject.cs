@@ -1,20 +1,41 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-
-namespace Miki.Framework
+﻿namespace Miki.Framework
 {
-	public interface IContext
+    using Microsoft.Extensions.DependencyInjection;
+    using System;
+    using System.Collections.Generic;
+
+	/// <summary>
+	/// Session context for a single command. Keeps data and services for this specific session.
+	/// </summary>
+    public interface IContext
 	{
+		/// <summary>
+		/// The command executed in this current session.
+		/// </summary>
 		IExecutable Executable { get; }
+
+		/// <summary>
+		/// Services built in <see cref="MikiApp"/>
+		/// </summary>
 		IServiceProvider Services { get; }
 
+		/// <summary>
+		/// Context objects are used for specific session-only objects that are added through pipeline
+		/// objects.
+		/// </summary>
+		/// <typeparam name="T">Used to pre-cast the object</typeparam>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		T GetContext<T>(string id);
 
+        /// <summary>
+        /// Used to retrieve services built in <see cref="MikiApp"/>
+        /// </summary>
 		object GetService(Type t);
 	}
 
-	public class ContextObject : IMutableContext, IDisposable
+    /// <inheritdoc cref="IMutableContext" />
+    public class ContextObject : IMutableContext, IDisposable
 	{
 		private readonly Dictionary<string, object> contextObjects;
 		private readonly IServiceScope scope;
@@ -30,12 +51,14 @@ namespace Miki.Framework
 			scope = p.CreateScope();
 		}
 
-		public void Dispose()
+        /// <inheritdoc/>
+        public void Dispose()
 		{
 			scope.Dispose();
 		}
 
-		public T GetContext<T>(string id)
+        /// <inheritdoc/>
+        public T GetContext<T>(string id)
 		{
 			if(contextObjects.TryGetValue(id, out var value))
 			{
@@ -44,13 +67,12 @@ namespace Miki.Framework
 			return default;
 		}
 
-		public T GetService<T>()
-			=> (T)GetService(typeof(T));
-
+        /// <inheritdoc/>
 		public object GetService(Type t)
 			=> scope.ServiceProvider
 				.GetService(t);
 
+        /// <inheritdoc/>
         public void SetContext<T>(string id, T value)
 		{
 			if(contextObjects.ContainsKey(id))
@@ -63,7 +85,8 @@ namespace Miki.Framework
 			}
 		}
 
-		public void SetExecutable(IExecutable exec)
+        /// <inheritdoc/>
+        public void SetExecutable(IExecutable exec)
 		{
 			Executable = exec;
 		}

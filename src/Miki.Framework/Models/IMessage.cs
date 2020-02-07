@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-
-namespace Miki.Framework.Models
+﻿namespace Miki.Framework.Models
 {
-	public interface IMessage
+    using System.Threading.Tasks;
+
+    public interface IMessage
 	{
 		Task DeleteAsync();
 

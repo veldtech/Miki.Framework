@@ -9,7 +9,7 @@
     public interface IUnitOfWork : IDisposable, IAsyncDisposable
     {
         /// <summary>
-        /// 
+        /// Gets the repository for a type. Will by default create an <see cref="EntityRepository{T}"/>.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="factory"></param>

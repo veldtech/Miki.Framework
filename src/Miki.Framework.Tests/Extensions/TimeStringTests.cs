@@ -3,7 +3,6 @@
 namespace Miki.Framework.Tests.Extensions
 {
     using Xunit;
-    using Miki.Framework.Extension;
 
     public class TimeStringTests
     {

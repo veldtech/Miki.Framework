@@ -1,23 +1,23 @@
-﻿using Miki.Discord;
-using Miki.Discord.Common;
-using Miki.Discord.Rest;
-using Miki.Localization;
-using Miki.Localization.Models;
-
-namespace Miki.Framework.Language
+﻿namespace Miki.Framework.Language
 {
-	public class LocalizedEmbedBuilder : EmbedBuilder
+    using Miki.Discord;
+    using Miki.Discord.Common;
+    using Miki.Discord.Rest;
+    using Miki.Localization;
+    using Miki.Localization.Models;
+    
+    public class LocalizedEmbedBuilder : EmbedBuilder
 	{
-		private readonly Locale _instance;
+		private readonly Locale instance;
 
 		public LocalizedEmbedBuilder(Locale instance)
 		{
-			_instance = instance;
+			this.instance = instance;
 		}
 
 		public LocalizedEmbedBuilder AddField(IResource title, IResource content, bool inline = false)
 		{
-			AddField(title.Get(_instance), content.Get(_instance), inline);
+			AddField(title.Get(instance), content.Get(instance), inline);
 			return this;
 		}
 
@@ -26,7 +26,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithAuthor(IResource title, string iconUrl = null, string url = null)
 		{
-			SetAuthor(title.Get(_instance), iconUrl, url);
+			SetAuthor(title.Get(instance), iconUrl, url);
 			return this;
 		}
 
@@ -41,7 +41,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithDescription(LanguageResource description)
 		{
-			SetDescription(description.Get(_instance));
+			SetDescription(description.Get(instance));
 			return this;
 		}
 
@@ -50,7 +50,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithFooter(IResource text, string iconUrl = null)
 		{
-			SetFooter(text.Get(_instance), iconUrl);
+			SetFooter(text.Get(instance), iconUrl);
 			return this;
 		}
 
@@ -71,7 +71,7 @@ namespace Miki.Framework.Language
 
 		public LocalizedEmbedBuilder WithTitle(IResource title)
 		{
-			SetTitle(title.Get(_instance));
+			SetTitle(title.Get(instance));
 			return this;
 		}
 	}

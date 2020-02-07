@@ -1,6 +1,5 @@
 ﻿namespace Miki.Framework.Exceptions
 {
-    using Miki.Localization;
     using Miki.Localization.Exceptions;
     using Miki.Localization.Models;
 

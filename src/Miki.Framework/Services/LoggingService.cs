@@ -1,18 +1,18 @@
-﻿using Miki.Logging;
-using System;
-
-namespace Miki.Framework.Services
+﻿namespace Miki.Framework.Services
 {
-	public class LoggingService
+    using Miki.Logging;
+    using System;
+
+    public class LoggingService
 	{
-		LogLevel _logLevel;
+		private LogLevel logLevel;
 
 		public LoggingService(LogLevel defaultLevel = LogLevel.Information)
 		{
-			_logLevel = defaultLevel;
+            logLevel = defaultLevel;
 			new LogBuilder()
-				.AddLogEvent((msg, level) => OnLog(msg, level))
-				.SetLogHeader((level) => $"[{DateTime.UtcNow.ToShortTimeString()}]")
+				.AddLogEvent(OnLog)
+				.SetLogHeader(level => $"[{DateTime.UtcNow.ToShortTimeString()}]")
 				.Apply();
 		}
 		public LoggingService(Action<LogBuilder> fn)
@@ -24,12 +24,12 @@ namespace Miki.Framework.Services
 
 		public void SetDefaultLogLevel(LogLevel level)
 		{
-			_logLevel = level;
+            logLevel = level;
 		}
 
 		private void OnLog(string message, LogLevel level)
 		{
-			if(level >= _logLevel)
+			if(level >= logLevel)
 			{
 				Console.WriteLine(message);
 			}

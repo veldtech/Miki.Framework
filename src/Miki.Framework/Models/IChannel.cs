@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Models
+﻿namespace Miki.Framework.Models
 {
+    using System.Threading.Tasks;
+
     public interface IChannel
     {
         Task<IMessage> CreateMessageAsync(string content);

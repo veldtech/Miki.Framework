@@ -8,6 +8,7 @@ namespace Miki.Framework
 {
     public class ProviderCollection : IEnumerable<IProvider>, IProvider
     {
+        /// <inheritdoc/>
         public bool IsActive { get; private set; }
 
         private readonly List<IProvider> providers = new List<IProvider>();

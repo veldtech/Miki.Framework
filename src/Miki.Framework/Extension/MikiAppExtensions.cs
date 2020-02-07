@@ -1,3 +1,0 @@
-﻿namespace Miki.Framework.Extension
-{
-}

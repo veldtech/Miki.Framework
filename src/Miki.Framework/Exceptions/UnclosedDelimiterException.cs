@@ -1,20 +1,19 @@
-﻿using Miki.Localization;
-using Miki.Localization.Exceptions;
-using Miki.Localization.Models;
-
-namespace Miki.Framework.Exceptions
+﻿namespace Miki.Framework.Exceptions
 {
-	public class UnclosedDelimiterException : LocalizedException
-	{
-		private readonly string _delimiter;
-		private readonly string _input;
+    using Miki.Localization.Exceptions;
+    using Miki.Localization.Models;
 
-		public override IResource LocaleResource => new LanguageResource("error_unclosed_delimiter", _delimiter, _input);
+    public class UnclosedDelimiterException : LocalizedException
+	{
+		private readonly string delimiter;
+		private readonly string input;
+
+		public override IResource LocaleResource => new LanguageResource("error_unclosed_delimiter", delimiter, input);
 
 		public UnclosedDelimiterException(string delimiter, string input)
 		{
-			_delimiter = delimiter;
-			_input = input;
+			this.delimiter = delimiter;
+			this.input = input;
 		}
 	}
 }
