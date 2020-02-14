@@ -16,10 +16,9 @@
             this.context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
-        public ValueTask AddAsync(T entity)
+        public async ValueTask<T> AddAsync(T entity)
         {
-            context.Set<T>().Add(entity);
-            return default;
+            return (await context.Set<T>().AddAsync(entity)).Entity;
         }
 
         public ValueTask DeleteAsync(T entity)

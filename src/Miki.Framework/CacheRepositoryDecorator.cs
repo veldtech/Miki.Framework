@@ -55,7 +55,7 @@
         }
 
         /// <inheritdoc />
-        public ValueTask AddAsync(T entity)
+        public ValueTask<T> AddAsync(T entity)
         {
             return innerRepository.AddAsync(entity);
         }
