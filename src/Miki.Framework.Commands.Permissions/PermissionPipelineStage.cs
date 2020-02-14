@@ -7,6 +7,7 @@
     using Miki.Framework.Commands.Pipelines;
     using Miki.Logging;
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -22,9 +23,9 @@
         public async ValueTask CheckAsync(
             IDiscordMessage data,
             IMutableContext e,
-            Func<ValueTask> next)
+            [NotNull] Func<ValueTask> next)
         {
-            if (e.Executable == null)
+            if (e?.Executable == null)
             {
                 Log.Debug("No executable found to perform permission check on.");
                 return;
