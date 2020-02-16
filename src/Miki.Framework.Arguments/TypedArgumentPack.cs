@@ -2,12 +2,12 @@
 {
 	public class TypedArgumentPack : ITypedArgumentPack
 	{
-		private readonly ArgumentParseProvider _parseProvider;
+		private readonly ArgumentParseProvider parseProvider;
 
 		public TypedArgumentPack(IArgumentPack pack, ArgumentParseProvider parseProvider)
 		{
 			Pack = pack;
-			_parseProvider = parseProvider;
+			this.parseProvider = parseProvider;
 		}
 
 		public bool CanTake => Pack.CanTake;
@@ -30,7 +30,7 @@
 				return false;
 			}
 
-			var output = _parseProvider.Peek(Pack, typeof(T));
+			var output = parseProvider.Peek(Pack, typeof(T));
 			if(output == null)
 			{
 				value = default;
@@ -48,7 +48,7 @@
 				return false;
 			}
 
-			var output = _parseProvider.Take(Pack, typeof(T));
+			var output = parseProvider.Take(Pack, typeof(T));
 			if(output == null)
 			{
 				value = default;

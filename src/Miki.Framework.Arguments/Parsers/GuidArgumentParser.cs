@@ -8,12 +8,16 @@
 
 		public int Priority => 0;
 
-		public bool CanParse(IArgumentPack pack)
+		public bool CanParse(IArgumentPack pack, Type targetType)
 		{
+            if(targetType != typeof(Guid))
+            {
+				return false;
+            }
 			return Guid.TryParse(pack.Peek(), out _);
 		}
 
-		public object Parse(IArgumentPack pack)
+		public object Parse(IArgumentPack pack, Type targetType)
 		{
 			return Guid.Parse(pack.Take());
 		}

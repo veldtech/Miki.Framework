@@ -8,8 +8,8 @@ namespace Miki.Framework.Arguments
 
 		int Priority { get; }
 
-		bool CanParse(IArgumentPack pack);
+		bool CanParse(IArgumentPack pack, Type targetType);
 
-		object Parse(IArgumentPack pack);
+		object Parse(IArgumentPack pack, Type targetType);
 	}
 }

@@ -1,22 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments
 {
-	public class ArgumentPack : IArgumentPack
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    
+    public class ArgumentPack : IArgumentPack
 	{
-		private readonly IReadOnlyList<string> _arguments;
+		private readonly IReadOnlyList<string> arguments;
 
-		public bool CanTake => Cursor < _arguments.Count && Cursor >= 0;
+		public bool CanTake => Cursor < arguments.Count && Cursor >= 0;
 
-		public int Cursor { get; private set; } = 0;
+		public int Cursor { get; private set; }
 
-		public int Length => _arguments.Count;
+		public int Length => arguments.Count;
 
+        public ArgumentPack(params string[] arguments)
+		    : this(arguments.AsEnumerable())
+        {
+        }
 		public ArgumentPack(IEnumerable<string> arguments)
 		{
-			_arguments = arguments.ToList();
+			this.arguments = arguments.ToList();
 		}
 
 		public string Peek()
@@ -37,18 +41,22 @@ namespace Miki.Framework.Arguments
 			{
 				throw new IndexOutOfRangeException();
 			}
-			return _arguments[index];
+			return arguments[index];
 		}
 
 		public void SetCursor(int value)
 		{
-			if(value < 0)
-				throw new ArgumentOutOfRangeException();
+            if(value < 0)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
 
-			if(value > Length)
-				throw new ArgumentOutOfRangeException();
+            if(value > Length)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
 
-			Cursor = value;
+            Cursor = value;
 		}
 	}
 }

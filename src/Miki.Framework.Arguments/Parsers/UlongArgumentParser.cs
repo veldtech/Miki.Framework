@@ -9,10 +9,15 @@
 
 		public int Priority => 1;
 
-		public bool CanParse(IArgumentPack pack)
-			=> ulong.TryParse(pack.Peek(), out _);
-
-		public object Parse(IArgumentPack pack)
+		public bool CanParse(IArgumentPack pack, Type targetType)
+        {
+            if(targetType != typeof(ulong))
+            {
+				return false;
+            }
+            return ulong.TryParse(pack.Peek(), out _);
+        }
+		public object Parse(IArgumentPack pack, Type targetType)
 		{
 			var value = pack.Take();
 

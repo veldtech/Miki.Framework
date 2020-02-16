@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    internal class SuffixedIntArgumentParser : IArgumentParser
+    public class SuffixedIntArgumentParser : IArgumentParser
 	{
 		private readonly Dictionary<char, long> suffixes = new Dictionary<char, long>
 		{
@@ -18,14 +18,24 @@
 
 		public int Priority => 1;
 
-		public bool CanParse(IArgumentPack pack)
+		public bool CanParse(IArgumentPack pack, Type targetType)
 		{
+            if(targetType != typeof(int))
+            {
+				return false;
+            }
+
 			var value = pack.Peek();
+            if(value.Length == 0)
+            {
+				return false;
+            }
+
 			return suffixes.ContainsKey(char.ToLowerInvariant(value.Last()))
 				&& int.TryParse(value.Substring(0, value.Length - 1), out _);
 		}
 
-		public object Parse(IArgumentPack pack)
+		public object Parse(IArgumentPack pack, Type targetType)
 		{
 			var value = pack.Take();
 			return (int)(int.Parse(value.Substring(0, value.Length - 1))

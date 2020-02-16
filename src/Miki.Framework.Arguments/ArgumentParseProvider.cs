@@ -18,10 +18,10 @@ namespace Miki.Framework.Arguments
 		{
 			int cursor = p.Cursor;
 			object output = parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
-				.Where(x => x.CanParse(p))
+				.Where(x => x.CanParse(p, type))
 				.OrderByDescending(x => x.Priority)
 				.FirstOrDefault()?
-				.Parse(p);
+				.Parse(p, type);
 			p.SetCursor(cursor);
 			return output;
 		}
@@ -31,10 +31,10 @@ namespace Miki.Framework.Arguments
 
 		public object Take(IArgumentPack p, Type type)
 			=> parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
-				.Where(x => x.CanParse(p))
+				.Where(x => x.CanParse(p, type))
 				.OrderByDescending(x => x.Priority)
 				.FirstOrDefault()?
-				.Parse(p);
+				.Parse(p, type);
 
 		public T Take<T>(IArgumentPack p)
 			=> (T)Take(p, typeof(T));

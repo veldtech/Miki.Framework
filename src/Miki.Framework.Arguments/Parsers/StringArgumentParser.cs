@@ -11,10 +11,10 @@
 		public int Priority
 			=> 0;
 
-		public bool CanParse(IArgumentPack pack)
+		public bool CanParse(IArgumentPack pack, Type targetType)
 			=> true;
 
-		public object Parse(IArgumentPack pack)
+		public object Parse(IArgumentPack pack, Type targetType)
 		{
 			var arg = pack.Peek();
 			if(arg.StartsWithAny("\"", "“", "”"))

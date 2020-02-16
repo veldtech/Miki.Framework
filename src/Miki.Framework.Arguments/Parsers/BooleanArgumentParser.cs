@@ -9,10 +9,17 @@
 
 		public int Priority => 1;
 
-		public bool CanParse(IArgumentPack pack)
-			=> bool.TryParse(pack.Peek(), out _) || int.TryParse(pack.Peek(), out _);
+        public bool CanParse(IArgumentPack pack, Type targetType)
+        {
+            if(targetType != typeof(bool))
+            {
+                return false;
+            }
+            return bool.TryParse(pack.Peek(), out _) 
+                   || int.TryParse(pack.Peek(), out _);
+        }
 
-		public object Parse(IArgumentPack pack)
+        public object Parse(IArgumentPack pack, Type targetType)
 		{
 			var item = pack.Take();
 			if(bool.TryParse(item, out bool valueBool))
