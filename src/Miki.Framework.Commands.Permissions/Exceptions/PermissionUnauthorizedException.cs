@@ -8,6 +8,7 @@
     {
         public override IResource LocaleResource => new LanguageResource("error_permissions_invalid");
 
+        public PermissionUnauthorizedException() { }
         public PermissionUnauthorizedException(string message) : base(message) { }
         public PermissionUnauthorizedException(string message, Exception innerException) 
             : base(message, innerException) { }

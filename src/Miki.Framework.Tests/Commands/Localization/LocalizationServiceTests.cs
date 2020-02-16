@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Framework.Commands.Localization.Services;
+    using Miki.Framework.Commands.Localization;
     using Miki.Framework.Commands.Localization.Models;
     using Miki.Framework.Commands.Localization.Models.Exceptions;
     using Miki.Localization;
@@ -11,7 +12,7 @@
 
     public class LocalizationServiceTests : BaseEntityTest<ChannelLanguage>  
     {
-        private const long ValidId = 0L;
+        private const long Id = 0L;
         private const long InvalidId = 1L;
 
         public LocalizationServiceTests()
@@ -29,10 +30,10 @@
         [Fact]
         public async Task GetValidLocaleTest()
         {
-            using var context = NewContext();
+            await using var context = NewContext();
             var service = CreateService(context);
 
-            Locale locale = await service.GetLocaleAsync(ValidId);
+            Locale locale = await service.GetLocaleAsync(Id);
 
             Assert.NotNull(locale);
             Assert.Equal("dut", locale.CountryCode);
@@ -41,7 +42,7 @@
         [Fact]
         public async Task GetDefaultLocaleTest()
         {
-            using var context = NewContext();
+            await using var context = NewContext();
             var service = CreateService(context);
 
             Locale locale = await service.GetLocaleAsync(InvalidId);
@@ -53,12 +54,13 @@
         [Fact]
         public async Task GetInvalidLocaleTest()
         {
-            using var context = NewContext();
+            await using var context = NewContext();
 
-            var serviceNoFallback = new LocalizationService(context, new LocalizationService.Config
-            {
-                DefaultIso3 = "invalid"
-            });
+            var serviceNoFallback = new LocalizationService(
+                context, new LocaleCollection(), new LocalizationService.Config
+                {
+                    DefaultIso3 = "invalid"
+                });
 
             await Assert.ThrowsAsync<LocaleNotFoundException>(
                 async () => await serviceNoFallback.GetLocaleAsync(InvalidId))
@@ -68,7 +70,7 @@
         [Fact]
         public async Task ListLocalesTest()
         {
-            using var context = NewContext();
+            await using var context = NewContext();
             var service = CreateService(context);
 
             var locales = new HashSet<string>();
@@ -88,48 +90,27 @@
             await using (var context = NewContext())
             {
                 var service = CreateService(context);
-                await service.SetLocaleAsync(ValidId, "eng");
+                await service.SetLocaleAsync(Id, "eng");
                 await context.CommitAsync();
             }
 
             await using(var context = NewContext())
             {
                 var service = CreateService(context);
-                Locale locale = await service.GetLocaleAsync(ValidId);
+                Locale locale = await service.GetLocaleAsync(Id);
 
                 Assert.NotNull(locale);
                 Assert.Equal("eng", locale.CountryCode);
             }
         }
 
-        [Fact]
-        public async Task AddLocaleTest()
-        {
-            using var context = NewContext();
-            var service = CreateService(context);
-
-            var locales = new HashSet<string>();
-            await foreach(var i in service.ListLocalesAsync())
-            {
-                locales.Add(i);
-            }
-            Assert.Equal(2, locales.Count);
-            
-            service.AddLocale(new Locale("swe", null));
-
-            var newLocales = new HashSet<string>();
-            await foreach(var i in service.ListLocalesAsync())
-            {
-                newLocales.Add(i);
-            }
-            Assert.Equal(3, newLocales.Count);
-        }
-
         private ILocalizationService CreateService(IUnitOfWork context)
         {
-            var service = new LocalizationService(context);
-            service.AddLocale(new Locale("eng", null));
-            service.AddLocale(new Locale("dut", null));
+            var collection = new LocaleCollection();
+            collection.Add(new Locale("eng", null));
+            collection.Add(new Locale("dut", null));
+
+            var service = new LocalizationService(context, collection);
             return service;
         }
     }

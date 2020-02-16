@@ -43,13 +43,12 @@
 		}
 	}
 
-
-	public class MessageWorker : IMessageWorker<IDiscordMessage>
+    public class MessageWorker : IMessageWorker<IDiscordMessage>
 	{
 		private static readonly ConcurrentQueue<IMessageReference<IDiscordMessage>> QueuedMessages 
             = new ConcurrentQueue<IMessageReference<IDiscordMessage>>();
 
-        public int WorkerCount { get; private set; } = 0;
+        public int WorkerCount { get; }
 
         /// <summary>
         /// Initiates a message worker
@@ -72,7 +71,7 @@
 			{
 				if(QueuedMessages.IsEmpty)
 				{
-					await Task.Delay(100);
+					await Task.Delay(10);
 					continue;
 				}
 

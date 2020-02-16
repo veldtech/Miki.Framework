@@ -15,37 +15,37 @@
     public class LocalizationService : ILocalizationService
     {
         private readonly IUnitOfWork context;
+        private readonly LocaleCollection locales;
         private readonly IAsyncRepository<ChannelLanguage> repository;
 
         private readonly Config config;
 
-        private readonly HashSet<Locale> localeSet = new HashSet<Locale>();
-
         public LocalizationService(
             IUnitOfWork context,
+            LocaleCollection locales,
             Config config = null)
         {
             this.context = context;
+            this.locales = locales;
             this.repository = context.GetRepository<ChannelLanguage>();
             this.config = config ?? new Config();
         }
 
+        /// <inheritdoc />
         public void AddLocale(Locale locale)
         {
-            localeSet.Add(locale);
+            throw new NotImplementedException();
         }
 
         public async ValueTask<Locale> GetLocaleAsync(long id)
         {
             var iso = await FetchLanguageIsoAsync(id);
-            var localeRef = new Locale(iso, null);
-            if(localeSet.TryGetValue(localeRef, out var locale))
+            if(locales.TryGet(iso, out var locale))
             {
                 return locale;
             }
 
-            var defaultLocaleRef = new Locale(config.DefaultIso3, null);
-            if(localeSet.TryGetValue(defaultLocaleRef, out var defaultLocale))
+            if(locales.TryGet(config.DefaultIso3, out var defaultLocale))
             {
                 return defaultLocale;
             }
@@ -55,7 +55,7 @@
         public async IAsyncEnumerable<string> ListLocalesAsync()
         {
             await Task.Yield();
-            foreach(var set in localeSet)
+            foreach(var set in locales.List())
             {
                 yield return set.CountryCode;
             }
@@ -99,7 +99,7 @@
 
         private bool IsValidIso(Locale locale)
         {
-            return localeSet.Contains(locale);
+            return locales.TryGet(locale.CountryCode, out _);
         }
         
         public class Config

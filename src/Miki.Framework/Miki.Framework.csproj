@@ -11,7 +11,7 @@
     <Company />
     <Description>Miki discord bot framework</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.4</Version>
+    <Version>2.1.0</Version>
     <PackageReleaseNotes>- Resolved issue where</PackageReleaseNotes>
     <PackageIconUrl></PackageIconUrl>
     <PackageProjectUrl>https://github.com/mikibot/miki.framework</PackageProjectUrl>

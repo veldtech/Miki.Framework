@@ -24,7 +24,7 @@ namespace Miki.Framework
         public async Task StartAsync()
         {
             ServiceCollection serviceCollection = new ServiceCollection();
-            Configure(serviceCollection);
+            await ConfigureAsync(serviceCollection);
             serviceCollection.AddSingleton(this);
             Services = serviceCollection.BuildServiceProvider();
 
@@ -46,6 +46,6 @@ namespace Miki.Framework
 
         public abstract IAsyncEventingExecutor<IDiscordMessage> ConfigurePipeline(IServiceProvider collection);
 
-        public abstract void Configure(ServiceCollection collection);
+        public abstract Task ConfigureAsync(ServiceCollection collection);
     }
 }
