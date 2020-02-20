@@ -7,12 +7,12 @@
 
     public class FetchDataStage : IPipelineStage
     {
-        public const string ChannelArgumentKey = "framework-channel";
-        public const string GuildArgumentKey = "framework-guild";
+        public static string ChannelArgumentKey = "framework-channel";
+        public static string GuildArgumentKey = "framework-guild";
 
         public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
         {
-            var channel = await e.GetMessage().GetChannelAsync() as IDiscordTextChannel;
+            var channel = await e.GetMessage().GetChannelAsync();
             if(channel == null)
             {
                 throw new InvalidOperationException("This channel is not supported");

@@ -1,13 +1,14 @@
-﻿using Miki.Discord.Common;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Events.Triggers
+﻿namespace Miki.Framework.Commands.Prefixes.Triggers
 {
-	public class MentionTrigger : ITrigger<IDiscordMessage>
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    using Miki.Discord.Common;
+
+    public class MentionTrigger : ITrigger
 	{
-		public async Task<string> CheckTriggerAsync(IContext context, IDiscordMessage packet)
-		{
+		public async Task<string> CheckTriggerAsync(IContext context)
+        {
+            var packet = context.GetMessage();
 			var result = Regex.Match(packet.Content, "^<@!?(\\d+)> ");
 			if(!result.Success)
 			{
@@ -20,9 +21,7 @@ namespace Miki.Framework.Events.Triggers
 			{
 				return null;
 			}
-
-			context.GetQuery().RemoveAt(0);
-			return result.Groups[1].Value;
+            return result.Groups[1].Value;
 		}
 	}
 }

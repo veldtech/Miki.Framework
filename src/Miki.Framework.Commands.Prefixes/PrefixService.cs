@@ -3,33 +3,27 @@ using Miki.Framework.Commands.Prefixes.Triggers;
 
 namespace Miki.Framework.Commands.Prefixes
 {
-    using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Miki.Framework.Events.Triggers;
 
-    public class PrefixCollection<T> : List<ITrigger<T>>
-    { }
-
-    public class PrefixService<T>
+    public class PrefixService : IPrefixService
     {
-        private readonly PrefixCollection<T> collection;
+        private readonly PrefixCollection collection;
 
-        public PrefixService(PrefixCollection<T> collection)
+        public PrefixService(PrefixCollection collection)
         {
             this.collection = collection;
         }
 
-        public PrefixTrigger GetDefaultTrigger()
+        public ITrigger GetDefaultTrigger()
         {
-            return collection.OfType<PrefixTrigger>()
-                .FirstOrDefault(x => x.IsDefault);
+            return collection.DefaultTrigger;
         }
 
-        public async ValueTask<string> MatchAsync(IContext context, T value)
+        public async ValueTask<string> MatchAsync(IContext context)
         {
             foreach (var x in collection)
             {
-                string v = await x.CheckTriggerAsync(context, value);
+                string v = await x.CheckTriggerAsync(context);
                 if (v != null)
                 {
                     return v;

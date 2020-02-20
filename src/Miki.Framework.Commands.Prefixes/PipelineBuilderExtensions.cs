@@ -7,23 +7,23 @@
 
     public class PipelineStageTrigger : IPipelineStage
     {
-        private readonly PrefixService<IDiscordMessage> service;
+        private readonly IPrefixService service;
 
-        public PipelineStageTrigger(PrefixService<IDiscordMessage> service)
+        public PipelineStageTrigger(IPrefixService service)
         {
             this.service = service;
         }
 
         public async ValueTask CheckAsync(IDiscordMessage msg, IMutableContext e, Func<ValueTask> next)
         {
-            var result = await service.MatchAsync(e, msg);
+            var result = await service.MatchAsync(e);
             if(result == null)
             {
                 return;
             }
 
             e.SetContext(PipelineBuilderExtensions.PrefixMatchKey, result);
-            e.GetQuery()[0] = e.GetQuery()[0].Substring(result.Length - 1);
+            e.SetQuery(e.GetQuery().Substring(result.Length - 1));
             await next();
         }
     }
@@ -33,7 +33,6 @@ namespace Miki.Framework.Commands
 {
     using Miki.Framework.Commands.Prefixes;
     using Microsoft.Extensions.DependencyInjection;
-    using Miki.Discord.Common;
 
     public static class PipelineBuilderExtensions
     {
@@ -44,7 +43,7 @@ namespace Miki.Framework.Commands
         {
             return builder.UseStage(
                 new PipelineStageTrigger(
-                    builder.Services.GetService<PrefixService<IDiscordMessage>>()));
+                    builder.Services.GetService<IPrefixService>()));
         }
 
         public static string GetPrefixMatch(this IContext e)

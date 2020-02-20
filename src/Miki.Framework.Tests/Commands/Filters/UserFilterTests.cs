@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
-using Miki.Discord.Common;
-using Moq;
-using Xunit;
-
-namespace Miki.Framework.Tests.Commands.Filters
+﻿namespace Miki.Framework.Tests.Commands.Filters
 {
     using Miki.Framework.Commands.Filters;
+    using System.Threading.Tasks;
+    using Miki.Discord.Common;
+    using Moq;
+    using Xunit;
 
     public class UserFilterTests
     {
@@ -23,7 +22,7 @@ namespace Miki.Framework.Tests.Commands.Filters
         [Theory]
         [InlineData(BannedUser, false)]
         [InlineData(ValidUser, true)]
-        public async Task ValidUserTest(long userId, bool allowed)
+        public async Task UserIsAllowedTest(long userId, bool allowed)
         {
             var isAllowed = await userFilter.CheckAsync(NewContext(userId));
             Assert.Equal(allowed, isAllowed);
@@ -35,9 +34,13 @@ namespace Miki.Framework.Tests.Commands.Filters
             author.Setup(x => x.Id)
                 .Returns((ulong)val);
 
-            var context = new Mock<IContext>();
-            context.Setup(x => x.GetContext<IDiscordMessage>("framework-message").Author)
+            var message = new Mock<IDiscordMessage>();
+            message.Setup(x => x.Author)
                 .Returns(author.Object);
+
+            var context = new Mock<IContext>();
+            context.Setup(x => x.GetContext("framework-message"))
+                .Returns(message.Object);
 
             return context.Object;
         }

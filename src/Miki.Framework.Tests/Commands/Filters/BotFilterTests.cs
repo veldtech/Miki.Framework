@@ -36,9 +36,13 @@
             author.Setup(x => x.IsBot)
                 .Returns(val);
 
-            var context = new Mock<IContext>();
-            context.Setup(x => x.GetContext<IDiscordMessage>("framework-message").Author)
+            var message = new Mock<IDiscordMessage>();
+            message.Setup(x => x.Author)
                 .Returns(author.Object);
+
+            var context = new Mock<IContext>();
+            context.Setup(x => x.GetContext("framework-message"))
+                .Returns(message.Object);
 
             return context.Object;
         }

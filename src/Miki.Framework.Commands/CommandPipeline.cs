@@ -65,7 +65,7 @@
             {
                 if(this.OnExecuted != null)
                 {
-                    await this.OnExecuted(
+                    await OnExecuted(
                         new ExecutionResult<IDiscordMessage>(contextObj, data, exception));
                 }
             }

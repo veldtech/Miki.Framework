@@ -3,18 +3,17 @@
     using Miki.Discord.Common;
     using Miki.Framework.Commands.Pipelines;
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
 	
     public class CorePipelineStage : IPipelineStage
 	{
-		public const string MessageArgumentKey = "framework-message";
-		public const string QueryArgumentKey = "framework-query";
+		public static string MessageContextKey = "framework-message";
+		public static string QueryContextKey = "framework-query";
 
 		public ValueTask CheckAsync(IDiscordMessage msg, IMutableContext e, Func<ValueTask> next)
 		{
-			e.SetContext(MessageArgumentKey, msg);
-			e.SetContext(QueryArgumentKey, msg.Content.Split(' ').ToList());
+			e.SetContext(MessageContextKey, msg);
+			e.SetContext(QueryContextKey, msg.Content);
 			return next();
 		}
 	}
@@ -22,7 +21,6 @@
 
 namespace Miki.Framework
 {
-    using System.Collections.Generic;
     using Commands;
     using Discord.Common;
 
@@ -30,15 +28,23 @@ namespace Miki.Framework
     {
 		public static IDiscordMessage GetMessage(this IContext context)
 		{
-			return context.GetContext<IDiscordMessage>(CorePipelineStage.MessageArgumentKey);
+			return context.GetContext<IDiscordMessage>(CorePipelineStage.MessageContextKey);
         }
 
         /// <summary>
         /// Mutable version of the query.
         /// </summary>
-        public static List<string> GetQuery(this IContext context)
+        public static string GetQuery(this IContext context)
 		{
-			return context.GetContext<List<string>>(CorePipelineStage.QueryArgumentKey);
+			return context.GetContext<string>(CorePipelineStage.QueryContextKey);
 		}
+
+        /// <summary>
+        /// Sets the query.
+        /// </summary>
+        public static void SetQuery(this IMutableContext context, string query)
+        {
+            context.SetContext(CorePipelineStage.QueryContextKey, query);
+        }
     }
 }

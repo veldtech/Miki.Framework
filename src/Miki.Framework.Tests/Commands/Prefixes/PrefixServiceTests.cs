@@ -8,10 +8,10 @@
 
     public class PrefixServiceTests : BaseEntityTest<Prefix>
     {
-        private const long ValidGuildId = 0;
-        private const long ValidDefaultId = 1;
-        private const string ValidDefaultValue = ">";
-        private const string ValidValue = "!";
+        private const long GuildId = 0;
+        private const long DefaultId = 1;
+        private const string DefaultValue = ">";
+        private const string Value = "!";
 
         public PrefixServiceTests()
         {
@@ -19,15 +19,15 @@
             context.Set<Prefix>().AddRange(
                 new Prefix
                 {
-                    GuildId = ValidGuildId,
-                    DefaultValue = ValidDefaultValue,
-                    Value = ValidValue
+                    GuildId = GuildId,
+                    DefaultValue = DefaultValue,
+                    Value = Value
                 },
                 new Prefix
                 {
-                    GuildId = ValidDefaultId,
-                    DefaultValue = ValidDefaultValue,
-                    Value = ValidDefaultValue
+                    GuildId = DefaultId,
+                    DefaultValue = DefaultValue,
+                    Value = DefaultValue
                 });
             context.SaveChanges();
         }

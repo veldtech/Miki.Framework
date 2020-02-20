@@ -23,10 +23,9 @@
 		/// Context objects are used for specific session-only objects that are added through pipeline
 		/// objects.
 		/// </summary>
-		/// <typeparam name="T">Used to pre-cast the object</typeparam>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		T GetContext<T>(string id);
+		object GetContext(string id);
 
         /// <summary>
         /// Used to retrieve services built in <see cref="MikiApp"/>
@@ -58,11 +57,11 @@
 		}
 
         /// <inheritdoc/>
-        public T GetContext<T>(string id)
+        public object GetContext(string id)
 		{
 			if(contextObjects.TryGetValue(id, out var value))
 			{
-				return (T)value;
+				return value;
 			}
 			return default;
 		}
@@ -73,7 +72,7 @@
 				.GetService(t);
 
         /// <inheritdoc/>
-        public void SetContext<T>(string id, T value)
+        public void SetContext(string id, object value)
 		{
 			if(contextObjects.ContainsKey(id))
 			{

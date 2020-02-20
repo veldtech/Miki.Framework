@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
-
-namespace Miki.Framework.Events.Triggers
+﻿namespace Miki.Framework.Commands.Prefixes.Triggers
 {
-	public interface ITrigger<in T>
+    using System.Threading.Tasks;
+
+    public interface ITrigger
 	{
-		Task<string> CheckTriggerAsync(IContext context, T packet);
+		Task<string> CheckTriggerAsync(IContext context);
 	}
 }
