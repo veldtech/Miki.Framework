@@ -32,7 +32,7 @@
             }
 
             var message = e.GetMessage();
-            if(message.Author is IDiscordGuildUser gu)
+            if(message.Author is IDiscordGuildUser)
             {
                 var permission = await service.GetPriorityPermissionAsync(e);
                 if(permission == null)
@@ -62,7 +62,8 @@
                 if(attribs.OfType<DefaultPermissionAttribute>()
                     .Any(x => x.Status == PermissionStatus.Deny))
                 {
-                    return;
+                    throw new InvalidOperationException(
+                        "Denied request due to default setting set to Deny");
                 }
 
                 await next();

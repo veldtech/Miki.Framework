@@ -51,13 +51,15 @@ namespace Miki.Framework.Commands.Scopes
 
                     if (!scopesRequired.All(x => scopesGranted.Contains(x)))
                     {
-                        Log.Debug($"User '{e.GetMessage().Author}' tried to access {node}, but was not allowed to.");
+                        Log.Debug(
+                            $"User '{e.GetMessage().Author}' tried to access {node}, but was not allowed to.");
                         return;
                     }
                 }
             }
 
-            await next().ConfigureAwait(false);
+            await next()
+                .ConfigureAwait(false);
         }
     }
 }

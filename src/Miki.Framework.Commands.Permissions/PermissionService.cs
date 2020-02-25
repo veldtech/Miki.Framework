@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace Miki.Framework.Commands.Permissions
+﻿namespace Miki.Framework.Commands.Permissions
 {
     using System;
     using System.Collections.Generic;

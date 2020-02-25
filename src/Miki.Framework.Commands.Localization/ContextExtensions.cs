@@ -19,7 +19,7 @@ namespace Miki.Framework.Commands
         public static Locale GetLocale(this IContext context)
         {
             return context.GetContext<Locale>(
-                LocalizationPipelineStage.LocaleContext);
+                LocalizationPipelineStage.LocaleContextKey);
         }
 
         public static string GetString(this IResourceManager m, string key, params object[] format)

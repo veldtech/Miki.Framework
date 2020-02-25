@@ -1,13 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Miki.Discord.Common;
-using Miki.Framework.Commands.Pipelines;
-using Miki.Framework.Commands.States;
-using Miki.Logging;
-using System;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.States
+﻿namespace Miki.Framework.Commands.States
 {
+    using Microsoft.EntityFrameworkCore;
+    using Miki.Discord.Common;
+    using Miki.Framework.Commands.Pipelines;
+    using Miki.Framework.Commands.States;
+    using Miki.Logging;
+    using System;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// A very basic state management pipeline stage for customizable per-channel states.
     /// </summary>
@@ -15,14 +15,14 @@ namespace Miki.Framework.Commands.States
     {
         public class StateConfiguration
         {
-            public bool defaultState = true;
+            public bool DefaultState = true;
         }
 
-        private readonly StateConfiguration _config;
+        private readonly StateConfiguration config;
 
         public StatePipelineStage(StateConfiguration config)
         {
-            _config = config;
+            this.config = config;
         }
 
         public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
@@ -36,23 +36,25 @@ namespace Miki.Framework.Commands.States
             string commandId = e.Executable.ToString();
             if (string.IsNullOrWhiteSpace(commandId))
             {
-                return;
+                throw new Exception("command ID not set.");
             }
 
             var dbContext = e.GetService<DbContext>();
             if(dbContext == null)
             {
-                return;
+                throw new Exception("No Entity database set.");
             }
 
             var state = await GetCommandStateAsync(
                 dbContext,
                 commandId,
                 (long)data.ChannelId);
-            if(state.State)
+            if(!state.State)
             {
-                await next();
+                throw new Exception("State was denied");
             }
+
+            await next();
         }
 
         public async Task<CommandState> GetCommandStateAsync(
@@ -81,7 +83,7 @@ namespace Miki.Framework.Commands.States
                 {
                     Name = commandId,
                     ChannelId = channelId,
-                    State = _config.defaultState
+                    State = config.DefaultState
                 });
                 state = entity.Entity;
                 await context.SaveChangesAsync();
@@ -137,6 +139,8 @@ namespace Miki.Framework.Commands.States
 
 namespace Miki.Framework.Commands
 {
+    using Miki.Framework.Commands.States;
+
     public static class Extensions
     {
         public static CommandPipelineBuilder UseStates(

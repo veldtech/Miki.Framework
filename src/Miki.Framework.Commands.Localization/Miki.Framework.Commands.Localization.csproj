@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>2.1.0</Version>
+    <Version>2.2.2</Version>
     <Authors>velddev</Authors>
     <Description>Localization context creation plugin for Miki.Framework</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -12,6 +12,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl />
+    <Company>mikibot</Company>
   </PropertyGroup>
 
   <ItemGroup>

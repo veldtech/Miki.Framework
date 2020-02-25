@@ -37,6 +37,11 @@
             throw new NotImplementedException();
         }
 
+        public Locale GetDefaultLocale()
+        {
+            return locales.Get(config.DefaultIso3);
+        }
+
         public async ValueTask<Locale> GetLocaleAsync(long id)
         {
             var iso = await FetchLanguageIsoAsync(id);

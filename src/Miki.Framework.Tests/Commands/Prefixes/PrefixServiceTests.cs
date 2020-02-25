@@ -1,41 +1,59 @@
 ﻿namespace Miki.Framework.Tests.Commands.Prefixes
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading.Tasks;
     using Framework.Commands.Prefixes.Models;
     using Microsoft.EntityFrameworkCore;
+    using Miki.Framework.Commands.Prefixes;
+    using Miki.Framework.Commands.Prefixes.Triggers;
+    using Moq;
+    using Xunit;
 
     // TODO(velddev): rework prefixes to have a better system to better seperate 
 
-    public class PrefixServiceTests : BaseEntityTest<Prefix>
+    public class PrefixServiceTests
     {
-        private const long GuildId = 0;
-        private const long DefaultId = 1;
-        private const string DefaultValue = ">";
-        private const string Value = "!";
+        [Theory]
+        [InlineData(".")]
+        [InlineData(null)]
+        public async Task MatchesAsync(string prefix)
+        {
+            var mockTrigger = new Mock<ITrigger>();
+            mockTrigger.Setup(x => x.CheckTriggerAsync(It.IsAny<IContext>()))
+                .Returns(Task.FromResult(prefix));
 
-        public PrefixServiceTests()
-        {
-            using var context = NewDbContext();
-            context.Set<Prefix>().AddRange(
-                new Prefix
-                {
-                    GuildId = GuildId,
-                    DefaultValue = DefaultValue,
-                    Value = Value
-                },
-                new Prefix
-                {
-                    GuildId = DefaultId,
-                    DefaultValue = DefaultValue,
-                    Value = DefaultValue
-                });
-            context.SaveChanges();
+            var service = new PrefixService(
+                new PrefixCollectionBuilder()
+                    .AddAsDefault(mockTrigger.Object)
+                    .Build());
+
+            var mock = new Mock<IContext>();
+            var result = await service.MatchAsync(mock.Object);
+            Assert.Equal(prefix, result);
         }
-        
-        protected override void OnModelCreating([NotNull] ModelBuilder builder)
+
+        [Theory]
+        [InlineData(".", ".")]
+        [InlineData(null, "backup")]
+        public async Task MatchesMultipleAsync(string prefix, string expected)
         {
-            builder?.Entity<Prefix>()
-                .HasKey(x => new {x.GuildId, x.DefaultValue});
+            var mockTrigger = new Mock<ITrigger>();
+            mockTrigger.Setup(x => x.CheckTriggerAsync(It.IsAny<IContext>()))
+                .Returns(Task.FromResult(prefix));
+
+            var mockTriggerBackup = new Mock<ITrigger>();
+            mockTriggerBackup.Setup(x => x.CheckTriggerAsync(It.IsAny<IContext>()))
+                .Returns(Task.FromResult("backup"));
+
+            var service = new PrefixService(
+                new PrefixCollectionBuilder()
+                    .AddAsDefault(mockTrigger.Object)
+                    .Add(mockTriggerBackup.Object)
+                    .Build());
+
+            var mock = new Mock<IContext>();
+            var result = await service.MatchAsync(mock.Object);
+            Assert.Equal(expected, result);
         }
     }
 }

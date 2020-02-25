@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.Pre
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Services", "Miki.Framework.Services\Miki.Framework.Services.csproj", "{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Common", "Miki.Framework.Common\Miki.Framework.Common.csproj", "{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.States", "Miki.Framework.Commands.States\Miki.Framework.Commands.States.csproj", "{B18A54C6-39EA-4F14-B7EB-83563DC92EA5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.Scopes", "Miki.Framework.Commands.Scopes\Miki.Framework.Commands.Scopes.csproj", "{7921A92B-9F78-4E1E-A71C-1D38157ADEC6}"
@@ -109,14 +107,6 @@ Global
 		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Prod|Any CPU.Build.0 = Debug|Any CPU
 		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}.Debug Production|Any CPU.ActiveCfg = Debug|Any CPU
-		{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}.Debug Production|Any CPU.Build.0 = Debug|Any CPU
-		{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}.Prod|Any CPU.ActiveCfg = Debug|Any CPU
-		{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}.Prod|Any CPU.Build.0 = Debug|Any CPU
-		{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C8CD7A87-CA5E-4D37-A744-A1BFC801851F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B18A54C6-39EA-4F14-B7EB-83563DC92EA5}.Debug Production|Any CPU.ActiveCfg = Debug|Any CPU
 		{B18A54C6-39EA-4F14-B7EB-83563DC92EA5}.Debug Production|Any CPU.Build.0 = Debug|Any CPU
 		{B18A54C6-39EA-4F14-B7EB-83563DC92EA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

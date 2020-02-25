@@ -1,9 +1,7 @@
 ﻿namespace Miki.Framework.Tests.Commands.Prefixes
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Miki.Cache;
@@ -12,12 +10,11 @@
     using Miki.Framework.Commands;
     using Miki.Framework.Commands.Prefixes.Models;
     using Miki.Framework.Commands.Prefixes.Triggers;
-    using Miki.Framework.Commands.Stages;
     using Miki.Serialization.Protobuf;
     using Moq;
     using Xunit;
 
-    public interface TestDiscordMessage : IDiscordTextChannel, IDiscordGuildChannel
+    public interface ITestDiscordMessage : IDiscordMessage
     {
 
     }
@@ -58,28 +55,45 @@
         }
 
         [Fact]
+        public async Task MentionTriggerDoesTrigger()
+        {
+            var mention = "<@12065984510520>";
+            var trigger = new MentionTrigger();
+            var mock = new TestContextObject();
+
+            mock.SetContext(CorePipelineStage.QueryContextKey, mention + " test");
+
+            var selfUserMock = new Mock<IDiscordSelfUser>();
+            selfUserMock.Setup(x => x.Id).Returns(12065984510520);
+
+            var clientMock = new Mock<IDiscordClient>();
+            clientMock.Setup(x => x.GetSelfAsync())
+                .Returns(Task.FromResult(selfUserMock.Object));
+            mock.SetService(typeof(IDiscordClient), clientMock.Object);
+
+            var result = await trigger.CheckTriggerAsync(mock)
+                .ConfigureAwait(false);
+
+            Assert.Equal(mention, result);
+        }
+
+
+        [Fact]
         public async Task AcceptDefaultCommandFromDynamicPrefix()
         {
             var trigger = new DynamicPrefixTrigger("test.");
-            var mockContext = new Mock<IContext>();
+            var mockContext = new TestContextObject();
 
-            mockContext.Setup(x => x.GetService(
-                    It.Is<Type>(y => y.IsAssignableFrom(typeof(DbContext)))))
-                .Returns(NewDbContext());
-            mockContext.Setup(x => x.GetService(
-                    It.Is<Type>(y => y.IsAssignableFrom(typeof(ICacheClient)))))
-                .Returns(new InMemoryCacheClient(new ProtobufSerializer()));
+            mockContext.SetService(typeof(DbContext), NewDbContext());
+            mockContext.SetService(
+                typeof(ICacheClient), new InMemoryCacheClient(new ProtobufSerializer()));
 
-            var mockChannel = new Mock<TestDiscordMessage>();
-            mockChannel.Setup(x => x.Id).Returns(0L);
-            mockContext.Setup(x => x.GetContext(
-                    It.Is<string>(y => y == CorePipelineStage.QueryContextKey)))
-                .Returns("test.command");
-            mockContext.Setup(x => x.GetContext(
-                    It.Is<string>(y => y == FetchDataStage.ChannelArgumentKey)))
-                .Returns(mockChannel.Object);
+            var mockMessage = new Mock<ITestDiscordMessage>();
+            mockMessage.Setup(x => x.Id).Returns(0L);
+            mockContext.SetContext(CorePipelineStage.MessageContextKey, mockMessage.Object);
+            mockContext.SetContext(CorePipelineStage.QueryContextKey, "test.command");
 
-            var result = await trigger.CheckTriggerAsync(mockContext.Object)
+            var result = await trigger.CheckTriggerAsync(mockContext)
                 .ConfigureAwait(false);
 
             Assert.Equal("test.", result);
@@ -99,14 +113,14 @@
                     It.Is<Type>(y => y.IsAssignableFrom(typeof(ICacheClient)))))
                 .Returns(new InMemoryCacheClient(new ProtobufSerializer()));
 
-            var mockChannel = new Mock<TestDiscordMessage>();
-            mockChannel.Setup(x => x.Id).Returns(1L);
+            var mockMessage = new Mock<ITestDiscordMessage>();
+            mockMessage.Setup(x => x.Id).Returns(1L);
+            mockContext.Setup(x => x.GetContext(
+                    It.Is<string>(y => y == CorePipelineStage.MessageContextKey)))
+                .Returns(mockMessage.Object);
             mockContext.Setup(x => x.GetContext(
                     It.Is<string>(y => y == CorePipelineStage.QueryContextKey)))
                 .Returns("test.command");
-            mockContext.Setup(x => x.GetContext(
-                    It.Is<string>(y => y == FetchDataStage.ChannelArgumentKey)))
-                .Returns(mockChannel.Object);
 
             var result = await trigger.CheckTriggerAsync(mockContext.Object)
                 .ConfigureAwait(false);

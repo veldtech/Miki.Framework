@@ -1,8 +1,8 @@
-﻿using System;
-using Miki.Framework.Commands.Nodes;
-
-namespace Miki.Framework.Commands
+﻿namespace Miki.Framework.Commands
 {
+    using System;
+    using Miki.Framework.Commands.Nodes;
+
     public interface ICommandBuildStep
     {
         NodeModule BuildModule(NodeModule module, IServiceProvider provider);

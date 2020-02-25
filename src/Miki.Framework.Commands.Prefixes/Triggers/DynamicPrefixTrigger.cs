@@ -5,21 +5,17 @@
     using Microsoft.EntityFrameworkCore;
     using Miki.Cache;
     using Miki.Discord.Common;
+    using Miki.Discord.Common.Models;
     using Miki.Framework.Commands.Prefixes.Models;
 
     public class DynamicPrefixTrigger : ITrigger
 	{
-		public short Id { get; internal set; }
-		public string Value { get; internal set; }
 		public string DefaultValue { get; internal set; }
-		public bool Changable { get; internal set; }
-		public bool IsDefault { get; internal set; }
 
 		public Func<IContext, Task> OnTriggerReceived { get; set; }
 
 		public DynamicPrefixTrigger(string value)
 		{
-			Value = value;
 			DefaultValue = value;
         }
 
@@ -74,25 +70,26 @@
 		{
 			long guildId = id.ToDbLong();
 			var identifier = await context.Set<Prefix>().FindAsync(guildId, DefaultValue);
-			if(identifier == null)
-			{
-				identifier = await CreateNewAsync(context, guildId);			
-                await context.SaveChangesAsync();
+            if(identifier != null)
+            {
+                return identifier.Value;
             }
 
-			return identifier.Value;
+            identifier = await CreateNewAsync(context, guildId);			
+            await context.SaveChangesAsync();
+            return identifier.Value;
 		}
 
 		public async Task<string> CheckTriggerAsync(IContext e)
         {
-            var channel = e.GetChannel();
-			if(channel == null)
+            var message = e.GetMessage();
+			if(message == null)
 			{
 				return null;
 			}
 
 			var prefix = DefaultValue;
-			if(channel is IDiscordGuildChannel c)
+			if(message is IDiscordGuildMessage c)
 			{
 				prefix = await GetForGuildAsync(
 					e.GetService<DbContext>(),
