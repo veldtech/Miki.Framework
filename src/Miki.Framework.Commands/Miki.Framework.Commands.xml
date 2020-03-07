@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Miki.Framework.Commands</name>
+    </assembly>
+    <members>
+        <member name="T:Miki.Framework.Commands.CommandAttribute">
+            <summary>
+            Command attributes are notated to show that this asynchronous method is a command that the
+            bot can execute. Keep in mind if you use the default <see cref="T:Miki.Framework.Commands.CommandTree"/> this will require
+            you to encapsulate your current method into a class marked with a <see cref="T:Miki.Framework.Commands.ModuleAttribute"/>
+            attribute to be able to be found. Command attributes can be assigned to both methods and types.
+            However, both targets require different semantics:
+            - For a method, you need to have an <see cref="T:Miki.Framework.IContext"/> as your first argument, and it needs to
+            return a <see cref="T:System.Threading.Tasks.Task"/>.
+            - For a type, you need to either enrich it with additional tasks that are commands. Child-commands
+            can be empty, but this will be used as the default execution line for the type command. An empty
+            child command needs to be unique. This execution is recursive-friendly.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.CommandAttribute.#ctor">
+            <summary>
+            Used as a default execution for child commands. Should not be used inside of modules.
+            <seealso cref="T:Miki.Framework.Commands.CommandAttribute"/> for more information.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.CommandAttribute.#ctor(System.String[])">
+            <summary>
+            Creates a default command. Aliases need to be unique all across the current scope. The
+            first alias will be used as its unique command ID.
+            <seealso cref="T:Miki.Framework.Commands.CommandAttribute"/> for more information.
+            </summary>
+            <param name="aliases">All aliases that the command should react to.</param>
+        </member>
+        <member name="T:Miki.Framework.Commands.ModuleAttribute">
+            <summary>
+            The intial command container object. Will initiate <see cref="T:Miki.Framework.Commands.CommandTree"/> fetching for this
+            type.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.Commands.ModuleAttribute.Name">
+            <summary>
+            Unique ID of the module.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.Commands.CommandPipelineBuilder">
+            <summary>
+            Builds Command Pipelines. Helper pattern to keep your code clean.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.Commands.CommandPipelineBuilder.Services">
+            <summary>
+            Services that can be used throughout the command pipeline.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.CommandPipelineBuilder.#ctor(System.IServiceProvider)">
+            <summary>
+            Creates a new CommandPipelineBuilder. 
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.CommandPipelineBuilder.Build">
+            <summary>
+            Builds the pipeline stage and returns an immutable <see cref="T:Miki.Framework.Commands.CommandPipeline"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Miki.Framework.Commands.CommandPipelineBuilder.UseStage(Miki.Framework.Commands.Pipelines.IPipelineStage)">
+            <summary>
+            Initializes a pipeline stage as a runnable stage in the pipeline.
+            </summary>
+            <param name="stage">The pipeline stage you'd like to add to the stagelist.</param>
+        </member>
+        <member name="T:Miki.Framework.Commands.CommandException">
+            <summary>
+            Localizable exception for when a command errors. When instructed to it will be automatically
+            called to the upstream if a context fails to run, with the exception of other localized
+            exceptions.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.Commands.CommandException.LocaleResource">
+            <inheritdoc/>
+        </member>
+        <member name="F:Miki.Framework.Commands.CommandException.Command">
+            <summary>
+            Source of the exception.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.ExecutableAdapter.ExecuteAsync(Miki.Framework.IContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.Commands.NodeExtensions.ValidateRequirementsAsync(Miki.Framework.IExecutable,Miki.Framework.IContext)">
+            <summary>
+            Validate if the <see cref="!:context"/> has all the requirements to execute the <see cref="!:executable"/>.
+            </summary>
+            <param name="executable">The executable.</param>
+            <param name="context">The context.</param>
+            <returns>True if the <see cref="!:context"/> has the requirements.</returns>
+        </member>
+        <member name="M:Miki.Framework.Commands.NodeExtensions.ValidateRequirementsAsync(Miki.Framework.Commands.Node,Miki.Framework.IContext)">
+            <summary>
+            Validate if the <see cref="!:context"/> has all the requirements to the <see cref="!:node"/>.
+            </summary>
+            <param name="node">The node.</param>
+            <param name="context">The context.</param>
+            <returns>True if the <see cref="!:context"/> has the requirements.</returns>
+        </member>
+        <member name="M:Miki.Framework.Commands.NodeExtensions.GetAllExecutableAsync(Miki.Framework.Commands.NodeContainer,Miki.Framework.IContext)">
+            <summary>
+            Get all the nodes that extend <see cref="T:Miki.Framework.IExecutable"/> where the <see cref="!:context"/> has access to.
+            </summary>
+            <param name="nodeContainer">The node container.</param>
+            <param name="context">The context.</param>
+            <returns>All the identifiers within the node container.</returns>
+        </member>
+        <member name="F:Miki.Framework.Commands.CommandMetadata.Identifiers">
+            <summary>
+            Aliases for this command.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.Commands.Node">
+            <summary>
+            Represents an internal command node.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Node.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.Commands.NodeContainer.Instance">
+            <summary>
+            Instance object for reflection.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.Commands.Nodes.NodeNestedExecutable">
+            <summary>
+            Executable Node that can contain multiple nodes, while keeping a default executable.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Nodes.NodeNestedExecutable.#ctor(Miki.Framework.Commands.CommandMetadata,System.IServiceProvider,System.Type)">
+            <summary>
+            Creates a new Nested, Executable Node.
+            </summary>
+            <param name="metadata">Command properties.</param>
+            <param name="builder"></param>
+            <param name="t"></param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Nodes.NodeNestedExecutable.#ctor(Miki.Framework.Commands.CommandMetadata,Miki.Framework.Commands.NodeContainer,System.IServiceProvider,System.Type)">
+            <summary>
+            Creates a new Nested, Executable Node.
+            </summary>
+            <param name="metadata">Command properties.</param>
+            <param name="parent"></param>
+            <param name="builder"></param>
+            <param name="t"></param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Nodes.NodeNestedExecutable.SetDefaultExecution(Miki.Framework.Commands.Nodes.CommandDelegate)">
+            <summary>
+            Sets the fallback executable.
+            </summary>
+            <param name="defaultTask"></param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Nodes.NodeNestedExecutable.FindCommand(Miki.Framework.Arguments.IArgumentPack)">
+            <summary>
+            Query a command recursively
+            </summary>
+            <param name="pack">Argument pack to iterate over.</param>
+            <returns>Nullable node</returns>
+        </member>
+        <member name="M:Miki.Framework.Commands.Nodes.NodeNestedExecutable.ExecuteAsync(Miki.Framework.IContext)">
+            <summary>
+            Executes command.
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Miki.Framework.Commands.PipelineRejectException">
+            <summary>
+            Internal Command pipeline exception when a pipeline stage stops the pipeline.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.Commands.Pipelines.IPipelineStage">
+            <summary>
+            Chainable pipeline stage which mutates and moves forward to the next stage.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Pipelines.IPipelineStage.CheckAsync(Miki.Discord.Common.IDiscordMessage,Miki.Framework.IMutableContext,System.Func{System.Threading.Tasks.ValueTask})">
+            <summary>
+            Executes and handles edge cases.
+            </summary>
+            <param name="data"></param>
+            <param name="e"></param>
+            <param name="next"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Miki.Framework.CorePipelineStageExtensions.GetQuery(Miki.Framework.IContext)">
+            <summary>
+            Mutable version of the query.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.CorePipelineStageExtensions.SetQuery(Miki.Framework.IMutableContext,System.String)">
+            <summary>
+            Sets the query.
+            </summary>
+        </member>
+    </members>
+</doc>

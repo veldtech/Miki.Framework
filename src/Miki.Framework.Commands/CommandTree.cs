@@ -1,10 +1,8 @@
-﻿
-using System.Collections.Generic;
-using Miki.Framework.Arguments;
-using Miki.Framework.Commands.Nodes;
-
-namespace Miki.Framework.Commands
+﻿namespace Miki.Framework.Commands
 {
+    using Miki.Framework.Arguments;
+    using Miki.Framework.Commands.Nodes;
+
 	public class CommandTree
 	{
 		public NodeContainer Root { get; }
@@ -18,6 +16,7 @@ namespace Miki.Framework.Commands
 		{
 			return Root.FindCommand(pack);
 		}
+
         public Node GetCommand(string name)
             => GetCommand(new ArgumentPack(name.Split(' ')));
     }

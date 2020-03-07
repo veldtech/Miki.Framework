@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Miki.Framework.Commands.Permissions</name>
+    </assembly>
+    <members>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.DeleteAsync(Miki.Framework.Commands.Permissions.Models.Permission)">
+            <summary>
+            Removes a specified permission from the permission list.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.ExistsAsync(Miki.Framework.Commands.Permissions.Models.Permission)">
+            <summary>
+            Checks if a permission with key types <see cref="P:Miki.Framework.Commands.Permissions.Models.Permission.EntityId"/>,
+            <see cref="P:Miki.Framework.Commands.Permissions.Models.Permission.CommandName"/>, and <see cref="P:Miki.Framework.Commands.Permissions.Models.Permission.GuildId"/> already exists
+            in the database.
+            </summary>
+            <param name="permission"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.GetPermissionAsync(System.Int64,System.String,System.Int64)">
+            <summary>
+            Gets the specified permission if exists.
+            </summary>
+            <param name="entityId">ID of the entity, these can be users, roles, channels, etc.</param>
+            <param name="commandName">Name of the IExecutable you want to apply this permission for.
+            </param>
+            <param name="guildId">Id of the server to apply this permission to.</param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.GetPriorityPermissionAsync(System.Int64,System.String,System.Int64[])">
+            <summary>
+            Gets the top priority permission, can only be of type <see cref="F:Miki.Framework.Commands.Permissions.Models.PermissionStatus.Allow"/>
+            and <see cref="F:Miki.Framework.Commands.Permissions.Models.PermissionStatus.Deny"/>. People with a special Administrator flag get to go
+            through always.
+            </summary>
+            <param name="entityIds">All entity Ids whitelisted for this permission check.</param>
+            <param name="commandName">Name of the IExecutable you want to apply this permission for.
+            </param>
+            <param name="guildId">Id of the server to apply this permission to.</param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.GetPriorityPermissionAsync(Miki.Framework.IContext)">
+            <summary>
+            Gets the top priority permission, can only be of type <see cref="F:Miki.Framework.Commands.Permissions.Models.PermissionStatus.Allow"/>
+            and <see cref="F:Miki.Framework.Commands.Permissions.Models.PermissionStatus.Deny"/>. People with a special Administrator flag get to go
+            through always.
+            </summary>
+            <param name="context">The current command pipeline context.</param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.ListPermissionsAsync(System.Int64)">
+            <summary>
+            Lists all permissions set for a single guild.
+            </summary>
+            <param name="guildId">Guild that you want to see all permissions of.</param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.ListPermissionsAsync(System.Int64,System.Int64[])">
+            <summary>
+            A guild-based permission list with additional specification filter to it. 
+            </summary>
+            <param name="guildId">Guild that you want to see all permissions of.</param>
+            <param name="entityFilter">All entity Ids whitelisted for this permission check.</param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.ListPermissionsAsync(System.Int64,System.String,System.Int64[])">
+            <summary>
+            A more specific version to list all permissions. Can be used to specify to which entities
+            you would like to see permissions of.
+            </summary>
+            <param name="guildId">Guild that you want to see all permissions of.</param>
+            <param name="commandName">Name of the IExecutable you want to apply this permission for.
+            </param>
+            <param name="entityFilter">All entity Ids whitelisted for this permission check.</param>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.IPermissionService.SetPermissionAsync(Miki.Framework.Commands.Permissions.Models.Permission)">
+            <summary>
+            Sets or Creates a new permission.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.Commands.Permissions.PermissionPipelineStage">
+            <summary>
+            Pipeline stage for Miki's Command Pipeline system, checks if the permissions are valid for this
+            executable.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.Commands.Permissions.PermissionService">
+            <summary>
+            Service that handles permissions, used as a basic ACL permission system.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.#ctor(Miki.Framework.IUnitOfWork)">
+            <summary>
+            Initializes the permission service, use a scoped IUnitOfWork.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.DeleteAsync(Miki.Framework.Commands.Permissions.Models.Permission)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.ExistsAsync(Miki.Framework.Commands.Permissions.Models.Permission)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.GetPermissionAsync(System.Int64,System.String,System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.GetPriorityPermissionAsync(System.Int64,System.String,System.Int64[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.GetPriorityPermissionAsync(Miki.Framework.IContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.ListPermissionsAsync(System.Int64)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.ListPermissionsAsync(System.Int64,System.String,System.Int64[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.ListPermissionsAsync(System.Int64,System.Int64[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionService.SetPermissionAsync(Miki.Framework.Commands.Permissions.Models.Permission)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Miki.Framework.Commands.PermissionExtensions">
+            <summary>
+            Helper functions for the PermissionPipelineStage.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.PermissionExtensions.UsePermissions(Miki.Framework.Commands.CommandPipelineBuilder)">
+             <summary>
+             Initializes the permissions system at this index on your CommandPipeline. Permissions will
+             give users a way to manage their entire command infrastructure in a ACL kind of manner.
+            
+             This stage requires you to already have set an Executable to work properly.
+             </summary>
+        </member>
+    </members>
+</doc>

@@ -9,6 +9,10 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Message reference to use while a message is being queued to 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IMessageReference<T>
         where T : class
 	{
@@ -48,6 +52,9 @@
 		private static readonly ConcurrentQueue<IMessageReference<IDiscordMessage>> QueuedMessages 
             = new ConcurrentQueue<IMessageReference<IDiscordMessage>>();
 
+        /// <summary>
+        /// Amount of threads currently queueing messages.
+        /// </summary>
         public int WorkerCount { get; }
 
         /// <summary>

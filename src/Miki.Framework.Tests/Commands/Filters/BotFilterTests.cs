@@ -11,7 +11,7 @@
         private readonly BotFilter filter = new BotFilter();
 
         [Fact]
-        public async Task IsBotTest()
+        public async Task IsBotTestAsync()
         {
             var context = NewContext(true);
 
@@ -21,7 +21,7 @@
         }
 
         [Fact]
-        public async Task IsNotBotTest()
+        public async Task IsNotBotTestAsync()
         {
             var context = NewContext(false);
 

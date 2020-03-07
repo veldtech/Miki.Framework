@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace Miki.Framework.Commands.Nodes
+﻿namespace Miki.Framework.Commands
 {
-	public class NodeModule : NodeContainer
+    using System;
+
+    public class NodeModule : NodeContainer
 	{
 		public NodeModule(string id, IServiceProvider provider, Type t)
 			: this(id, null, provider, t)

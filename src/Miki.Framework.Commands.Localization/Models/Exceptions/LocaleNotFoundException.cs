@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Miki.Framework.Commands.Localization.Models.Exceptions
+﻿namespace Miki.Framework.Commands.Localization.Models.Exceptions
 {
+    using System;
+
     public class LocaleNotFoundException : Exception
     {
         public string Iso3 { get; }

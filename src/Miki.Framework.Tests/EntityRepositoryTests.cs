@@ -1,9 +1,7 @@
 ﻿namespace Miki.Framework.Tests
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Xunit;
@@ -25,7 +23,7 @@
         }
 
         [Fact]
-        public async Task AddAndUpdateTest()
+        public async Task AddAndUpdateTestAsync()
         {
             var newItem = new Model
             {
@@ -70,8 +68,11 @@
 
         protected override void OnModelCreating([NotNull] ModelBuilder builder)
         {
-            builder.Entity<Model>()
-                .HasKey(x => x.Key);
+            if(builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+            builder.Entity<Model>().HasKey(x => x.Key);
         }
     }
 }

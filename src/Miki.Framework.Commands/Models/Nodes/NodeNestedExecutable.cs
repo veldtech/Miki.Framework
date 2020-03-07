@@ -1,22 +1,39 @@
-﻿using Miki.Framework.Arguments;
-using Miki.Logging;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Nodes
+﻿namespace Miki.Framework.Commands.Nodes
 {
+    using Miki.Framework.Arguments;
+    using Miki.Logging;
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    /// <summary>
+	/// Executable Node that can contain multiple nodes, while keeping a default executable.
+	/// </summary>
 	public class NodeNestedExecutable : NodeContainer, IExecutable
 	{
-		private CommandDelegate _runAsync;
+		private CommandDelegate runAsync;
 
-		public NodeNestedExecutable(
+        /// <summary>
+		/// Creates a new Nested, Executable Node.
+		/// </summary>
+		/// <param name="metadata">Command properties.</param>
+		/// <param name="builder"></param>
+		/// <param name="t"></param>
+        public NodeNestedExecutable(
 			CommandMetadata metadata,
 			IServiceProvider builder,
 			Type t)
 			: this(metadata, null, builder, t)
 		{
 		}
+
+		/// <summary>
+		/// Creates a new Nested, Executable Node.
+		/// </summary>
+		/// <param name="metadata">Command properties.</param>
+		/// <param name="parent"></param>
+		/// <param name="builder"></param>
+		/// <param name="t"></param>
 		public NodeNestedExecutable(
 			CommandMetadata metadata,
 			NodeContainer parent,
@@ -26,52 +43,68 @@ namespace Miki.Framework.Commands.Nodes
 		{
 		}
 
+		/// <summary>
+		/// Sets the fallback executable.
+		/// </summary>
+		/// <param name="defaultTask"></param>
 		public void SetDefaultExecution(CommandDelegate defaultTask)
 		{
-			_runAsync = defaultTask;
+			runAsync = defaultTask;
 		}
 
+		/// <summary>
+		/// Query a command recursively
+		/// </summary>
+		/// <param name="pack">Argument pack to iterate over.</param>
+		/// <returns>Nullable node</returns>
 		public override Node FindCommand(IArgumentPack pack)
 		{
-			var arg = pack.Peek()
+			var arg = pack.Peek().Unwrap()
 				.ToLowerInvariant();
 
-			if(Metadata.Identifiers != null
-				&& Metadata.Identifiers.Count() > 0)
-			{
-				if(Metadata.Identifiers.Any(x => x == arg))
-				{
-					pack.Take();
-					var cmd = base.FindCommand(pack);
-					if(cmd != null)
-					{
-						return cmd;
-					}
-					return this;
-				}
-			}
-			return null;
-		}
+            if(Metadata.Identifiers == null || !Metadata.Identifiers.Any())
+            {
+                return null;
+            }
 
+            if(Metadata.Identifiers.All(x => x != arg))
+            {
+                return null;
+            }
+
+            pack.Take();
+            var cmd = base.FindCommand(pack);
+            if(cmd != null)
+            {
+                return cmd;
+            }
+            return this;
+        }
+
+		/// <summary>
+		/// Executes command.
+		/// </summary>
+		/// <param name="context"></param>
+		/// <returns></returns>
 		public async ValueTask ExecuteAsync(IContext context)
 		{
-			foreach(var v in Attributes
-				.OfType<ICommandRequirement>())
+			foreach(var v in Attributes.OfType<ICommandRequirement>())
 			{
-				if(!await v.CheckAsync(context))
-				{
-					await v.OnCheckFail(context);
-					return;
-				}
-			}
+                if(await v.CheckAsync(context))
+                {
+                    continue;
+                }
+                await v.OnCheckFail(context);
+                return;
+            }
 
-			if(_runAsync == null)
+			if(runAsync == null)
 			{
 				Log.Warning("Default executable not found; omitting request.");
 				return;
 			}
 
-			await _runAsync(context);
+			await runAsync(context);
 		}
 	}
 }

@@ -1,11 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Miki.Framework.Commands
+﻿namespace Miki.Framework.Commands
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    
     internal static class CommandTreeHelpers
     {
         internal static object CreateInstance(Type type, IServiceProvider app)

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Miki.Framework
+﻿namespace Miki.Framework
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     public class ProviderCollection : IEnumerable<IProvider>, IProvider
     {
         /// <inheritdoc/>

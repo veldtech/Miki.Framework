@@ -1,10 +1,6 @@
-﻿using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Filters
+﻿namespace Miki.Framework.Commands.Filters
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
+    using System.Threading.Tasks;
 
     public interface IFilter
     {

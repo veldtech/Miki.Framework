@@ -7,6 +7,10 @@
     using Cache;
     using Patterns.Repositories;
 
+    /// <summary>
+    /// Cached decorator pattern to automatically cache a fetched repository entity.
+    /// </summary>
+    /// <typeparam name="T">Entity Type</typeparam>
     public class CachedRepository<T> : IAsyncRepository<T>
         where T : class
     {
@@ -14,6 +18,12 @@
         private readonly ICacheClient cache;
         private readonly Config config;
 
+        /// <summary>
+        /// Cached decorator pattern to automatically cache a fetched repository entity.
+        /// </summary>
+        /// <param name="innerRepository">Actual data source.</param>
+        /// <param name="cache">Cache client instance.</param>
+        /// <param name="config">Configuration for this decorator.</param>
         public CachedRepository(
             IAsyncRepository<T> innerRepository,
             ICacheClient cache,

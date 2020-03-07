@@ -1,8 +1,4 @@
-﻿namespace Miki.Framework.Commands.Prefixes
-{
-}
-
-namespace Miki.Framework.Commands
+﻿namespace Miki.Framework.Commands
 {
     using Miki.Framework.Commands.Prefixes;
     using Microsoft.Extensions.DependencyInjection;

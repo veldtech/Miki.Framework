@@ -19,7 +19,9 @@
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
 	public class CommandAttribute : Attribute
 	{
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'CommandAttribute.Aliases'
 		public IReadOnlyCollection<string> Aliases { get; }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'CommandAttribute.Aliases'
 
 		/// <summary>
 		/// Used as a default execution for child commands. Should not be used inside of modules.

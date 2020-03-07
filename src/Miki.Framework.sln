@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.Loc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.Prefixes", "Miki.Framework.Commands.Prefixes\Miki.Framework.Commands.Prefixes.csproj", "{D4BE949C-FE0B-49CF-B2E7-BFE9700E91B4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Services", "Miki.Framework.Services\Miki.Framework.Services.csproj", "{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.States", "Miki.Framework.Commands.States\Miki.Framework.Commands.States.csproj", "{B18A54C6-39EA-4F14-B7EB-83563DC92EA5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.Scopes", "Miki.Framework.Commands.Scopes\Miki.Framework.Commands.Scopes.csproj", "{7921A92B-9F78-4E1E-A71C-1D38157ADEC6}"
@@ -99,14 +97,6 @@ Global
 		{D4BE949C-FE0B-49CF-B2E7-BFE9700E91B4}.Prod|Any CPU.Build.0 = Debug|Any CPU
 		{D4BE949C-FE0B-49CF-B2E7-BFE9700E91B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4BE949C-FE0B-49CF-B2E7-BFE9700E91B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Debug Production|Any CPU.ActiveCfg = Debug|Any CPU
-		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Debug Production|Any CPU.Build.0 = Debug|Any CPU
-		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Prod|Any CPU.ActiveCfg = Debug|Any CPU
-		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Prod|Any CPU.Build.0 = Debug|Any CPU
-		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ABB192CD-B1A6-4D76-B476-4CF3AA2C87B8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B18A54C6-39EA-4F14-B7EB-83563DC92EA5}.Debug Production|Any CPU.ActiveCfg = Debug|Any CPU
 		{B18A54C6-39EA-4F14-B7EB-83563DC92EA5}.Debug Production|Any CPU.Build.0 = Debug|Any CPU
 		{B18A54C6-39EA-4F14-B7EB-83563DC92EA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

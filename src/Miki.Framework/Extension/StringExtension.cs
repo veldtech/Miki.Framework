@@ -34,27 +34,16 @@
                 return default;
             }
 
-            switch(timeNotifier.ToString())
+            return (timeNotifier.ToString()) switch
             {
-                case "y":
-                    return TimeSpan.FromDays(365 * result);
-
-                case "w":
-                    return TimeSpan.FromDays(7 * result);
-
-                case "d":
-                    return TimeSpan.FromDays(result);
-
-                case "h":
-                    return TimeSpan.FromHours(result);
-
-                case "m":
-                    return TimeSpan.FromMinutes(result);
-
-                case "s":
-                    return TimeSpan.FromSeconds(result);
-            }
-            return default;
-		}
+                "y" => TimeSpan.FromDays(365 * result),
+                "w" => TimeSpan.FromDays(7 * result),
+                "d" => TimeSpan.FromDays(result),
+                "h" => TimeSpan.FromHours(result),
+                "m" => TimeSpan.FromMinutes(result),
+                "s" => TimeSpan.FromSeconds(result),
+                _ => default,
+            };
+        }
 	}
 }

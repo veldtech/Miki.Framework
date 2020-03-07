@@ -8,11 +8,17 @@
     using Miki.Framework.Commands.Pipelines;
     using Miki.Logging;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'CommandPipeline'
     public class CommandPipeline : IAsyncEventingExecutor<IDiscordMessage>
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'CommandPipeline'
     {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'CommandPipeline.PipelineStages'
         public IReadOnlyList<IPipelineStage> PipelineStages { get; }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'CommandPipeline.PipelineStages'
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'CommandPipeline.OnExecuted'
         public Func<IExecutionResult<IDiscordMessage>, ValueTask> OnExecuted { get; set; }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'CommandPipeline.OnExecuted'
 
         private readonly IServiceProvider services;
 
@@ -25,7 +31,9 @@
         }
 
         // TODO (velddev): Move IDiscordMessage to abstraction for a library-free solution.
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'CommandPipeline.ExecuteAsync(IDiscordMessage)'
         public async ValueTask ExecuteAsync(IDiscordMessage data)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'CommandPipeline.ExecuteAsync(IDiscordMessage)'
         {
             var sw = Stopwatch.StartNew();
             using ContextObject contextObj = new ContextObject(services);

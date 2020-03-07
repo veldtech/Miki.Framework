@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace Miki.Framework.Arguments
+﻿namespace Miki.Framework.Arguments
 {
-	public class ArgumentParseProvider
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
+    public class ArgumentParseProvider
     {
 		private static readonly List<IArgumentParser> parsers = new List<IArgumentParser>();
 

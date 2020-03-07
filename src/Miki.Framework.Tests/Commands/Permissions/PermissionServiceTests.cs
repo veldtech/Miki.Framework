@@ -60,7 +60,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         }
 
         [Fact]
-        public async Task ListPermissionsTest()
+        public async Task ListPermissionsTestAsync()
         {
             await using var unit = NewContext();
             var service = new PermissionService(unit);
@@ -70,7 +70,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         }
 
         [Fact]
-        public async Task GetPriorityPermissionTest()
+        public async Task GetPriorityPermissionTestAsync()
         {
             await using var unit = NewContext();
             var service = new PermissionService(unit);
@@ -113,7 +113,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         }
 
         [Fact]
-        public async Task SetPermissionTest()
+        public async Task SetPermissionTestAsync()
         {
             long entityId = new Random().Next(int.MaxValue);
             var expectedPermission = new Permission
@@ -148,7 +148,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         }
 
         [Fact]
-        public async Task UpdatePermissionTest()
+        public async Task UpdatePermissionTestAsync()
         {
             var expectedPermission = new Permission
             {
@@ -183,7 +183,7 @@ namespace Miki.Framework.Tests.Commands.Permissions
         }
 
         [Fact]
-        public async Task DeletePermissionTest()
+        public async Task DeletePermissionTestAsync()
         {
             await using(var context = NewContext())
             {

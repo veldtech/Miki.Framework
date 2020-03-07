@@ -1,15 +1,20 @@
 ﻿namespace Miki.Framework
 {
-    using System;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using Patterns.Repositories;
 
+    /// <summary>
+    /// Default unit of work pattern, uses Entity Framework by default.
+    /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DbContext context;
 
+        /// <summary>
+        /// Default unit of work pattern, uses Entity Framework by default.
+        /// </summary>
         public UnitOfWork(DbContext context)
         {
             this.context = context;

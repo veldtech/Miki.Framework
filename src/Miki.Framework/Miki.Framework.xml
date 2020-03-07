@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Miki.Framework</name>
+    </assembly>
+    <members>
+        <member name="T:Miki.Common.Builders.MessageFormatting">
+            <summary>
+            Message format style.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.CachedRepository`1">
+            <summary>
+            Cached decorator pattern to automatically cache a fetched repository entity.
+            </summary>
+            <typeparam name="T">Entity Type</typeparam>
+        </member>
+        <member name="M:Miki.Framework.CachedRepository`1.#ctor(Miki.Patterns.Repositories.IAsyncRepository{`0},Miki.Cache.ICacheClient,Miki.Framework.CachedRepository{`0}.Config)">
+            <summary>
+            Cached decorator pattern to automatically cache a fetched repository entity.
+            </summary>
+            <param name="innerRepository">Actual data source.</param>
+            <param name="cache">Cache client instance.</param>
+            <param name="config">Configuration for this decorator.</param>
+        </member>
+        <member name="M:Miki.Framework.CachedRepository`1.GetAsync(System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.CachedRepository`1.ListAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.CachedRepository`1.AddAsync(`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.CachedRepository`1.EditAsync(`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.CachedRepository`1.DeleteAsync(`0)">
+            <inheritdoc />
+        </member>
+        <member name="P:Miki.Framework.CachedRepository`1.Config.KeySelector">
+            <summary>
+            Should align with your "get" parameters.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.CachedRepository`1.Config.Namespace">
+            <summary>
+            Overrides the keyspace root
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.CachedRepository`1.Config.Lifetime">
+            <summary>
+            Time-To-Live for cache objects.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.IContext">
+            <summary>
+            Session context for a single command. Keeps data and services for this specific session.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IContext.Executable">
+            <summary>
+            The command executed in this current session.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IContext.Services">
+            <summary>
+            Services built in <see cref="T:Miki.Framework.MikiApp"/>
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.IContext.GetContext(System.String)">
+            <summary>
+            Context objects are used for specific session-only objects that are added through pipeline
+            objects.
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Miki.Framework.IContext.GetService(System.Type)">
+            <summary>
+            Used to retrieve services built in <see cref="T:Miki.Framework.MikiApp"/>
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.ContextObject">
+            <inheritdoc cref="T:Miki.Framework.IMutableContext" />
+        </member>
+        <member name="M:Miki.Framework.ContextObject.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.ContextObject.GetContext(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.ContextObject.GetService(System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.ContextObject.SetContext(System.String,System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.ContextObject.SetExecutable(Miki.Framework.IExecutable)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Miki.Framework.TestContextObject">
+            <summary>
+            Context object usable for testing. Avoids having to mock a lot of context related fetching.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.TestContextObject.Executable">
+            <inheritdoc />
+        </member>
+        <member name="P:Miki.Framework.TestContextObject.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.GetContext(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.GetService(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.SetExecutable(Miki.Framework.IExecutable)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.SetService(System.Type,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.SetContext(System.String,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="T:Miki.Framework.Exceptions.ChannelNotNsfwException">
+            <summary>
+            An exception that gets thrown whenever a NSFW-only decorated command node gets used in a
+            non-NSFW entity.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.IAsyncController`2">
+            <summary>
+            Default controller pipeline object. Expects a valid request and and will give back a valid
+            response if no exceptions are thrown. Used to abstractify entities.
+            </summary>
+            <typeparam name="TRequest">Required request object that the controller requires to handle its
+            request properly.</typeparam>
+            <typeparam name="TResponse">Response object that handles </typeparam>
+        </member>
+        <member name="T:Miki.Framework.IMutableContext">
+            <inheritdoc/>
+        </member>
+        <member name="T:Miki.Framework.IProvider">
+            <summary>
+            Can be used to have services with an active connection turn on and off.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IProvider.IsActive">
+            <summary>
+            Whether the current service has its internal threads collecting for
+            additional events.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.IProvider.StartAsync">
+            <summary>
+            Enabled the aggregation of events.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.IProvider.StopAsync">
+            <summary>
+            Disables the aggregation of events.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.ProviderCollection.IsActive">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.IUnitOfWork.GetRepository``1(Miki.Framework.IRepositoryFactory{``0})">
+            <summary>
+            Gets the repository for a type. Will by default create an <see cref="T:Miki.Framework.EntityRepository`1"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="factory"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Miki.Framework.IUnitOfWork.CommitAsync">
+            <summary>
+            Commits and flushes your work to the datasource.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.IMessageReference`1">
+            <summary>
+            Message reference to use while a message is being queued to 
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:Miki.Framework.MessageWorker.WorkerCount">
+            <summary>
+            Amount of threads currently queueing messages.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.MessageWorker.#ctor(System.Nullable{System.Int32})">
+            <summary>
+            Initiates a message worker
+            </summary>
+            <param name="workerCount">amount of workers to be initialized, if none are given the default value is PROCESSOR_COUNT * 2</param>
+        </member>
+        <member name="M:Miki.Framework.MessageWorker.CreateRef(Miki.Framework.MessageBucketArgs)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.MessageWorker.Execute(Miki.Framework.IMessageReference{Miki.Discord.Common.IDiscordMessage})">
+            <inheritdoc />
+        </member>
+        <member name="P:Miki.Framework.ProviderAdapter.IsActive">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.ProviderAdapter.StartAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.ProviderAdapter.StopAsync">
+            <inheritdoc/>
+        </member>
+        <member name="T:Miki.Framework.UnitOfWork">
+            <summary>
+            Default unit of work pattern, uses Entity Framework by default.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.UnitOfWork.#ctor(Microsoft.EntityFrameworkCore.DbContext)">
+            <summary>
+            Default unit of work pattern, uses Entity Framework by default.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.UnitOfWork.GetRepository``1(Miki.Framework.IRepositoryFactory{``0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.UnitOfWork.CommitAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.UnitOfWork.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.UnitOfWork.DisposeAsync">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

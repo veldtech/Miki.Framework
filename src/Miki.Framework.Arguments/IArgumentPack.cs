@@ -1,6 +1,8 @@
 ﻿namespace Miki.Framework.Arguments
 {
-	public interface IArgumentPack
+    using Miki.Functional;
+
+    public interface IArgumentPack
 	{
 		/// <summary>
 		/// Check whether you're allowed to take at the moment.
@@ -15,7 +17,7 @@
 		/// Returns the string without consuming the argument.
 		/// </summary>
 		/// <returns>current first argument</returns>
-		string Peek();
+        Optional<string> Peek();
 
 		void SetCursor(int value);
 

@@ -41,7 +41,7 @@
         }
 
         [Fact]
-        public async Task PrefixTriggerDoesTrigger()
+        public async Task PrefixTriggerDoesTriggerAsync()
         {
             var trigger = new PrefixTrigger("test.");
             var mock = new Mock<IContext>();
@@ -55,7 +55,7 @@
         }
 
         [Fact]
-        public async Task MentionTriggerDoesTrigger()
+        public async Task MentionTriggerDoesTriggerAsync()
         {
             var mention = "<@12065984510520>";
             var trigger = new MentionTrigger();
@@ -79,7 +79,7 @@
 
 
         [Fact]
-        public async Task AcceptDefaultCommandFromDynamicPrefix()
+        public async Task AcceptDefaultCommandFromDynamicPrefixAsync()
         {
             var trigger = new DynamicPrefixTrigger("test.");
             var mockContext = new TestContextObject();
@@ -101,7 +101,7 @@
 
 
         [Fact]
-        public async Task AcceptModifiedCommandFromDynamicPrefix()
+        public async Task AcceptModifiedCommandFromDynamicPrefixAsync()
         {
             var trigger = new DynamicPrefixTrigger("test.");
             var mockContext = new Mock<IContext>();
@@ -130,6 +130,11 @@
 
         protected override void OnModelCreating([NotNull] ModelBuilder builder)
         {
+            if(builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
             base.OnModelCreating(builder);
 
             builder.Entity<Prefix>()

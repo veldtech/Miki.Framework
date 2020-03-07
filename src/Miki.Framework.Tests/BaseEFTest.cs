@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Miki.Framework.Commands.Permissions.Models;
-
-namespace Miki.Framework.Tests
+﻿namespace Miki.Framework.Tests
 {
+    using Microsoft.Data.Sqlite;
+    using Microsoft.EntityFrameworkCore;
     using System.Diagnostics.CodeAnalysis;
 
     /// <summary>

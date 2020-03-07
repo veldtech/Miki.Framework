@@ -14,23 +14,21 @@
 		public bool CanParse(IArgumentPack pack, Type targetType)
 			=> true;
 
-		public object Parse(IArgumentPack pack, Type targetType)
-		{
-			var arg = pack.Peek();
-			if(arg.StartsWithAny("\"", "“", "”"))
-			{
-				List<string> allItems = new List<string>();
-				do
-				{
-					allItems.Add(pack.Take());
-				} while(!allItems[^1].EndsWithAny("\"", "“", "”"));
-				return string.Join(" ", allItems).TrimStart('"', '“', '”').TrimEnd('"', '“', '”');
-			}
-			else
-			{
-				return pack.Take();
-			}
-		}
-	}
+        public object Parse(IArgumentPack pack, Type targetType)
+        {
+            var arg = pack.Peek().Unwrap();
+            if(!arg.StartsWithAny("\"", "“", "”"))
+            {
+                return pack.Take();
+            }
 
+            var allItems = new List<string>();
+            do
+            {
+                allItems.Add(pack.Take());
+            } while(!allItems[^1].EndsWithAny("\"", "“", "”"));
+
+            return string.Join(" ", allItems).TrimStart('"', '“', '”').TrimEnd('"', '“', '”');
+        }
+    }
 }

@@ -51,7 +51,7 @@
         [Theory]
         [InlineData(ValidId, true)]
         [InlineData(1L, false)]
-        public async Task RunPipelineTest(ulong id, bool success)
+        public async Task RunPipelineTestAsync(ulong id, bool success)
         {
             using var @lock = new Semaphore(0, 1);
 

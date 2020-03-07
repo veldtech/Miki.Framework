@@ -19,7 +19,9 @@
 		/// </summary>
 		public readonly Node Command;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'CommandException.CommandException(Node)'
 		public CommandException(Node e)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'CommandException.CommandException(Node)'
 		{
 			Command = e;
 		}

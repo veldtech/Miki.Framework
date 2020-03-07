@@ -1,14 +1,13 @@
-﻿using Miki.Framework.Commands.Nodes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Miki.Framework.Commands
+﻿namespace Miki.Framework.Commands
 {
-	public class CommandTreeBuilder
+    using Miki.Framework.Commands.Nodes;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks;
+    
+    public class CommandTreeBuilder
 	{
         [Obsolete("use 'CommandTreeBuilder::AddCommandBuildStep()' intead")]
 		public event Action<NodeContainer, IServiceProvider> OnContainerLoaded;

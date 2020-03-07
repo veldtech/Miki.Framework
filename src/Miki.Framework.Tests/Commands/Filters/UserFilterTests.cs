@@ -22,7 +22,7 @@
         [Theory]
         [InlineData(BannedUser, false)]
         [InlineData(ValidUser, true)]
-        public async Task UserIsAllowedTest(long userId, bool allowed)
+        public async Task UserIsAllowedTestAsync(long userId, bool allowed)
         {
             var isAllowed = await userFilter.CheckAsync(NewContext(userId));
             Assert.Equal(allowed, isAllowed);

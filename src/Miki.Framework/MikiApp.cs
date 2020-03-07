@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Miki.Discord.Common;
-
-namespace Miki.Framework
+﻿namespace Miki.Framework
 {
+    using System.Threading.Tasks;
+    using Miki.Discord.Common;
     using Microsoft.Extensions.DependencyInjection;
     using System;
     using Logging;

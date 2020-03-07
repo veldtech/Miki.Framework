@@ -28,7 +28,7 @@
         }
 
         [Fact]
-        public async Task GetValidLocaleTest()
+        public async Task GetValidLocaleTestAsync()
         {
             await using var context = NewContext();
             var service = CreateService(context);
@@ -40,7 +40,7 @@
         }
 
         [Fact]
-        public async Task GetDefaultLocaleTest()
+        public async Task GetDefaultLocaleTestAsync()
         {
             await using var context = NewContext();
             var service = CreateService(context);
@@ -52,7 +52,7 @@
         }
 
         [Fact]
-        public async Task GetInvalidLocaleTest()
+        public async Task GetInvalidLocaleTestAsync()
         {
             await using var context = NewContext();
 
@@ -68,7 +68,7 @@
         }
 
         [Fact]
-        public async Task ListLocalesTest()
+        public async Task ListLocalesTestAsync()
         {
             await using var context = NewContext();
             var service = CreateService(context);
@@ -85,7 +85,7 @@
         }
 
         [Fact]
-        public async Task SetLocaleTest()
+        public async Task SetLocaleTestAsync()
         {
             await using (var context = NewContext())
             {

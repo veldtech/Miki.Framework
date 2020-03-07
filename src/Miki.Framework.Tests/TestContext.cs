@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-
-namespace Miki.Framework.Tests
+﻿namespace Miki.Framework.Tests
 {
+    using System;
+    using Microsoft.EntityFrameworkCore;
+
     /// <inheritdoc />
     public class TestContext<T> : DbContext
         where T : class

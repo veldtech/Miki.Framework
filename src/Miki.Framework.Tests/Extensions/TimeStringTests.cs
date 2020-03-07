@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Miki.Framework.Tests.Extensions
+﻿namespace Miki.Framework.Tests.Extensions
 {
+    using System;
     using Xunit;
 
     public class TimeStringTests

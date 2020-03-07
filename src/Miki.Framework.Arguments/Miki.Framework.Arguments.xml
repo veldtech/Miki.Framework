@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Miki.Framework.Arguments</name>
+    </assembly>
+    <members>
+        <member name="P:Miki.Framework.Arguments.IArgumentPack.CanTake">
+            <summary>
+            Check whether you're allowed to take at the moment.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Arguments.IArgumentPack.Peek">
+            <summary>
+            Returns the string without consuming the argument.
+            </summary>
+            <returns>current first argument</returns>
+        </member>
+        <member name="M:Miki.Framework.Arguments.IArgumentPack.Take">
+            <summary>
+            Returns and consumes the argument.
+            </summary>
+            <returns>current first argument</returns>
+        </member>
+        <member name="P:Miki.Framework.Arguments.ITypedArgumentPack.CanTake">
+            <summary>
+            Check whether you're allowed to take at the moment.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Arguments.ITypedArgumentPack.Peek``1(``0@)">
+            <summary>
+            Returns the string without consuming the argument.
+            </summary>
+            <returns>current first argument</returns>
+        </member>
+        <member name="M:Miki.Framework.Arguments.ITypedArgumentPack.Take``1(``0@)">
+            <summary>
+            Returns and consumes the argument.
+            </summary>
+            <returns>current first argument</returns>
+        </member>
+        <member name="P:Miki.Framework.Arguments.Parsers.EnumArgumentParser.OutputType">
+            <inheritdoc />
+        </member>
+        <member name="P:Miki.Framework.Arguments.Parsers.EnumArgumentParser.Priority">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.Arguments.Parsers.EnumArgumentParser.CanParse(Miki.Framework.Arguments.IArgumentPack,System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.Arguments.Parsers.EnumArgumentParser.Parse(Miki.Framework.Arguments.IArgumentPack,System.Type)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

@@ -24,7 +24,6 @@
             return QueueAsync(
                 embed,
                 context.GetService<IMessageWorker<IDiscordMessage>>(),
-                context.GetService<IDiscordClient>(),
                 channel,
                 content,
                 modifier);
@@ -33,7 +32,6 @@
         public static Task QueueAsync(
             this DiscordEmbed embed,
             IMessageWorker<IDiscordMessage> worker,
-            IDiscordClient client,
             IDiscordTextChannel channel,
             string content = "",
             Func<IMessageReference<IDiscordMessage>, IMessageReference<IDiscordMessage>> modifier = null)

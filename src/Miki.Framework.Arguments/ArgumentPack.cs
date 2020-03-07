@@ -3,7 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    
+    using Miki.Functional;
+
     public class ArgumentPack : IArgumentPack
 	{
 		private readonly IReadOnlyList<string> arguments;
@@ -23,10 +24,17 @@
 			this.arguments = arguments.ToList();
 		}
 
-		public string Peek()
+		public Optional<string> Peek()
 		{
-			return Get(Cursor);
-		}
+            try
+            {
+                return Get(Cursor);
+            }
+            catch
+            {
+                return Optional<string>.None;
+            }
+        }
 
 		public string Take()
 		{
@@ -35,7 +43,7 @@
 			return g;
 		}
 
-		private string Get(int index)
+		private Optional<string> Get(int index)
 		{
 			if(!CanTake)
 			{

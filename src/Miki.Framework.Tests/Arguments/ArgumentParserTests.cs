@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Miki.Framework.Tests.Arguments
+﻿namespace Miki.Framework.Tests.Arguments
 {
+    using System;
     using Miki.Framework.Arguments;
     using Miki.Framework.Arguments.Parsers;
     using Xunit;

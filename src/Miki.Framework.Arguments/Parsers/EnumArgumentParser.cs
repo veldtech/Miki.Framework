@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Miki.Framework.Arguments.Parsers
+﻿namespace Miki.Framework.Arguments.Parsers
 {
+    using System;
+
     public class EnumArgumentParser : IArgumentParser
     {
         /// <inheritdoc />

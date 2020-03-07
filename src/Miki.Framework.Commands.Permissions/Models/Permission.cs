@@ -1,9 +1,9 @@
-﻿﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Miki.Framework.Commands.Permissions.Models
+﻿namespace Miki.Framework.Commands.Permissions.Models
 {
-	public enum EntityType
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+	
+    public enum EntityType
 	{
 		User,
 		Channel,

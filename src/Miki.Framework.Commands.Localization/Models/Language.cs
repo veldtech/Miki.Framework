@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Miki.Framework.Commands.Localization.Models
+﻿namespace Miki.Framework.Commands.Localization.Models
 {
-	[Table("ChannelLanguage")]
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+
+    [Table("ChannelLanguage")]
 	public class ChannelLanguage
 	{
 		[Key]

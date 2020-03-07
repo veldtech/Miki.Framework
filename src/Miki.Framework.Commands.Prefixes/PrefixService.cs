@@ -1,8 +1,6 @@
-﻿using System.Linq;
-using Miki.Framework.Commands.Prefixes.Triggers;
-
-namespace Miki.Framework.Commands.Prefixes
+﻿namespace Miki.Framework.Commands.Prefixes
 {
+    using Miki.Framework.Commands.Prefixes.Triggers;
     using System.Threading.Tasks;
 
     public class PrefixService : IPrefixService

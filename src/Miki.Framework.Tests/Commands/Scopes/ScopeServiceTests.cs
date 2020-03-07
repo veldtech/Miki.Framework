@@ -1,7 +1,6 @@
 ﻿namespace Miki.Framework.Tests.Commands.Scopes
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using Framework.Commands.Scopes;
     using Framework.Commands.Scopes.Models;
@@ -26,7 +25,7 @@
         }
 
         [Fact]
-        public async Task AddScopeTest()
+        public async Task AddScopeTestAsync()
         {
             const long newId = 1L;
             const string newScope = "scope.new";
@@ -45,7 +44,7 @@
             await using (var context = NewContext())
             {
                 var service = new ScopeService(context);
-                var result = await service.HasScopeAsync(newId, newScope);
+                var result = await service.HasScopeAsync(newId, new [] {newScope});
                 Assert.True(result);
             }
         }
@@ -53,12 +52,12 @@
         [Theory]
         [InlineData(ValidId, ValidScope, true)]
         [InlineData(0L, "invalid.scope", false)]
-        public async Task HasScopeTest(long id, string scope, bool expected)
+        public async Task HasScopeTestAsync(long id, string scope, bool expected)
         {
             await using var context = NewContext();
             var service = new ScopeService(context);
 
-            bool hasScope = await service.HasScopeAsync(id, scope);
+            bool hasScope = await service.HasScopeAsync(id, new [] {scope});
 
             Assert.Equal(expected, hasScope);
         }

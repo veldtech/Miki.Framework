@@ -9,46 +9,62 @@
     using Miki.Framework.Commands.Permissions.Models;
     using Miki.Patterns.Repositories;
 
-    public class PermissionService
+    /// <summary>
+    /// Service that handles permissions, used as a basic ACL permission system.
+    /// </summary>
+    public class PermissionService : IPermissionService
     {
         private readonly IUnitOfWork unit;
         private readonly IAsyncRepository<Permission> repository;
 
+        /// <summary>
+        /// Initializes the permission service, use a scoped IUnitOfWork.
+        /// </summary>
         public PermissionService(IUnitOfWork unit)
         {
             this.unit = unit ?? throw new ArgumentNullException(nameof(unit));
             this.repository = unit.GetRepository<Permission>();
         }
 
-        public ValueTask DeleteAsync(Permission permission)
+        /// <inheritdoc/>
+        public async ValueTask DeleteAsync(Permission permission)
         {
-            return repository.DeleteAsync(permission);
+            await repository.DeleteAsync(permission);
         }
 
+        /// <inheritdoc/>
         public async ValueTask<bool> ExistsAsync(Permission permission)
         {
             var enumerable = await repository.ListAsync();
-            if (enumerable is IQueryable<Permission> queryable)
+            if(enumerable is IQueryable<Permission> queryable)
             {
                 return await queryable.AnyAsync(
-                    x => x.EntityId == permission.EntityId
-                         && x.CommandName == permission.CommandName
-                         && x.GuildId == permission.GuildId)
+                        x => x.EntityId == permission.EntityId
+                             && x.CommandName == permission.CommandName
+                             && x.GuildId == permission.GuildId)
                     .ConfigureAwait(false);
             }
+
             return enumerable.Any(
                 x => x.EntityId == permission.EntityId
                      && x.CommandName == permission.CommandName
                      && x.GuildId == permission.GuildId);
         }
 
+        /// <inheritdoc/>
         public ValueTask<Permission> GetPermissionAsync(
-            long entityId, string commandName, long guildId)
+            long entityId,
+            string commandName,
+            long guildId)
         {
             return repository.GetAsync(entityId, commandName, guildId);
         }
+
+        /// <inheritdoc/>
         public async ValueTask<Permission> GetPriorityPermissionAsync(
-            long guildId, string commandName, long[] entityIds)
+            long guildId,
+            string commandName,
+            long[] entityIds)
         {
             var enumerable = await repository.ListAsync();
             enumerable = enumerable.Where(x => x.CommandName == commandName && x.GuildId == guildId)
@@ -59,12 +75,15 @@
                 return await queryable.FirstOrDefaultAsync(x => x.Status != PermissionStatus.Default)
                     .ConfigureAwait(false);
             }
+
             return enumerable.FirstOrDefault(x => x.Status != PermissionStatus.Default);
         }
+
+        /// <inheritdoc/>
         public async ValueTask<Permission> GetPriorityPermissionAsync(
             IContext context)
         {
-            if (context == null)
+            if(context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
@@ -78,7 +97,7 @@
                     {
                         EntityId = 0,
                         CommandName = context.Executable.ToString(),
-                        GuildId = (long)context.GetGuild().Id,
+                        GuildId = (long) context.GetGuild().Id,
                         Status = PermissionStatus.Allow,
                         Type = EntityType.User
                     };
@@ -88,22 +107,28 @@
             List<long> idList = new List<long>();
             if(context.GetMessage() != null)
             {
-                idList.Add((long)context.GetMessage().Author.Id);
-                idList.Add((long)context.GetMessage().ChannelId);
+                idList.Add((long) context.GetMessage().Author.Id);
+                idList.Add((long) context.GetMessage().ChannelId);
             }
+
             if(context.GetGuild() != null)
             {
-                idList.Add((long)context.GetGuild().Id);
+                idList.Add((long) context.GetGuild().Id);
             }
-            if(context.GetMessage().Author is IDiscordGuildUser user)
+
+            if(context.GetMessage().Author is IDiscordGuildUser user
+               && user.RoleIds != null
+               && user.RoleIds.Any())
             {
-                idList.AddRange(user.RoleIds.Select(x => (long)x));
+                idList.AddRange(user.RoleIds.Select(x => (long) x));
             }
+
             return await GetPriorityPermissionAsync(
-                (long)context.GetGuild().Id, context.Executable.ToString(), idList.ToArray());
+                (long) context.GetGuild().Id, context.Executable.ToString(), idList.ToArray());
         }
 
-        public async ValueTask<List<Permission>> ListPermissionsAsync(long guildId)
+        /// <inheritdoc/>
+        public async ValueTask<IReadOnlyList<Permission>> ListPermissionsAsync(long guildId)
         {
             var enumerable = await repository.ListAsync();
             enumerable = enumerable.Where(x => x.GuildId == guildId);
@@ -112,10 +137,15 @@
                 return await queryable.ToListAsync()
                     .ConfigureAwait(false);
             }
+
             return enumerable.ToList();
         }
-        public async ValueTask<List<Permission>> ListPermissionsAsync(
-            long guildId, string commandName, params long[] entityFilter)
+
+        /// <inheritdoc/>
+        public async ValueTask<IReadOnlyList<Permission>> ListPermissionsAsync(
+            long guildId,
+            string commandName,
+            params long[] entityFilter)
         {
             var enumerable = await repository.ListAsync();
             if(enumerable is IQueryable<Permission> queryable)
@@ -125,24 +155,31 @@
                     .Where(x => x.CommandName == commandName)
                     .ToListAsync().ConfigureAwait(false);
             }
+
             throw new NotSupportedException();
         }
+
+        /// <inheritdoc/>
         public async ValueTask<List<Permission>> ListPermissionsAsync(
-    long guildId, params long[] entityFilter)
+            long guildId,
+            params long[] entityFilter)
         {
             var enumerable = await repository.ListAsync();
             if(enumerable is IQueryable<Permission> queryable)
             {
                 return await queryable.Where(x => x.GuildId == guildId)
                     .Where(x => entityFilter.Contains(x.EntityId))
-                    .ToListAsync().ConfigureAwait(false);
+                    .ToListAsync()
+                    .ConfigureAwait(false);
             }
+
             throw new NotSupportedException();
         }
 
+        /// <inheritdoc/>
         public async ValueTask SetPermissionAsync(Permission permission)
         {
-            if (await ExistsAsync(permission))
+            if(await ExistsAsync(permission))
             {
                 await repository.EditAsync(permission);
             }

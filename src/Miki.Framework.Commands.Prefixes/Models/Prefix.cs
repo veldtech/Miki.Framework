@@ -1,8 +1,8 @@
-﻿using System.Runtime.Serialization;
-
-namespace Miki.Framework.Commands.Prefixes.Models
+﻿namespace Miki.Framework.Commands.Prefixes.Models
 {
-	[DataContract]
+    using System.Runtime.Serialization;
+
+    [DataContract]
 	public class Prefix
 	{
 		[DataMember(Name = "guild_id", Order = 1)]

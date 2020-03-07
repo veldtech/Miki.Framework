@@ -1,14 +1,13 @@
-﻿using Miki.Discord.Common;
-using Miki.Framework.Commands.Filters;
-using Miki.Framework.Commands.Pipelines;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Miki.Framework.Commands.Filters
+﻿namespace Miki.Framework.Commands.Filters
 {
-	public class FilterPipelineStage : IPipelineStage
+    using Miki.Discord.Common;
+    using Miki.Framework.Commands.Pipelines;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    
+    public class FilterPipelineStage : IPipelineStage
 	{
 		private readonly IEnumerable<IFilter> filters;
 
@@ -20,13 +19,11 @@ namespace Miki.Framework.Commands.Filters
 		public T GetFilterOfType<T>()
 			where T : class, IFilter
 		{
-			if(filters == null
-				|| !filters.Any())
+			if(filters == null || !filters.Any())
 			{
 				return default;
 			}
-			return filters.OfType<T>()
-                .FirstOrDefault();
+			return filters.OfType<T>().FirstOrDefault();
 		}
 
 		public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
@@ -45,7 +42,9 @@ namespace Miki.Framework.Commands.Filters
 
 namespace Miki.Framework.Commands
 {
-	public static class Extensions
+    using Miki.Framework.Commands.Filters;
+
+    public static class Extensions
 	{
 		public static CommandPipelineBuilder UseFilter(this CommandPipelineBuilder b, IFilter f)
 			=> b.UseFilters(f);

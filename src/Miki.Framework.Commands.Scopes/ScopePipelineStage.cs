@@ -1,11 +1,9 @@
 ﻿
 namespace Miki.Framework.Commands.Scopes
 {
-    using Microsoft.EntityFrameworkCore;
     using Miki.Discord.Common;
     using Miki.Framework.Commands.Pipelines;
     using Miki.Framework.Commands.Scopes.Attributes;
-    using Miki.Framework.Commands.Scopes.Models;
     using Miki.Logging;
     using System;
     using System.Linq;
@@ -13,67 +11,57 @@ namespace Miki.Framework.Commands.Scopes
 
     public class ScopePipelineStage : IPipelineStage
 	{
-        public async Task AddScopeAsync(DbContext context, IDiscordUser user, string scope)
+        private readonly ScopeService service;
+
+        public ScopePipelineStage(ScopeService service)
         {
-            var scopeObject = await context.Set<Scope>()
-                .FindAsync(scope, user.Id.ToDbLong());
-            if(scopeObject == null)
-            {
-                context.Set<Scope>()
-                    .Add(new Scope
-                    {
-                        ScopeId = scope.ToLowerInvariant(),
-                        UserId = (long)user.Id
-                    });
-                await context.SaveChangesAsync();
-            }
+            this.service = service;
         }
 
         public async ValueTask CheckAsync(IDiscordMessage data, IMutableContext e, Func<ValueTask> next)
-		{
-            if (e.Executable is Node node)
+        {
+            if(e.Executable == null)
             {
-                var db = e.GetService<DbContext>();
-
-                var scopesRequired = node.Attributes
-                    .OfType<RequiresScopeAttribute>()
-                    .Select(x => x.ScopeId)
-                    .ToList();
-
-                if (scopesRequired.Any())
-                {
-                    var scopesGranted = await db.Set<Scope>()
-                        .Where(x => x.UserId == e.GetMessage().Author.Id.ToDbLong()
-                                    && scopesRequired.Contains(x.ScopeId))
-                        .Select(x => x.ScopeId)
-                        .ToListAsync()
-                        .ConfigureAwait(false);
-
-                    if (!scopesRequired.All(x => scopesGranted.Contains(x)))
-                    {
-                        Log.Debug(
-                            $"User '{e.GetMessage().Author}' tried to access {node}, but was not allowed to.");
-                        return;
-                    }
-                }
+                Log.Warning("No command was selected, discontinue the flow.");
+                return;
             }
 
-            await next()
+            var scopesRequired = e.Executable.GetType()
+                .GetCustomAttributes(false)
+                .OfType<RequiresScopeAttribute>()
+                .Select(x => x.ScopeId)
+                .ToList();
+
+            var scopesGranted = await service.HasScopeAsync(
+                    (long) e.GetMessage().Author.Id, scopesRequired)
                 .ConfigureAwait(false);
+
+            if(!scopesGranted)
+            {
+                Log.Warning("User tried to access scoped command, failed scope check.");
+                return;
+            }
+
+            await next().ConfigureAwait(false);
         }
     }
 }
 
 namespace Miki.Framework.Commands
 {
+    using Microsoft.Extensions.DependencyInjection;
     using Miki.Framework.Commands.Scopes;   
 
     public static class ScopeExtensions
 	{
-		public static CommandPipelineBuilder UseScopes(this CommandPipelineBuilder builder)
+        /// <summary>
+        /// Enable the feature to create feature-flag like scopes to allow specific users to specific
+        /// commands.
+        /// </summary>
+        public static CommandPipelineBuilder UseScopes(this CommandPipelineBuilder builder)
 		{
-			builder.UseStage(new ScopePipelineStage());
-			return builder;
+            return builder.UseStage(
+                new ScopePipelineStage(builder.Services.GetService<ScopeService>()));
 		}
 	}
 }

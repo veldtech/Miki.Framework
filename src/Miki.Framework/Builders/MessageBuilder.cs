@@ -1,8 +1,8 @@
-﻿using System.Text;
-
-namespace Miki.Common.Builders
+﻿namespace Miki.Common.Builders
 {
-	public class MessageBuilder
+    using System.Text;
+
+    public class MessageBuilder
 	{
 		private readonly StringBuilder _builder = new StringBuilder();
 
@@ -43,39 +43,28 @@ namespace Miki.Common.Builders
 		}
 
 		private string ApplyFormatting(string text, MessageFormatting formatting)
-		{
-			switch(formatting)
-			{
-				case MessageFormatting.Bold:
-					return "**" + text + "**";
-
-				case MessageFormatting.BoldItalic:
-					return "**_" + text + "_**";
-
-				case MessageFormatting.BoldItalicUnderlined:
-					return "__**_" + text + "_**__";
-
-				case MessageFormatting.Italic:
-					return "_" + text + "_";
-
-				case MessageFormatting.ItalicUnderlined:
-					return "___" + text + "___";
-
-				case MessageFormatting.Underlined:
-					return "__" + text + "__";
-
-				case MessageFormatting.Code:
-					return "`" + text + "`";
-
-				case MessageFormatting.BlockCode:
-					return "```" + text + "```";
-
-				default:
-					return text;
-			}
-		}
+        {
+            return formatting switch
+            {
+                MessageFormatting.Bold => ("**" + text + "**"),
+                MessageFormatting.BoldItalic => ("**_" + text + "_**"),
+                MessageFormatting.BoldItalicUnderlined => ("__**_" + text + "_**__"),
+                MessageFormatting.Italic => ("_" + text + "_"),
+                MessageFormatting.ItalicUnderlined => ("___" + text + "___"),
+                MessageFormatting.Underlined => ("__" + text + "__"),
+                MessageFormatting.Code => ("`" + text + "`"),
+                MessageFormatting.BlockCode => ("```" + text + "```"),
+                MessageFormatting.BoldUnderlined => ("**_" + text + "_**"),
+                MessageFormatting.Plain => text,
+                _ => text
+            };
+        }
 	}
 
+	/// <summary>
+	/// Message format style.
+	/// </summary>
+	// TODO: Use a bitflag instead?
 	public enum MessageFormatting
 	{
 		Plain,

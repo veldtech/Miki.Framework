@@ -26,19 +26,20 @@
             }
 
 			var value = pack.Peek();
-            if(value.Length == 0)
+            if(!value.HasValue)
             {
 				return false;
             }
 
-			return suffixes.ContainsKey(char.ToLowerInvariant(value.Last()))
-				&& int.TryParse(value.Substring(0, value.Length - 1), out _);
+            var argument = value.Unwrap();
+			return suffixes.ContainsKey(char.ToLowerInvariant(argument.Last()))
+				&& int.TryParse(argument[..^1], out _);
 		}
 
 		public object Parse(IArgumentPack pack, Type targetType)
 		{
 			var value = pack.Take();
-			return (int)(int.Parse(value.Substring(0, value.Length - 1))
+			return (int)(int.Parse(value[0..^1])
 				* suffixes[char.ToLowerInvariant(value[^1])]);
 		}
 	}

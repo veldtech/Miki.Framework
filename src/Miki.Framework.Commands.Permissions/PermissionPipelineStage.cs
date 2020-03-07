@@ -11,11 +11,15 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Pipeline stage for Miki's Command Pipeline system, checks if the permissions are valid for this
+    /// executable.
+    /// </summary>
     public class PermissionPipelineStage : IPipelineStage
 	{
         private readonly PermissionService service;
 
-        public PermissionPipelineStage(PermissionService service)
+        internal PermissionPipelineStage(PermissionService service)
         {
             this.service = service;
         }
@@ -25,6 +29,11 @@
             IMutableContext e,
             [NotNull] Func<ValueTask> next)
         {
+            if(next == null)
+            {
+                throw new ArgumentNullException(nameof(next));
+            }
+
             if (e?.Executable == null)
             {
                 Log.Debug("No executable found to perform permission check on.");
@@ -37,15 +46,13 @@
                 var permission = await service.GetPriorityPermissionAsync(e);
                 if(permission == null)
                 {
-                    var attribs = (e.Executable as NodeExecutable)?.Attributes;
-
-                    permission = new Permission()
+                    var defaultStatus = FetchPermissionStatusFrom(e.Executable);
+                    permission = new Permission
                     {
                         GuildId = (long)e.GetGuild().Id,
                         CommandName = e.Executable.ToString(),
                         EntityId = 0,
-                        Status = attribs?.OfType<DefaultPermissionAttribute>()
-                            .FirstOrDefault()?.Status ?? PermissionStatus.Allow,
+                        Status = defaultStatus,
                         Type = 0
                     };
                 }
@@ -58,31 +65,57 @@
             }
             else
             {
-                var attribs = (e.Executable as NodeExecutable)?.Attributes;
-                if(attribs.OfType<DefaultPermissionAttribute>()
-                    .Any(x => x.Status == PermissionStatus.Deny))
+                if(FetchPermissionStatusFrom(e.Executable) == PermissionStatus.Deny)
                 {
                     throw new InvalidOperationException(
                         "Denied request due to default setting set to Deny");
                 }
-
-                await next();
+                await next();   
             }
+        }
+
+        private PermissionStatus FetchPermissionStatusFrom(IExecutable executable)
+        {
+            var defaultPermissionAtrrib = (DefaultPermissionAttribute)executable.GetType()
+                .GetCustomAttributes(false)
+                .FirstOrDefault(x => x is DefaultPermissionAttribute);
+
+            if(defaultPermissionAtrrib != null)
+            {
+                return defaultPermissionAtrrib.Status;
+            }
+
+            return PermissionStatus.Allow;
         }
     }
 }
 
 namespace Miki.Framework.Commands
 {
+    using System;
     using Microsoft.Extensions.DependencyInjection;
     using Miki.Framework.Commands.Permissions;
 
+    /// <summary>
+    /// Helper functions for the PermissionPipelineStage.
+    /// </summary>
     public static class PermissionExtensions
 	{
+        /// <summary>
+        /// Initializes the permissions system at this index on your CommandPipeline. Permissions will
+        /// give users a way to manage their entire command infrastructure in a ACL kind of manner.
+        ///
+        /// This stage requires you to already have set an Executable to work properly.
+        /// </summary>
 		public static CommandPipelineBuilder UsePermissions(
 			this CommandPipelineBuilder builder)
 		{
-            builder?.UseStage(
+            if(builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            builder.UseStage(
                 new PermissionPipelineStage(
                     builder.Services.GetRequiredService<PermissionService>()));
 			return builder;

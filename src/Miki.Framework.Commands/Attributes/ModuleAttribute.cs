@@ -13,7 +13,9 @@
 		/// </summary>
 		public string Name { get; }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ModuleAttribute.ModuleAttribute(string)'
 		public ModuleAttribute(string name)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ModuleAttribute.ModuleAttribute(string)'
 		{
 			Name = name;
 		}

@@ -15,7 +15,7 @@
         [InlineData(">")]
         [InlineData("testlong. withspaces.")]
         [InlineData("<@90285094092840980495> ")]
-        public async Task TestWithValidContext(string prefix)
+        public async Task TestWithValidContextAsync(string prefix)
         {
             var funcMock = new Mock<Func<ValueTask>>();
             var serviceMock = new Mock<IPrefixService>();
