@@ -26,14 +26,19 @@ namespace Miki.Framework.Commands.Scopes
                 return;
             }
 
-            var scopesRequired = e.Executable.GetType()
-                .GetCustomAttributes(false)
+            if(!(e.Executable is Node node))
+            {
+                Log.Warning("Executable was not made from a default Node.");
+                return;
+            }
+
+            var scopesRequired = node.Attributes
                 .OfType<RequiresScopeAttribute>()
                 .Select(x => x.ScopeId)
                 .ToList();
 
             var scopesGranted = await service.HasScopeAsync(
-                    (long) e.GetMessage().Author.Id, scopesRequired)
+                    (long)e.GetMessage().Author.Id, scopesRequired)
                 .ConfigureAwait(false);
 
             if(!scopesGranted)

@@ -131,6 +131,11 @@
             non-NSFW entity.
             </summary>
         </member>
+        <member name="M:Miki.Framework.DiscordExtensions.ToMessageBuilder(Miki.Discord.Common.DiscordEmbed)">
+            <summary>
+            Transforms an embed to a formatted Discord message builder.
+            </summary>
+        </member>
         <member name="T:Miki.Framework.IAsyncController`2">
             <summary>
             Default controller pipeline object. Expects a valid request and and will give back a valid

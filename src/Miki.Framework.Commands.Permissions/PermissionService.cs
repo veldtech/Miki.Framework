@@ -67,16 +67,19 @@
             long[] entityIds)
         {
             var enumerable = await repository.ListAsync();
-            enumerable = enumerable.Where(x => x.CommandName == commandName && x.GuildId == guildId)
-                .Where(x => entityIds.Contains(x.EntityId))
-                .OrderBy(x => x.Type);
-            if(enumerable is IQueryable<Permission> queryable)
+            if(enumerable is IQueryable<Permission>)
             {
-                return await queryable.FirstOrDefaultAsync(x => x.Status != PermissionStatus.Default)
+                return await enumerable.AsQueryable()
+                    .Where(x => x.CommandName == commandName && x.GuildId == guildId)
+                    .Where(x => entityIds.Contains(x.EntityId))
+                    .OrderBy(x => x.Type)
+                    .FirstOrDefaultAsync(x => x.Status != PermissionStatus.Default)
                     .ConfigureAwait(false);
             }
-
-            return enumerable.FirstOrDefault(x => x.Status != PermissionStatus.Default);
+            return enumerable.Where(x => x.CommandName == commandName && x.GuildId == guildId)
+                .Where(x => entityIds.Contains(x.EntityId))
+                .OrderBy(x => x.Type)
+                .FirstOrDefault(x => x.Status != PermissionStatus.Default);
         }
 
         /// <inheritdoc/>
@@ -131,14 +134,13 @@
         public async ValueTask<IReadOnlyList<Permission>> ListPermissionsAsync(long guildId)
         {
             var enumerable = await repository.ListAsync();
-            enumerable = enumerable.Where(x => x.GuildId == guildId);
-            if(enumerable is IQueryable<Permission> queryable)
+            if(enumerable is IQueryable<Permission>)
             {
-                return await queryable.ToListAsync()
+                return await enumerable.AsQueryable()
+                    .Where(x => x.GuildId == guildId).ToListAsync()
                     .ConfigureAwait(false);
             }
-
-            return enumerable.ToList();
+            return enumerable.Where(x => x.GuildId == guildId).ToList();
         }
 
         /// <inheritdoc/>
@@ -153,7 +155,8 @@
                 return await queryable.Where(x => x.GuildId == guildId)
                     .Where(x => entityFilter.Contains(x.EntityId))
                     .Where(x => x.CommandName == commandName)
-                    .ToListAsync().ConfigureAwait(false);
+                    .ToListAsync()
+                    .ConfigureAwait(false);
             }
 
             throw new NotSupportedException();

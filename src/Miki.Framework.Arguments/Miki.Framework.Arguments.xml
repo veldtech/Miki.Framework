@@ -50,5 +50,11 @@
         <member name="M:Miki.Framework.Arguments.Parsers.EnumArgumentParser.Parse(Miki.Framework.Arguments.IArgumentPack,System.Type)">
             <inheritdoc />
         </member>
+        <member name="M:Miki.Framework.Arguments.Parsers.SuffixedIntArgumentParser.CanParse(Miki.Framework.Arguments.IArgumentPack,System.Type)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Arguments.Parsers.SuffixedIntArgumentParser.Parse(Miki.Framework.Arguments.IArgumentPack,System.Type)">
+            <inheritdoc/>
+        </member>
     </members>
 </doc>

@@ -191,6 +191,46 @@
             <param name="next"></param>
             <returns></returns>
         </member>
+        <member name="T:Miki.Framework.Commands.Pipelines.ArgumentPackBuilder">
+            <summary>
+            Allows you to use FIFO-like argument readers. Used in other packages as a dependency.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Pipelines.ArgumentPackBuilder.#ctor">
+            <summary>
+            Allows you to use FIFO-like argument readers. Used in other packages as a dependency.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Pipelines.ArgumentPackBuilder.#ctor(Miki.Framework.Arguments.ArgumentParseProvider)">
+            <summary>
+            Allows you to use FIFO-like argument readers. Used in other packages as a dependency. With 
+            non-default providers if you prefer overriding default implementation.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Pipelines.ArgumentPackBuilder.CheckAsync(Miki.Discord.Common.IDiscordMessage,Miki.Framework.IMutableContext,System.Func{System.Threading.Tasks.ValueTask})">
+            <inheritdoc/>
+        </member>
+        <member name="T:Miki.Framework.Commands.ArgumentPackCommandPipelineExtensions">
+            <summary>
+            Helper class for builder extensions
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.ArgumentPackCommandPipelineExtensions.UseArgumentPack(Miki.Framework.Commands.CommandPipelineBuilder)">
+            <summary>
+            Allows you to use FIFO-like argument readers. Used in other packages as a dependency.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.ArgumentPackCommandPipelineExtensions.UseArgumentPack(Miki.Framework.Commands.CommandPipelineBuilder,Miki.Framework.Arguments.ArgumentParseProvider)">
+            <summary>
+            Allows you to use FIFO-like argument readers. Used in other packages as a dependency. With 
+            non-default providers if you prefer overriding default implementation.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.ArgumentPackContextExtensions">
+            <summary>
+            Helper class for context extensions
+            </summary>
+        </member>
         <member name="M:Miki.Framework.CorePipelineStageExtensions.GetQuery(Miki.Framework.IContext)">
             <summary>
             Mutable version of the query.

@@ -74,6 +74,48 @@
             Sets or Creates a new permission.
             </summary>
         </member>
+        <member name="F:Miki.Framework.Commands.Permissions.Models.PermissionStatus.Default">
+            <summary>
+            Is used as a fall-through option. <see cref="F:Miki.Framework.Commands.Permissions.Models.PermissionStatus.Default"/> will not impact the permission tree.
+            </summary>
+        </member>
+        <member name="F:Miki.Framework.Commands.Permissions.Models.PermissionStatus.Allow">
+            <summary>
+            Means that this permission is allowed to be used.
+            </summary>
+        </member>
+        <member name="F:Miki.Framework.Commands.Permissions.Models.PermissionStatus.Deny">
+            <summary>
+            Means that this permission is not allowed to be used.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.Commands.Permissions.Models.Permission.EntityId">
+            <summary>
+            The Entity ID of the permission, use <see cref="P:Miki.Framework.Commands.Permissions.Models.Permission.Type"/> to find out to which repository it
+            relates to.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.Commands.Permissions.Models.Permission.Status">
+            <summary>
+            The current permission of the entity.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.Models.Permission.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.Models.Permission.Equals(Miki.Framework.Commands.Permissions.Models.Permission)">
+            <summary>
+            Does an equal check on another permission reference.
+            </summary>
+            <param name="other"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.Models.Permission.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.Commands.Permissions.Models.Permission.ToString">
+            <inheritdoc/>
+        </member>
         <member name="T:Miki.Framework.Commands.Permissions.PermissionPipelineStage">
             <summary>
             Pipeline stage for Miki's Command Pipeline system, checks if the permissions are valid for this

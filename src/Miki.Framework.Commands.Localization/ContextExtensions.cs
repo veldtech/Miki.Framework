@@ -4,7 +4,6 @@ namespace Miki.Framework.Commands
     using Microsoft.Extensions.DependencyInjection;
     using Miki.Framework.Commands.Localization;
     using Miki.Localization;
-    using Miki.Localization.Models;
 
     public static class ContextExtensions
     {

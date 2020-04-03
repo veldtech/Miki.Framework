@@ -18,6 +18,7 @@
 
 		public int Priority => 1;
 
+		/// <inheritdoc/>
 		public bool CanParse(IArgumentPack pack, Type targetType)
 		{
             if(targetType != typeof(int))
@@ -36,11 +37,12 @@
 				&& int.TryParse(argument[..^1], out _);
 		}
 
-		public object Parse(IArgumentPack pack, Type targetType)
+        /// <inheritdoc/>
+        public object Parse(IArgumentPack pack, Type targetType)
 		{
 			var value = pack.Take();
-			return (int)(int.Parse(value[0..^1])
-				* suffixes[char.ToLowerInvariant(value[^1])]);
+            return (int)(int.Parse(value[0..^1])
+                         * suffixes[char.ToLowerInvariant(value[^1])]);
 		}
 	}
 }

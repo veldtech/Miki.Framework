@@ -7,7 +7,6 @@
     using Miki.Framework.Commands.Localization.Models;
     using Miki.Framework.Commands.Localization.Models.Exceptions;
     using Miki.Localization;
-    using Miki.Localization.Models;
     using Xunit;
 
     public class LocalizationServiceTests : BaseEntityTest<ChannelLanguage>  

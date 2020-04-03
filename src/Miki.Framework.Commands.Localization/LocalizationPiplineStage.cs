@@ -6,7 +6,6 @@
     using System;
     using System.Threading.Tasks;
     using Miki.Framework.Commands.Localization.Services;
-    using Miki.Localization.Models;
 
     public class LocalizationPipelineStage : IPipelineStage
     {
@@ -23,7 +22,12 @@
         {
             var channel = e.GetChannel();
             
-            if(channel == null)
+            if(channel is IDiscordGuildChannel)
+            {
+                var locale = await service.GetLocaleAsync((long)channel.Id);
+                e.SetContext(LocaleContextKey, locale);
+            }
+            else
             {
                 // TODO: add GetDefaultLocale to ILocalizationService.
                 if(!(service is LocalizationService extService))
@@ -32,11 +36,6 @@
                 }
 
                 var locale = extService.GetDefaultLocale();
-                e.SetContext(LocaleContextKey, locale);
-            }
-            else
-            {
-                var locale = await service.GetLocaleAsync((long) channel.Id);
                 e.SetContext(LocaleContextKey, locale);
             }
 

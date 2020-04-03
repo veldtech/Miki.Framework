@@ -1,96 +1,102 @@
 ﻿﻿namespace Miki.Framework.Commands.Permissions
-{
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Nodes;
-    using Miki.Framework.Commands.Permissions.Attributes;
-    using Miki.Framework.Commands.Permissions.Models;
-    using Miki.Framework.Commands.Pipelines;
-    using Miki.Logging;
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Threading.Tasks;
+ {
+     using Miki.Discord.Common;
+     using Miki.Framework.Commands.Nodes;
+     using Miki.Framework.Commands.Permissions.Attributes;
+     using Miki.Framework.Commands.Permissions.Models;
+     using Miki.Framework.Commands.Pipelines;
+     using Miki.Logging;
+     using System;
+     using System.Diagnostics.CodeAnalysis;
+     using System.Linq;
+     using System.Threading.Tasks;
 
-    /// <summary>
-    /// Pipeline stage for Miki's Command Pipeline system, checks if the permissions are valid for this
-    /// executable.
-    /// </summary>
-    public class PermissionPipelineStage : IPipelineStage
-	{
-        private readonly PermissionService service;
+     /// <summary>
+     /// Pipeline stage for Miki's Command Pipeline system, checks if the permissions are valid for this
+     /// executable.
+     /// </summary>
+     public class PermissionPipelineStage : IPipelineStage
+     {
+         private readonly PermissionService service;
 
-        internal PermissionPipelineStage(PermissionService service)
-        {
-            this.service = service;
-        }
+         internal PermissionPipelineStage(PermissionService service)
+         {
+             this.service = service;
+         }
 
-        public async ValueTask CheckAsync(
-            IDiscordMessage data,
-            IMutableContext e,
-            [NotNull] Func<ValueTask> next)
-        {
-            if(next == null)
-            {
-                throw new ArgumentNullException(nameof(next));
-            }
+         public async ValueTask CheckAsync(
+             IDiscordMessage data,
+             IMutableContext e,
+             [NotNull] Func<ValueTask> next)
+         {
+             if(next == null)
+             {
+                 throw new ArgumentNullException(nameof(next));
+             }
 
-            if (e?.Executable == null)
-            {
-                Log.Debug("No executable found to perform permission check on.");
-                return;
-            }
+             if(e?.Executable == null)
+             {
+                 Log.Debug("No executable found to perform permission check on.");
+                 return;
+             }
 
-            var message = e.GetMessage();
-            if(message.Author is IDiscordGuildUser)
-            {
-                var permission = await service.GetPriorityPermissionAsync(e);
-                if(permission == null)
-                {
-                    var defaultStatus = FetchPermissionStatusFrom(e.Executable);
-                    permission = new Permission
-                    {
-                        GuildId = (long)e.GetGuild().Id,
-                        CommandName = e.Executable.ToString(),
-                        EntityId = 0,
-                        Status = defaultStatus,
-                        Type = 0
-                    };
-                }
-                Log.Debug(permission.ToString());
+             var message = e.GetMessage();
+             if(message.Author is IDiscordGuildUser)
+             {
+                 var permission = await service.GetPriorityPermissionAsync(e);
+                 if(permission == null)
+                 {
+                     var defaultStatus = FetchPermissionStatusFrom(e.Executable);
+                     permission = new Permission
+                     {
+                         GuildId = (long) e.GetGuild().Id,
+                         CommandName = e.Executable.ToString(),
+                         EntityId = 0,
+                         Status = defaultStatus,
+                         Type = 0
+                     };
+                 }
 
-                if(permission.Status == PermissionStatus.Allow)
-                {
-                    await next();
-                }
-            }
-            else
-            {
-                if(FetchPermissionStatusFrom(e.Executable) == PermissionStatus.Deny)
-                {
-                    throw new InvalidOperationException(
-                        "Denied request due to default setting set to Deny");
-                }
-                await next();   
-            }
-        }
+                 Log.Debug(permission.ToString());
 
-        private PermissionStatus FetchPermissionStatusFrom(IExecutable executable)
-        {
-            var defaultPermissionAtrrib = (DefaultPermissionAttribute)executable.GetType()
-                .GetCustomAttributes(false)
-                .FirstOrDefault(x => x is DefaultPermissionAttribute);
+                 if(permission.Status == PermissionStatus.Allow)
+                 {
+                     await next();
+                 }
+             }
+             else
+             {
+                 if(FetchPermissionStatusFrom(e.Executable) == PermissionStatus.Deny)
+                 {
+                     throw new InvalidOperationException(
+                         "Denied request due to default setting set to Deny");
+                 }
 
-            if(defaultPermissionAtrrib != null)
-            {
-                return defaultPermissionAtrrib.Status;
-            }
+                 await next();
+             }
+         }
 
-            return PermissionStatus.Allow;
-        }
-    }
-}
+         private PermissionStatus FetchPermissionStatusFrom(IExecutable executable)
+         {
+             if(!(executable is Node node))
+             {
+                 return PermissionStatus.Allow;
+             }
 
-namespace Miki.Framework.Commands
+             var defaultPermissionAtrrib = (DefaultPermissionAttribute) node.Attributes
+                 .FirstOrDefault(x => x is DefaultPermissionAttribute);
+
+             if(defaultPermissionAtrrib != null)
+             {
+                 return defaultPermissionAtrrib.Status;
+             }
+
+             return PermissionStatus.Allow;
+         }
+     }
+ }
+
+ namespace Miki.Framework.Commands
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;

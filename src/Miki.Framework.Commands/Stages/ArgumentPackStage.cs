@@ -3,37 +3,42 @@
     using Miki.Discord.Common;
     using Miki.Framework.Arguments;
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackBuilder'
-    public class ArgumentPackBuilder : IPipelineStage
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackBuilder'
+    /// <summary>
+    /// Allows you to use FIFO-like argument readers. Used in other packages as a dependency.
+    /// </summary>
+	public class ArgumentPackBuilder : IPipelineStage
 	{
 		internal static string ArgumentKey = "framework-arguments";
 
 		private readonly ArgumentParseProvider provider;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackBuilder.ArgumentPackBuilder()'
+        /// <summary>
+        /// Allows you to use FIFO-like argument readers. Used in other packages as a dependency.
+        /// </summary>
 		public ArgumentPackBuilder()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackBuilder.ArgumentPackBuilder()'
             : this(new ArgumentParseProvider())
 		{ }
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackBuilder.ArgumentPackBuilder(ArgumentParseProvider)'
+        /// <summary>
+        /// Allows you to use FIFO-like argument readers. Used in other packages as a dependency. With 
+        /// non-default providers if you prefer overriding default implementation.
+        /// </summary>
 		public ArgumentPackBuilder(ArgumentParseProvider provider)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackBuilder.ArgumentPackBuilder(ArgumentParseProvider)'
 		{
 			this.provider = provider;
 		}
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackBuilder.CheckAsync(IDiscordMessage, IMutableContext, Func<ValueTask>)'
+		/// <inheritdoc/>
 		public async ValueTask CheckAsync(
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackBuilder.CheckAsync(IDiscordMessage, IMutableContext, Func<ValueTask>)'
             IDiscordMessage message, IMutableContext e, Func<ValueTask> next)
 		{
 			e.SetContext<ITypedArgumentPack>(
 				ArgumentKey,
 				new TypedArgumentPack(
-					new ArgumentPack(e.GetQuery().Split(' ')),
+					new ArgumentPack(
+                        e.GetQuery().Split(' ').Where(x => !string.IsNullOrWhiteSpace(x))),
 					provider));
 			await next();
 		}
@@ -45,20 +50,24 @@ namespace Miki.Framework.Commands
     using Miki.Framework.Arguments;
     using Miki.Framework.Commands.Pipelines;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackCommandPipelineExtensions'
+	/// <summary>
+	/// Helper class for builder extensions
+	/// </summary>
     public static class ArgumentPackCommandPipelineExtensions
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackCommandPipelineExtensions'
 	{
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackCommandPipelineExtensions.UseArgumentPack(CommandPipelineBuilder)'
+		/// <summary>
+		/// Allows you to use FIFO-like argument readers. Used in other packages as a dependency.
+		/// </summary>
 		public static CommandPipelineBuilder UseArgumentPack(this CommandPipelineBuilder builder)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackCommandPipelineExtensions.UseArgumentPack(CommandPipelineBuilder)'
 		{
 			return builder.UseStage(new ArgumentPackBuilder());
 		}
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackCommandPipelineExtensions.UseArgumentPack(CommandPipelineBuilder, ArgumentParseProvider)'
+        /// <summary>
+        /// Allows you to use FIFO-like argument readers. Used in other packages as a dependency. With 
+        /// non-default providers if you prefer overriding default implementation.
+        /// </summary>
 		public static CommandPipelineBuilder UseArgumentPack(
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackCommandPipelineExtensions.UseArgumentPack(CommandPipelineBuilder, ArgumentParseProvider)'
-            this CommandPipelineBuilder builder, ArgumentParseProvider provider)
+           this CommandPipelineBuilder builder, ArgumentParseProvider provider)
 		{
 			return builder.UseStage(new ArgumentPackBuilder(provider));
 		}
@@ -68,16 +77,14 @@ namespace Miki.Framework.Commands
 namespace Miki.Framework
 {
     using Miki.Framework.Arguments;
-
     using Miki.Framework.Commands.Pipelines;
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackContextExtensions'
-    public static class ArgumentPackContextExtensions
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackContextExtensions'
+    /// <summary>
+    /// Helper class for context extensions
+    /// </summary>
+	public static class ArgumentPackContextExtensions
 	{
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackContextExtensions.GetArgumentPack(IContext)'
 		public static ITypedArgumentPack GetArgumentPack(this IContext context)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ArgumentPackContextExtensions.GetArgumentPack(IContext)'
 		{
 			return context.GetContext<ITypedArgumentPack>(ArgumentPackBuilder.ArgumentKey);
 		}

@@ -2,15 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
-    using Cache;
-    using Framework;
+    using Miki.Framework;
     using Miki.Localization;
-    using Miki.Localization.Models;
+    using Miki.Patterns.Repositories;
     using Models;
     using Models.Exceptions;
-    using Patterns.Repositories;
 
     public class LocalizationService : ILocalizationService
     {
