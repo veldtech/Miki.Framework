@@ -4,20 +4,72 @@
         <name>Miki.Framework.Arguments</name>
     </assembly>
     <members>
+        <member name="T:Miki.Framework.Arguments.ArgumentPack">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.Arguments.ArgumentPack.CanTake">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.Arguments.ArgumentPack.Cursor">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.Arguments.ArgumentPack.Length">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Arguments.ArgumentPack.#ctor(System.String[])">
+            <summary>
+            Creates a new argument pack from an array.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Arguments.ArgumentPack.#ctor(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a new argument pack from an enumerable.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.Arguments.ArgumentPack.Peek">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Arguments.ArgumentPack.Take">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.Arguments.ArgumentPack.SetCursor(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Miki.Framework.Arguments.IArgumentPack">
+            <summary>
+            A validated queue pattern for split arguments.
+            </summary>
+        </member>
         <member name="P:Miki.Framework.Arguments.IArgumentPack.CanTake">
             <summary>
-            Check whether you're allowed to take at the moment.
+            Indicates whether the <see cref="P:Miki.Framework.Arguments.IArgumentPack.Cursor"/> position has exceeded the <see cref="P:Miki.Framework.Arguments.IArgumentPack.Length"/>
+            or is in a valid index.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.Arguments.IArgumentPack.Cursor">
+            <summary>
+            Current cursor index.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.Arguments.IArgumentPack.Length">
+            <summary>
+            Total amount of arguments parsed.
             </summary>
         </member>
         <member name="M:Miki.Framework.Arguments.IArgumentPack.Peek">
             <summary>
-            Returns the string without consuming the argument.
+            Peeks the current in the <see cref="P:Miki.Framework.Arguments.IArgumentPack.Cursor"/> first value without consuming the value.
             </summary>
             <returns>current first argument</returns>
         </member>
+        <member name="M:Miki.Framework.Arguments.IArgumentPack.SetCursor(System.Int32)">
+            <summary>
+            Sets the cursor index.
+            </summary>
+        </member>
         <member name="M:Miki.Framework.Arguments.IArgumentPack.Take">
             <summary>
-            Returns and consumes the argument.
+            Returns the value and increments the <see cref="P:Miki.Framework.Arguments.IArgumentPack.Cursor"/>.
             </summary>
             <returns>current first argument</returns>
         </member>

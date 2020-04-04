@@ -226,9 +226,19 @@
             non-default providers if you prefer overriding default implementation.
             </summary>
         </member>
+        <member name="T:Miki.Framework.Commands.CorePipelineStage">
+            <summary>
+            Sets up basic values such as query and the intial message entity.
+            </summary>
+        </member>
         <member name="T:Miki.Framework.ArgumentPackContextExtensions">
             <summary>
             Helper class for context extensions
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.ArgumentPackContextExtensions.GetArgumentPack(Miki.Framework.IContext)">
+            <summary>
+            Gets this context's arguments.
             </summary>
         </member>
         <member name="M:Miki.Framework.CorePipelineStageExtensions.GetQuery(Miki.Framework.IContext)">

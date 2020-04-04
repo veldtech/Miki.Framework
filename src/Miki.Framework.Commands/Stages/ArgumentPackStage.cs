@@ -21,6 +21,7 @@
 		public ArgumentPackBuilder()
             : this(new ArgumentParseProvider())
 		{ }
+
         /// <summary>
         /// Allows you to use FIFO-like argument readers. Used in other packages as a dependency. With 
         /// non-default providers if you prefer overriding default implementation.
@@ -38,8 +39,7 @@
 				ArgumentKey,
 				new TypedArgumentPack(
 					new ArgumentPack(
-                        e.GetQuery().Split(' ').Where(x => !string.IsNullOrWhiteSpace(x))),
-					provider));
+                        e.GetQuery().Split(' ').Where(x => !string.IsNullOrWhiteSpace(x))), provider));
 			await next();
 		}
 	}
@@ -84,6 +84,9 @@ namespace Miki.Framework
     /// </summary>
 	public static class ArgumentPackContextExtensions
 	{
+		/// <summary>
+		/// Gets this context's arguments.
+		/// </summary>
 		public static ITypedArgumentPack GetArgumentPack(this IContext context)
 		{
 			return context.GetContext<ITypedArgumentPack>(ArgumentPackBuilder.ArgumentKey);

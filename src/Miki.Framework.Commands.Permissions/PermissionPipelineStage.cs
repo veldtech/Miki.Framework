@@ -1,7 +1,6 @@
 ﻿﻿namespace Miki.Framework.Commands.Permissions
  {
      using Miki.Discord.Common;
-     using Miki.Framework.Commands.Nodes;
      using Miki.Framework.Commands.Permissions.Attributes;
      using Miki.Framework.Commands.Permissions.Models;
      using Miki.Framework.Commands.Pipelines;
@@ -24,16 +23,10 @@
              this.service = service;
          }
 
+         /// <inheritdoc/>
          public async ValueTask CheckAsync(
-             IDiscordMessage data,
-             IMutableContext e,
-             [NotNull] Func<ValueTask> next)
+             IDiscordMessage data, [NotNull] IMutableContext e, [NotNull] Func<ValueTask> next)
          {
-             if(next == null)
-             {
-                 throw new ArgumentNullException(nameof(next));
-             }
-
              if(e?.Executable == null)
              {
                  Log.Debug("No executable found to perform permission check on.");
@@ -113,8 +106,7 @@
         ///
         /// This stage requires you to already have set an Executable to work properly.
         /// </summary>
-		public static CommandPipelineBuilder UsePermissions(
-			this CommandPipelineBuilder builder)
+		public static CommandPipelineBuilder UsePermissions(this CommandPipelineBuilder builder)
 		{
             if(builder == null)
             {

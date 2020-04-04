@@ -2,11 +2,11 @@
 {
     using System.Threading.Tasks;
 
-    /// <summary>
-	/// Filters bot accounts
-	/// </summary>
+
+    /// <inheritdoc/>
 	public class BotFilter : IFilter
 	{
+        /// <inheritdoc/>
 		public ValueTask<bool> CheckAsync(IContext e)
 		{
 			return new ValueTask<bool>(!e.GetMessage().Author.IsBot);

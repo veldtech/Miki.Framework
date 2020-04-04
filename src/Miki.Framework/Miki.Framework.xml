@@ -131,9 +131,68 @@
             non-NSFW entity.
             </summary>
         </member>
+        <member name="T:Miki.Framework.ExecutionResult`1">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.ExecutionResult`1.Success">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.ExecutionResult`1.Error">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.ExecutionResult`1.Result">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.ExecutionResult`1.Context">
+            <inheritdoc/>
+        </member>
+        <member name="P:Miki.Framework.ExecutionResult`1.TimeMilliseconds">
+            <inheritdoc/>
+        </member>
+        <member name="M:Miki.Framework.ExecutionResult`1.#ctor(Miki.Framework.IContext,`0,System.Int64,System.Exception)">
+            <summary>
+            Constructs a new Execution result.
+            </summary>
+        </member>
         <member name="M:Miki.Framework.DiscordExtensions.ToMessageBuilder(Miki.Discord.Common.DiscordEmbed)">
             <summary>
             Transforms an embed to a formatted Discord message builder.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.UlongExtensions.ToDbLong(System.UInt64)">
+            <summary>
+            Casts an ulong to a long.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.IExecutionResult`1">
+            <summary>
+            Result of an execution.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IExecutionResult`1.Success">
+            <summary>
+            Returns whether the execution was successful or not.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IExecutionResult`1.Error">
+            <summary>
+            If the execution was not successful, there will be an error in this object that you can use
+            to log.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IExecutionResult`1.Result">
+            <summary>
+            If the execution was successful, there will be a result payload in here.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IExecutionResult`1.Context">
+            <summary>
+            The context used to execute this request.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IExecutionResult`1.TimeMilliseconds">
+            <summary>
+            The amount of milliseconds this request ran for.
             </summary>
         </member>
         <member name="T:Miki.Framework.IAsyncController`2">
@@ -207,6 +266,21 @@
         </member>
         <member name="M:Miki.Framework.MessageWorker.Execute(Miki.Framework.IMessageReference{Miki.Discord.Common.IDiscordMessage})">
             <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.IMessageWorker`1.CreateRef(Miki.Framework.MessageBucketArgs)">
+            <summary>
+            Creates a reference to queue in the worker in the future.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.IMessageWorker`1.Execute(Miki.Framework.IMessageReference{`0})">
+            <summary>
+            Queues a reference in the worker.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.MikiApp.#ctor">
+            <summary>
+            Initializes the current instance.
+            </summary>
         </member>
         <member name="P:Miki.Framework.ProviderAdapter.IsActive">
             <inheritdoc/>

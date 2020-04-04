@@ -7,7 +7,9 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
+    using Miki.Discord.Common.Arguments;
 
     /// <summary>
     /// Message reference to use while a message is being queued to 
@@ -52,6 +54,8 @@
 		private static readonly ConcurrentQueue<IMessageReference<IDiscordMessage>> QueuedMessages 
             = new ConcurrentQueue<IMessageReference<IDiscordMessage>>();
 
+        private readonly ConfiguredTaskAwaitable workerTask;
+
         /// <summary>
         /// Amount of threads currently queueing messages.
         /// </summary>
@@ -67,48 +71,48 @@
             for(int i = 0; i < count; i++)
             {
                 WorkerCount++;
-                Task.Run(async () => await Tick());
+                workerTask = TickAsync().ConfigureAwait(false);
             }
             WorkerCount = count;
         }
 
-		private static async Task Tick()
+		private static async Task TickAsync()
 		{
 			while(true)
 			{
 				if(QueuedMessages.IsEmpty)
 				{
-					await Task.Delay(10);
+					await Task.Delay(50);
 					continue;
 				}
 
 				if(QueuedMessages.TryDequeue(out IMessageReference<IDiscordMessage> msg))
 				{
-					try
-					{
-						IDiscordMessage m;
-						if(msg.Arguments.Attachment == null)
-						{
-							m = await msg.Arguments.Channel.SendMessageAsync(
-                                msg.Arguments.Properties.Content ?? "", 
+                    try
+                    {
+                        IDiscordMessage m;
+                        if(msg.Arguments.Attachment == null)
+                        {
+                            m = await msg.Arguments.Channel.SendMessageAsync(
+                                msg.Arguments.Properties.Content ?? "",
                                 embed: msg.Arguments.Properties.Embed);
-						}
-						else
-						{
-							m = await msg.Arguments.Channel.SendFileAsync(
-                                msg.Arguments.Attachment, 
-                                "file.png", 
-                                msg.Arguments.Properties.Content ?? "", 
+                        }
+                        else
+                        {
+                            m = await msg.Arguments.Channel.SendFileAsync(
+                                msg.Arguments.Attachment,
+                                "file.png",
+                                msg.Arguments.Properties.Content ?? "",
                                 embed: msg.Arguments.Properties.Embed);
-							msg.Arguments.Attachment.Dispose();
-						}
+                            await msg.Arguments.Attachment.DisposeAsync();
+                        }
 
-						if(msg.Decorators.Any())
-						{
-							ProcessDecorators(msg, m);
-						}
-					}
-					catch(Exception e)
+                        if(msg.Decorators.Any())
+                        {
+                            await ProcessDecoratorsAsync(msg, m);
+                        }
+                    }
+                    catch(Exception e)
 					{
 						Log.Error(e);
 					}
@@ -116,16 +120,15 @@
 			}
 		}
 
-		private static void ProcessDecorators(IMessageReference<IDiscordMessage> msgRef, IDiscordMessage msg)
-		{
-			Task.Run(async () =>
-			{
-				foreach(var x in msgRef.Decorators)
-				{
-					await x(msg);
-				}
-			});
-		}
+        private static async Task ProcessDecoratorsAsync(
+            IMessageReference<IDiscordMessage> msgRef,
+            IDiscordMessage msg)
+        {
+            foreach(var x in msgRef.Decorators)
+            {
+                await x(msg);
+            }
+        }
 
         /// <inheritdoc />
         public IMessageReference<IDiscordMessage> CreateRef(MessageBucketArgs args)
@@ -147,8 +150,14 @@
     public interface IMessageWorker<T>
         where T : class
     {
+        /// <summary>
+        /// Creates a reference to queue in the worker in the future.
+        /// </summary>
         IMessageReference<T> CreateRef(MessageBucketArgs args);
         
+        /// <summary>
+        /// Queues a reference in the worker.
+        /// </summary>
         void Execute(IMessageReference<T> args);
     }
 }

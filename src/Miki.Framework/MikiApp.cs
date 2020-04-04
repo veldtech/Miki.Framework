@@ -6,14 +6,21 @@
     using System;
     using Logging;
 
+    /// <summary>
+    /// Starting point of Miki.Framework. Extend this class to create a managed start flow.
+    /// </summary>
     public abstract class MikiApp
 	{
+        [Obsolete("Avoid using the singleton pattern on Miki, instead pass the App to your classes")]
 		public static MikiApp Instance { get; private set; }
 
 		public IServiceProvider Services { get; protected set; }
 
         public IAsyncEventingExecutor<IDiscordMessage> Pipeline { get; private set; }
 
+        /// <summary>
+        /// Initializes the current instance.
+        /// </summary>
 		protected MikiApp()
 		{
 			Instance = this;

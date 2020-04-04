@@ -122,6 +122,9 @@
             executable.
             </summary>
         </member>
+        <member name="M:Miki.Framework.Commands.Permissions.PermissionPipelineStage.CheckAsync(Miki.Discord.Common.IDiscordMessage,Miki.Framework.IMutableContext,System.Func{System.Threading.Tasks.ValueTask})">
+            <inheritdoc/>
+        </member>
         <member name="T:Miki.Framework.Commands.Permissions.PermissionService">
             <summary>
             Service that handles permissions, used as a basic ACL permission system.

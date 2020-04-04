@@ -5,26 +5,37 @@
     using System.Linq;
     using Miki.Functional;
 
+    /// <inheritdoc/>
     public class ArgumentPack : IArgumentPack
 	{
-		private readonly IReadOnlyList<string> arguments;
-
+		/// <inheritdoc/>
 		public bool CanTake => Cursor < arguments.Count && Cursor >= 0;
 
-		public int Cursor { get; private set; }
+        /// <inheritdoc/>
+        public int Cursor { get; private set; }
 
-		public int Length => arguments.Count;
+        /// <inheritdoc/>
+        public int Length => arguments.Count;
 
+        private readonly IReadOnlyList<string> arguments;
+
+        /// <summary>
+        /// Creates a new argument pack from an array.
+        /// </summary>
         public ArgumentPack(params string[] arguments)
 		    : this(arguments.AsEnumerable())
         {
         }
+		/// <summary>
+		/// Creates a new argument pack from an enumerable.
+		/// </summary>
 		public ArgumentPack(IEnumerable<string> arguments)
 		{
 			this.arguments = arguments.ToList();
 		}
 
-		public Optional<string> Peek()
+        /// <inheritdoc/>
+        public Optional<string> Peek()
 		{
             try
             {
@@ -36,23 +47,16 @@
             }
         }
 
-		public string Take()
+        /// <inheritdoc/>
+        public string Take()
 		{
 			var g = Peek();
 			Cursor++;
 			return g;
 		}
 
-		private Optional<string> Get(int index)
-		{
-			if(!CanTake)
-			{
-				throw new IndexOutOfRangeException();
-			}
-			return arguments[index];
-		}
-
-		public void SetCursor(int value)
+        /// <inheritdoc/>
+        public void SetCursor(int value)
 		{
             if(value < 0)
             {
@@ -66,5 +70,14 @@
 
             Cursor = value;
 		}
-	}
+
+        private Optional<string> Get(int index)
+        {
+            if(!CanTake)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            return arguments[index];
+        }
+    }
 }

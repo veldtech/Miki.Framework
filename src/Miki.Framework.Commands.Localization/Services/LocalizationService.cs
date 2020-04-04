@@ -31,7 +31,7 @@
         /// <inheritdoc />
         public void AddLocale(Locale locale)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Pass locales through the LocaleCollection instead");
         }
 
         public Locale GetDefaultLocale()

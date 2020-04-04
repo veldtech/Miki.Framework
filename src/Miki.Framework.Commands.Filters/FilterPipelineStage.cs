@@ -48,7 +48,9 @@ namespace Miki.Framework.Commands
 	{
 		public static CommandPipelineBuilder UseFilter(this CommandPipelineBuilder b, IFilter f)
 			=> b.UseFilters(f);
-		public static CommandPipelineBuilder UseFilters(this CommandPipelineBuilder b, params IFilter[] filters)
+
+		public static CommandPipelineBuilder UseFilters(
+            this CommandPipelineBuilder b, params IFilter[] filters)
 			=> b.UseStage(new FilterPipelineStage(filters));
 	}
 }

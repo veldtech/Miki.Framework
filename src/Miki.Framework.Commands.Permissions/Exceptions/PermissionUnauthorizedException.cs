@@ -1,8 +1,8 @@
 ﻿namespace Miki.Framework.Commands.Permissions.Exceptions
 {
     using System;
+    using Miki.Localization;
     using Miki.Localization.Exceptions;
-    using Miki.Localization.Models;
 
     public class PermissionUnauthorizedException : LocalizedException
     {

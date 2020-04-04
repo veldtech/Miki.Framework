@@ -3,15 +3,36 @@
     using System;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Result of an execution.
+    /// </summary>
     public interface IExecutionResult<out T>
     {
+        /// <summary>
+        /// Returns whether the execution was successful or not.
+        /// </summary>
         bool Success { get; }
 
+        /// <summary>
+        /// If the execution was not successful, there will be an error in this object that you can use
+        /// to log.
+        /// </summary>
         Exception Error { get; }
 
+        /// <summary>
+        /// If the execution was successful, there will be a result payload in here.
+        /// </summary>
         T Result { get; }
 
+        /// <summary>
+        /// The context used to execute this request.
+        /// </summary>
         IContext Context { get; }
+
+        /// <summary>
+        /// The amount of milliseconds this request ran for.
+        /// </summary>
+        long TimeMilliseconds { get; }
     }
 
     public interface IAsyncEventingExecutor<TRequest> : IAsyncExecutor<TRequest>

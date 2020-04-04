@@ -9,7 +9,11 @@
     using Discord.Common;
     using Framework;
     using Microsoft.Extensions.DependencyInjection;
+    using Miki.Discord.Common.Arguments;
 
+    /// <summary>
+    /// Extension methods for Miki.Discord
+    /// </summary>
     public static class DiscordExtensions
     {
         public static Task QueueAsync(
@@ -94,10 +98,7 @@
             var channel = await msg.GetChannelAsync();
             if(channel is IDiscordGuildChannel guildChannel)
             {
-                var currentUser = await MikiApp.Instance
-                    .Services.GetService<IDiscordClient>()
-                    .GetSelfAsync();
-                var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
+                var currentGuildUser = await guildChannel.GetSelfAsync();
                 var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
 
                 if(!permissions.HasFlag(GuildPermission.EmbedLinks))
@@ -108,14 +109,12 @@
             return await msg.EditAsync(new EditMessageArgs("", embed));
         }
 
-        public static async Task<IDiscordMessage> SendToChannel(this DiscordEmbed embed, IDiscordTextChannel channel)
+        public static async Task<IDiscordMessage> SendToChannelAsync(
+            this DiscordEmbed embed, IDiscordTextChannel channel)
         {
             if(channel is IDiscordGuildChannel guildChannel)
             {
-                var currentUser = await MikiApp.Instance
-                    .Services.GetService<DiscordClient>()
-                    .GetSelfAsync();
-                var currentGuildUser = await guildChannel.GetUserAsync(currentUser.Id);
+                var currentGuildUser = await guildChannel.GetSelfAsync();
                 var permissions = await guildChannel.GetPermissionsAsync(currentGuildUser);
 
                 if(!permissions.HasFlag(GuildPermission.EmbedLinks))
@@ -143,11 +142,10 @@
             return await channel.SendMessageAsync("", embed: embed);
         }
 
-        public static Task<IDiscordMessage> SendToUser(this DiscordEmbed embed, IDiscordUser user)
+        public static async Task<IDiscordMessage> SendToUserAsync(this DiscordEmbed embed, IDiscordUser user)
         {
-            return user.GetDMChannelAsync()
-                .ContinueWith(x => x.Result.SendMessageAsync("", false, embed))
-                .Unwrap();
+            var dmChannel = await user.GetDMChannelAsync();
+            return await dmChannel.SendMessageAsync("", false, embed);
         }
 
         [Obsolete("Consider using the full method.")]
