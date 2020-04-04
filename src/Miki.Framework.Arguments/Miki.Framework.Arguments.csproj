@@ -6,7 +6,7 @@
     <ApplicationIcon />
     <StartupObject />
     <LangVersion>8.0</LangVersion>
-    <Version>2.3.0</Version>
+    <Version>2.3.1</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl />

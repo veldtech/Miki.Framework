@@ -5,6 +5,7 @@
     using Miki.Cache;
     using Miki.Discord.Common.Models;
     using Miki.Framework.Commands.Prefixes.Models;
+    using Miki.Patterns.Repositories;
 
     public class DynamicPrefixTrigger : ITrigger
 	{
@@ -19,6 +20,34 @@
 
         private string GetCacheKey(ulong id)
 			=> $"framework:prefix:{id}";
+
+        public async Task ChangeForGuildAsync(
+            IUnitOfWork context,
+            ICacheClient cache,
+            ulong id,
+            string prefix)
+        {
+            var repository = context.GetRepository<Prefix>();
+
+            Prefix currentPrefix = await repository.GetAsync((long)id, DefaultValue);
+            if(currentPrefix == null)
+            {
+                await repository.AddAsync(new Prefix
+                {
+                    GuildId = (long) id,
+                    DefaultValue = DefaultValue,
+                    Value = prefix
+                });
+            }
+            else
+            {
+                currentPrefix.Value = prefix;
+                await repository.EditAsync(currentPrefix);
+            }
+
+            await context.CommitAsync();
+            await cache.UpsertAsync(GetCacheKey(id), prefix);
+        }
 
         public async Task<string> GetForGuildAsync(IUnitOfWork db, ICacheClient cache, ulong id)
         {

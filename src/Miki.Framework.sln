@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.Sco
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miki.Framework.Commands.Filters", "Miki.Framework.Commands.Filters\Miki.Framework.Commands.Filters.csproj", "{C8F412EB-645B-42EA-B21E-5A04D813D930}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4BE94594-5456-49B4-AA9D-4BBDCD77BCE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Production|Any CPU = Debug Production|Any CPU
@@ -124,6 +126,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C32EDC70-5D41-492E-9A4E-3291215BB6B9} = {4BE94594-5456-49B4-AA9D-4BBDCD77BCE3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A47C9596-D4CD-47A2-A189-088EBA926FF1}

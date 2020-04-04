@@ -84,6 +84,21 @@
         <member name="T:Miki.Framework.ContextObject">
             <inheritdoc cref="T:Miki.Framework.IMutableContext" />
         </member>
+        <member name="P:Miki.Framework.ContextObject.Services">
+            <summary>
+            Service collection of the current context.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.ContextObject.Executable">
+            <summary>
+            Current set Executable.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.ContextObject.#ctor(System.IServiceProvider)">
+            <summary>
+            Creates a scoped context object
+            </summary>
+        </member>
         <member name="M:Miki.Framework.ContextObject.Dispose">
             <inheritdoc/>
         </member>
@@ -98,32 +113,6 @@
         </member>
         <member name="M:Miki.Framework.ContextObject.SetExecutable(Miki.Framework.IExecutable)">
             <inheritdoc/>
-        </member>
-        <member name="T:Miki.Framework.TestContextObject">
-            <summary>
-            Context object usable for testing. Avoids having to mock a lot of context related fetching.
-            </summary>
-        </member>
-        <member name="P:Miki.Framework.TestContextObject.Executable">
-            <inheritdoc />
-        </member>
-        <member name="P:Miki.Framework.TestContextObject.Services">
-            <inheritdoc />
-        </member>
-        <member name="M:Miki.Framework.TestContextObject.GetContext(System.String)">
-            <inheritdoc />
-        </member>
-        <member name="M:Miki.Framework.TestContextObject.GetService(System.Type)">
-            <inheritdoc />
-        </member>
-        <member name="M:Miki.Framework.TestContextObject.SetExecutable(Miki.Framework.IExecutable)">
-            <inheritdoc />
-        </member>
-        <member name="M:Miki.Framework.TestContextObject.SetService(System.Type,System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:Miki.Framework.TestContextObject.SetContext(System.String,System.Object)">
-            <inheritdoc />
         </member>
         <member name="T:Miki.Framework.Exceptions.ChannelNotNsfwException">
             <summary>
@@ -154,9 +143,39 @@
             Constructs a new Execution result.
             </summary>
         </member>
+        <member name="T:Miki.Framework.ContextExtensions">
+            <summary>
+            <see cref="T:Miki.Framework.IContext"/> extension methods for utility.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.ContextExtensions.GetService``1(Miki.Framework.IContext)">
+            <summary>
+            Generic version of <see cref="M:Miki.Framework.IContext.GetService(System.Type)"/>
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.ContextExtensions.GetContext``1(Miki.Framework.IContext,System.String)">
+            <summary>
+            Generic version of <see cref="M:Miki.Framework.IContext.GetContext(System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.ContextExtensions.SetContext``1(Miki.Framework.IMutableContext,System.String,``0)">
+            <summary>
+            Generic version of <see cref="M:Miki.Framework.IMutableContext.SetContext(System.String,System.Object)"/>
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.DiscordExtensions">
+            <summary>
+            Extension methods for Miki.Discord
+            </summary>
+        </member>
         <member name="M:Miki.Framework.DiscordExtensions.ToMessageBuilder(Miki.Discord.Common.DiscordEmbed)">
             <summary>
             Transforms an embed to a formatted Discord message builder.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.UlongExtensions">
+            <summary>
+            Extension methods for the ulong type.
             </summary>
         </member>
         <member name="M:Miki.Framework.UlongExtensions.ToDbLong(System.UInt64)">
@@ -277,6 +296,11 @@
             Queues a reference in the worker.
             </summary>
         </member>
+        <member name="T:Miki.Framework.MikiApp">
+            <summary>
+            Starting point of Miki.Framework. Extend this class to create a managed start flow.
+            </summary>
+        </member>
         <member name="M:Miki.Framework.MikiApp.#ctor">
             <summary>
             Initializes the current instance.
@@ -290,6 +314,32 @@
         </member>
         <member name="M:Miki.Framework.ProviderAdapter.StopAsync">
             <inheritdoc/>
+        </member>
+        <member name="T:Miki.Framework.TestContextObject">
+            <summary>
+            Context object usable for testing. Avoids having to mock a lot of context related fetching.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.TestContextObject.Executable">
+            <inheritdoc />
+        </member>
+        <member name="P:Miki.Framework.TestContextObject.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.GetContext(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.GetService(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.SetExecutable(Miki.Framework.IExecutable)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.SetService(System.Type,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Miki.Framework.TestContextObject.SetContext(System.String,System.Object)">
+            <inheritdoc />
         </member>
         <member name="T:Miki.Framework.UnitOfWork">
             <summary>
