@@ -9,12 +9,14 @@
 	/// </summary>
     public class CommandPipelineBuilder
 	{
+		private readonly List<IPipelineStage> stages = new List<IPipelineStage>();
+
 		/// <summary>
 		/// Services that can be used throughout the command pipeline.
 		/// </summary>
         public IServiceProvider Services { get; }
 
-        private readonly List<IPipelineStage> stages = new List<IPipelineStage>();
+        public IReadOnlyList<IPipelineStage> Stages => stages;
 
 		/// <summary>
 		/// Creates a new CommandPipelineBuilder. 

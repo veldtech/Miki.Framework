@@ -1,4 +1,6 @@
-﻿namespace Miki.Framework.Commands
+﻿using System;
+
+namespace Miki.Framework.Commands
 {
     using Miki.Discord.Common;
     using Miki.Framework.Commands.Pipelines;
@@ -29,9 +31,10 @@ namespace Miki.Framework
 
     public static class CorePipelineStageExtensions
     {
+	    [Obsolete("Use IContext.Message instead")]
 		public static IDiscordMessage GetMessage(this IContext context)
 		{
-			return context.GetContext<IDiscordMessage>(CorePipelineStage.MessageContextKey);
+			return context.Message;
         }
 
         /// <summary>

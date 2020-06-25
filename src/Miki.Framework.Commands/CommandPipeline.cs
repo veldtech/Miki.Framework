@@ -28,7 +28,7 @@
         public async ValueTask ExecuteAsync(IDiscordMessage data)
         {
             var sw = Stopwatch.StartNew();
-            using ContextObject contextObj = new ContextObject(services);
+            using ContextObject contextObj = new ContextObject(services, data);
             int index = 0;
 
             Func<ValueTask> nextFunc = null;
