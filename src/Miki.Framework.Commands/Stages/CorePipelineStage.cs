@@ -34,7 +34,7 @@ namespace Miki.Framework
 	    [Obsolete("Use IContext.Message instead")]
 		public static IDiscordMessage GetMessage(this IContext context)
 		{
-			return context.Message;
+			return context.Message ?? context.GetContext<IDiscordMessage>(CorePipelineStage.MessageContextKey);
         }
 
         /// <summary>
