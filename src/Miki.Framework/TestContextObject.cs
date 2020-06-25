@@ -1,4 +1,5 @@
 ﻿using Miki.Discord.Common;
+using Miki.Framework.Models;
 
 namespace Miki.Framework
 {
@@ -14,7 +15,7 @@ namespace Miki.Framework
         private readonly Dictionary<Type, object> serviceObjects = new Dictionary<Type, object>();
 
         /// <inheritdoc />
-        public IDiscordMessage Message { get; set; }
+        public IMessage Message { get; set; }
 
         /// <inheritdoc />
         public IExecutable Executable { get; set; }

@@ -20,23 +20,5 @@ namespace Miki.Framework
             services.AddSingleton<IExtendedCacheClient, T>();
             return services;
         }
-        
-        public static IServiceCollection AddDiscord(this IServiceCollection services, Type factoryType, params object[] factoryArguments)
-        {
-            services.AddHostedService(provider =>
-            {
-                var factory = (IDiscordClientFactory) ActivatorUtilities.CreateInstance(provider, factoryType, factoryArguments);
-                
-                return ActivatorUtilities.CreateInstance<DiscordHostedService>(provider, factory);
-            });
-            
-            return services;
-        }
-        
-        public static IServiceCollection AddDiscord<TFactory>(this IServiceCollection services, params object[] factoryArguments)
-            where TFactory : IDiscordClientFactory
-        {
-            return AddDiscord(services, typeof(TFactory), factoryArguments);
-        }
     }
 }

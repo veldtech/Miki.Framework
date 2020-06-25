@@ -1,4 +1,6 @@
-﻿namespace Miki.Framework.Commands
+﻿using Miki.Framework.Models;
+
+namespace Miki.Framework.Commands
 {
     using System;
     using System.Collections.Generic;
@@ -28,7 +30,7 @@
         public async ValueTask ExecuteAsync(IDiscordMessage data)
         {
             var sw = Stopwatch.StartNew();
-            using ContextObject contextObj = new ContextObject(services, data);
+            using ContextObject contextObj = new ContextObject(services, new DiscordMessage(data));
             int index = 0;
 
             Func<ValueTask> nextFunc = null;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Miki.Discord.Common;
 using Miki.Framework.Commands.Pipelines;
 using Miki.Framework.Hosting;
 
@@ -11,7 +12,10 @@ namespace Miki.Framework.Commands
         {
             return app.Use(next =>
             {
-                return context => stage.CheckAsync(context.Message, (IMutableContext) context, () => next(context));
+                return context => stage.CheckAsync(
+                    (IDiscordMessage) context.Message.InnerMessage,
+                    (IMutableContext) context, 
+                    () => next(context));
             });
         }
 

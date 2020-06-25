@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Miki.Discord.Common;
 
-namespace Miki.Framework.Hosting
+namespace Miki.Framework.Discord.Factories
 {
     public interface IDiscordClientFactory
     {

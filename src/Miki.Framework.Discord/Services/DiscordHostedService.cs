@@ -4,9 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Miki.Discord.Common;
+using Miki.Framework.Discord.Factories;
+using Miki.Framework.Hosting;
+using Miki.Framework.Models;
 using Miki.Logging;
 
-namespace Miki.Framework.Hosting
+namespace Miki.Framework.Discord.Services
 {
     public class DiscordHostedService : IHostedService, IDisposable
     {
@@ -28,7 +31,7 @@ namespace Miki.Framework.Hosting
         private async Task HandleMessageAsync(IDiscordMessage message)
         {
             using var scope = serviceProvider.CreateScope();
-            using var context = new ContextObject(scope.ServiceProvider, message);
+            using var context = new ContextObject(scope.ServiceProvider, new DiscordMessage(message));
             
             try
             {

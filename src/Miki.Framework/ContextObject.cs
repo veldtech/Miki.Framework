@@ -1,4 +1,5 @@
 ﻿using Miki.Discord.Common;
+using Miki.Framework.Models;
 
 namespace Miki.Framework
 {
@@ -14,7 +15,7 @@ namespace Miki.Framework
 		/// <summary>
 		/// The message received from discord.
 		/// </summary>
-		IDiscordMessage Message { get; }
+		IMessage Message { get; }
 		
 		/// <summary>
 		/// The command executed in this current session.
@@ -53,7 +54,7 @@ namespace Miki.Framework
 			=> scope.ServiceProvider;
 
 		/// <inheritdoc />
-		public IDiscordMessage Message { get; }
+		public IMessage Message { get; }
 
 		/// <summary>
 		/// Current set Executable.
@@ -63,7 +64,7 @@ namespace Miki.Framework
 		/// <summary>
 		/// Creates a scoped context object
 		/// </summary>
-        public ContextObject(IServiceProvider p, IDiscordMessage message)
+        public ContextObject(IServiceProvider p, IMessage message)
 		{
 			Message = message;
 			contextObjects = new Dictionary<string, object>();

@@ -4,16 +4,15 @@ using Miki.Discord;
 using Miki.Discord.Common;
 using Miki.Discord.Gateway;
 using Miki.Discord.Rest;
-using Miki.Framework.Hosting;
 
-namespace Miki.Framework.Discord
+namespace Miki.Framework.Discord.Factories
 {
-    public class DiscordClientFactory : IDiscordClientFactory
+    public class DefaultDiscordClientFactory : IDiscordClientFactory
     {
         private readonly IExtendedCacheClient cacheClient;
         private readonly DiscordToken token;
 
-        public DiscordClientFactory(IExtendedCacheClient cacheClient, DiscordToken token)
+        public DefaultDiscordClientFactory(IExtendedCacheClient cacheClient, DiscordToken token)
         {
             this.cacheClient = cacheClient;
             this.token = token;

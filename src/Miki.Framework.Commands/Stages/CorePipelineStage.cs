@@ -31,10 +31,9 @@ namespace Miki.Framework
 
     public static class CorePipelineStageExtensions
     {
-	    [Obsolete("Use IContext.Message instead")]
 		public static IDiscordMessage GetMessage(this IContext context)
 		{
-			return context.Message ?? context.GetContext<IDiscordMessage>(CorePipelineStage.MessageContextKey);
+			return context.GetContext<IDiscordMessage>(CorePipelineStage.MessageContextKey);
         }
 
         /// <summary>
