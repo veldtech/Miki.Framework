@@ -32,6 +32,8 @@ namespace Miki.Framework.Discord.Services
         {
             using var scope = serviceProvider.CreateScope();
             using var context = new ContextObject(scope.ServiceProvider, new DiscordMessage(message));
+
+            context.SetContext("DiscordClient", discordClient);
             
             try
             {

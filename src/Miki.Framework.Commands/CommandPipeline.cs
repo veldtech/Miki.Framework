@@ -1,12 +1,11 @@
-﻿using Miki.Framework.Models;
-
-namespace Miki.Framework.Commands
+﻿namespace Miki.Framework.Commands
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading.Tasks;
     using Miki.Discord.Common;
+    using Miki.Framework.Models;
     using Miki.Framework.Commands.Pipelines;
     using Miki.Logging;
 
