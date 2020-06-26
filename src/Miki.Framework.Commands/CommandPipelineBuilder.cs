@@ -44,5 +44,14 @@
 			stages.Add(stage);
 			return this;
 		}
+
+		/// <summary>
+		/// Initializes a pipeline stage as a runnable stage in the pipeline.
+		/// </summary>
+		public CommandPipelineBuilder UseStage<T>()
+			where T : class, IPipelineStage
+		{
+			return UseStage(Services.GetOrCreateService<T>());
+		}
 	}
 }
