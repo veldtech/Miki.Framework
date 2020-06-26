@@ -7,6 +7,6 @@
 		/// <summary>
 		/// Aliases for this command.
 		/// </summary>
-		public IReadOnlyCollection<string> Identifiers;
+		public IReadOnlyList<string> Identifiers;
 	}
 }

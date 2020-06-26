@@ -20,7 +20,7 @@
 	public class CommandAttribute : Attribute
 	{
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'CommandAttribute.Aliases'
-		public IReadOnlyCollection<string> Aliases { get; }
+		public IReadOnlyList<string> Aliases { get; }
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'CommandAttribute.Aliases'
 
 		/// <summary>

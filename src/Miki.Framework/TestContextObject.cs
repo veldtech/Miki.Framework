@@ -1,4 +1,7 @@
-﻿namespace Miki.Framework
+﻿using Miki.Discord.Common;
+using Miki.Framework.Models;
+
+namespace Miki.Framework
 {
     using System;
     using System.Collections.Generic;
@@ -10,6 +13,9 @@
     {
         private readonly Dictionary<string, object> contextObjects = new Dictionary<string, object>();
         private readonly Dictionary<Type, object> serviceObjects = new Dictionary<Type, object>();
+
+        /// <inheritdoc />
+        public IMessage Message { get; set; }
 
         /// <inheritdoc />
         public IExecutable Executable { get; set; }

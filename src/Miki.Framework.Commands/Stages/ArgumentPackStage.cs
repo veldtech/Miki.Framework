@@ -1,4 +1,7 @@
-﻿namespace Miki.Framework.Commands.Pipelines
+﻿using Miki.Framework.Commands;
+using Miki.Functional;
+
+namespace Miki.Framework.Commands.Pipelines
 {
     using Miki.Discord.Common;
     using Miki.Framework.Arguments;
@@ -90,6 +93,19 @@ namespace Miki.Framework
 		public static ITypedArgumentPack GetArgumentPack(this IContext context)
 		{
 			return context.GetContext<ITypedArgumentPack>(ArgumentPackBuilder.ArgumentKey);
+		}
+
+		/// <summary>
+		/// Gets this context's arguments.
+		/// </summary>
+		public static T Take<T>(this ITypedArgumentPack pack)
+		{
+			if (!pack.Take<T>(out var value))
+			{
+				throw new MissingArgumentException();
+			}
+
+			return value;
 		}
 	}
 }

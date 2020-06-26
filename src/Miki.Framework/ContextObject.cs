@@ -1,4 +1,7 @@
-﻿namespace Miki.Framework
+﻿using Miki.Discord.Common;
+using Miki.Framework.Models;
+
+namespace Miki.Framework
 {
     using Microsoft.Extensions.DependencyInjection;
     using System;
@@ -9,6 +12,11 @@
 	/// </summary>
     public interface IContext
 	{
+		/// <summary>
+		/// The message received from discord.
+		/// </summary>
+		IMessage Message { get; }
+		
 		/// <summary>
 		/// The command executed in this current session.
 		/// </summary>
@@ -45,6 +53,9 @@
         public IServiceProvider Services
 			=> scope.ServiceProvider;
 
+		/// <inheritdoc />
+		public IMessage Message { get; }
+
 		/// <summary>
 		/// Current set Executable.
 		/// </summary>
@@ -53,8 +64,9 @@
 		/// <summary>
 		/// Creates a scoped context object
 		/// </summary>
-        public ContextObject(IServiceProvider p)
+        public ContextObject(IServiceProvider p, IMessage message)
 		{
+			Message = message;
 			contextObjects = new Dictionary<string, object>();
 			scope = p.CreateScope();
 		}

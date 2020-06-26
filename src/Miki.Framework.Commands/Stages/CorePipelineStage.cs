@@ -1,4 +1,6 @@
-﻿namespace Miki.Framework.Commands
+﻿using System;
+
+namespace Miki.Framework.Commands
 {
     using Miki.Discord.Common;
     using Miki.Framework.Commands.Pipelines;

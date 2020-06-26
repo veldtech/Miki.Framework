@@ -1,4 +1,4 @@
-﻿namespace Miki.Framework.Commands
+﻿﻿namespace Miki.Framework.Commands
 {
     using Microsoft.Extensions.DependencyInjection;
     using Miki.Framework.Arguments;
@@ -10,60 +10,56 @@
 	{
 		public List<Node> Children = new List<Node>();
 
-		/// <summary>
-		/// Instance object for reflection.
-		/// </summary>
-		public object Instance { get; }
-
 		public NodeContainer(CommandMetadata metadata, Type t)
 			: base(metadata, t)
 		{
 		}
-		public NodeContainer(CommandMetadata metadata, NodeContainer parent, IServiceProvider provider, Type t)
+		public NodeContainer(CommandMetadata metadata, NodeContainer parent, Type t)
 			: base(metadata, parent, t)
 		{
-			if(t != null)
-			{
-				Instance = ActivatorUtilities.CreateInstance(provider, t);
-			}
 		}
 
-		public virtual Node FindCommand(IArgumentPack pack)
+		public virtual IEnumerable<NodeResult> FindCommands(IArgumentPack pack)
 		{
-			if(!pack.CanTake)
+			if (!pack.CanTake)
 			{
-				return null;
+				yield break;
 			}
 
-			var arg = pack.Peek().Unwrap()
-				.ToLowerInvariant();
+			var arg = pack.Peek().Unwrap();
 
 			// Take if this module starts.
-			if(Metadata.Identifiers?.Any(x => x.ToLowerInvariant() == arg.ToLowerInvariant()) ?? false)
+			var hasPrefix = Metadata.Identifiers != null
+			                && Metadata.Identifiers.Count > 0
+			                && Metadata.Identifiers.Any(x => string.Equals(x, arg, StringComparison.InvariantCultureIgnoreCase));
+			
+			if (hasPrefix)
 			{
-				pack.Take();
+				pack.SetCursor(pack.Cursor + 1);
 			}
 
-			foreach(var c in Children)
+			foreach(var child in Children)
 			{
-				if(c is NodeContainer nc)
+				if (child is NodeContainer nc)
 				{
-					var foundNode = nc.FindCommand(pack);
-					if(foundNode != null)
+					foreach (var node in nc.FindCommands(pack))
 					{
-						return foundNode;
+						yield return node;
 					}
 				}
 				else
 				{
-					if(c.Metadata.Identifiers.Any(x => x == arg))
+					if (child.Metadata.Identifiers.Any(x => x == arg))
 					{
-						pack.Take();
-						return c;
+						yield return new NodeResult(child, pack.Cursor + 1);
 					}
 				}
 			}
-			return null;
+			
+			if (hasPrefix)
+			{
+				pack.SetCursor(pack.Cursor - 1);
+			}
 		}
 	}
 }

@@ -1,4 +1,6 @@
-﻿namespace Miki.Framework.Commands.Stages
+﻿using System.Linq;
+
+namespace Miki.Framework.Commands.Stages
 {
     using System;
     using System.Threading.Tasks;
@@ -19,18 +21,29 @@
         {
             Log.Debug($"Starting command aggregation with query '{e.GetQuery()}'");
 
-            var command = map.GetCommand(e.GetArgumentPack().Pack);
-            if(command == null)
+            var pack = e.GetArgumentPack().Pack;
+            var results = map.GetCommands(pack)
+                .Where(t => t.Node is IExecutable)
+                .ToArray();
+            
+            if (results.Length == 0)
             {
                 Log.Warning($"No command was found with query '{string.Join(" ", e.GetQuery())}'");
                 return;
             }
 
-            if(command is IExecutable exec)
+            if (results.Length == 1)
             {
-                e.SetExecutable(exec);
-                await next();
+                var result = results[0];
+                pack.SetCursor(result.CursorPosition);
+                e.SetExecutable((IExecutable) result.Node);
             }
+            else
+            {
+                e.SetExecutable(new MultiExecutable(results));
+            }
+            
+            await next();
         }
     }
 }
