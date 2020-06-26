@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.Threading.Tasks;
     using Miki.Discord.Common;
+    using Miki.Framework.Models;
     using Miki.Framework.Commands.Pipelines;
     using Miki.Logging;
 
@@ -28,7 +29,7 @@
         public async ValueTask ExecuteAsync(IDiscordMessage data)
         {
             var sw = Stopwatch.StartNew();
-            using ContextObject contextObj = new ContextObject(services);
+            using ContextObject contextObj = new ContextObject(services, new DiscordMessage(data));
             int index = 0;
 
             Func<ValueTask> nextFunc = null;

@@ -10,22 +10,13 @@
 	{
 		public List<Node> Children = new List<Node>();
 
-		/// <summary>
-		/// Instance object for reflection.
-		/// </summary>
-		public object Instance { get; }
-
 		public NodeContainer(CommandMetadata metadata, Type t)
 			: base(metadata, t)
 		{
 		}
-		public NodeContainer(CommandMetadata metadata, NodeContainer parent, IServiceProvider provider, Type t)
+		public NodeContainer(CommandMetadata metadata, NodeContainer parent, Type t)
 			: base(metadata, parent, t)
 		{
-			if(t != null)
-			{
-				Instance = ActivatorUtilities.CreateInstance(provider, t);
-			}
 		}
 
 		public virtual Node FindCommand(IArgumentPack pack)

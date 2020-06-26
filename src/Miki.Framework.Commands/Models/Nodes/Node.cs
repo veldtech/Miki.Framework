@@ -16,15 +16,15 @@
         public IReadOnlyCollection<Attribute> Attributes => Type.GetCustomAttributes<Attribute>(false)
 				.ToList();
 
-		private MemberInfo Type { get; }
+		public Type Type { get; }
 
-		protected Node(CommandMetadata metadata, MemberInfo type)
+		protected Node(CommandMetadata metadata, Type type)
 		{
 			Metadata = metadata;
 			Type = type;
 		}
 
-        protected Node(CommandMetadata metadata, NodeContainer parent, MemberInfo type)
+        protected Node(CommandMetadata metadata, NodeContainer parent, Type type)
             : this(metadata, type)
         {
             Parent = parent ?? throw new InvalidOperationException("Parent cannot be null when explicitly set up.");

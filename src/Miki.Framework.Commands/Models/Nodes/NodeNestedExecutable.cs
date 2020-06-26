@@ -23,23 +23,21 @@
 			CommandMetadata metadata,
 			IServiceProvider builder,
 			Type t)
-			: this(metadata, null, builder, t)
+			: this(metadata, (NodeContainer) null, t)
 		{
 		}
 
-		/// <summary>
-		/// Creates a new Nested, Executable Node.
-		/// </summary>
-		/// <param name="metadata">Command properties.</param>
-		/// <param name="parent"></param>
-		/// <param name="builder"></param>
-		/// <param name="t"></param>
-		public NodeNestedExecutable(
+        /// <summary>
+        /// Creates a new Nested, Executable Node.
+        /// </summary>
+        /// <param name="metadata">Command properties.</param>
+        /// <param name="parent"></param>
+        /// <param name="t"></param>
+        public NodeNestedExecutable(
 			CommandMetadata metadata,
 			NodeContainer parent,
-			IServiceProvider builder,
 			Type t)
-			: base(metadata, parent, builder, t)
+			: base(metadata, parent, t)
 		{
 		}
 
