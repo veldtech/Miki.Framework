@@ -14,6 +14,8 @@
 			SeedAssembly(GetType().Assembly);
 		}
 
+		public IReadOnlyList<IArgumentParser> Parsers => parsers;
+		
 		public object Peek(IArgumentPack p, Type type)
 		{
 			int cursor = p.Cursor;

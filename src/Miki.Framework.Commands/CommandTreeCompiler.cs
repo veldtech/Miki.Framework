@@ -121,25 +121,39 @@ namespace Miki.Framework.Commands
 			var parameterValues = GetParameterValues(builder, methodInfo);
 			var returnType = methodInfo.ReturnType;
 			Expression result = Expression.Call(module, methodInfo, parameterValues);
+			
+			var returnTarget = Expression.Label(typeof(Task));
+			var taskComplete = Expression.Property(null, TaskCompleteProperty);
 
+			Expression[] callMethod;
+			
 			if (returnType == typeof(void))
 			{
-				var taskComplete = Expression.Property(null, TaskCompleteProperty);
-				var returnTarget = Expression.Label(typeof(Task));
-
-				result = Expression.Block(new[]
+				callMethod = new[]
 				{
 					result,
 					Expression.Return(returnTarget, taskComplete),
 					Expression.Label(returnTarget, taskComplete)
-				});
+				};
 			}
-			else if (returnType != typeof(Task))
+			else if (returnType == typeof(Task))
+			{
+				callMethod = new Expression[]
+				{
+					Expression.Return(returnTarget, result),
+					Expression.Label(returnTarget, taskComplete)
+				};
+			}
+			else
 			{
 				throw new InvalidOperationException($"Method {type.Name}.{methodInfo.Name} should return Task or void.");
 			}
 			
-			return Expression.Lambda<CommandDelegate>(result, context).Compile();
+			result = Expression.Block(builder.Variables.Values, builder.Initializers.Union(callMethod));
+
+			var lambda = Expression.Lambda<CommandDelegate>(result, context);
+			
+			return lambda.Compile();
 		}
 
 		private Expression[] GetParameterValues(ParameterBuilder builder, MethodBase methodInfo)

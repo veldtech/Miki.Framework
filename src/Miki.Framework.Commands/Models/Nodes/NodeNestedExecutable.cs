@@ -1,4 +1,6 @@
-﻿namespace Miki.Framework.Commands.Nodes
+﻿﻿using System.Collections.Generic;
+
+namespace Miki.Framework.Commands.Nodes
 {
     using Miki.Framework.Arguments;
     using Miki.Logging;
@@ -55,29 +57,45 @@
 		/// </summary>
 		/// <param name="pack">Argument pack to iterate over.</param>
 		/// <returns>Nullable node</returns>
-		public override Node FindCommand(IArgumentPack pack)
+		public override IEnumerable<NodeResult> FindCommands(IArgumentPack pack)
 		{
-			var arg = pack.Peek().Unwrap()
-				.ToLowerInvariant();
+			var arg = pack.Peek().Unwrap();
 
-            if(Metadata.Identifiers == null || !Metadata.Identifiers.Any())
+            if (Metadata.Identifiers == null)
             {
-                return null;
+	            yield break;
             }
 
-            if(Metadata.Identifiers.All(x => x != arg))
+            var count = Metadata.Identifiers.Count;
+
+            if (count == 0)
             {
-                return null;
+	            yield break;
             }
 
-            pack.Take();
-            var cmd = base.FindCommand(pack);
-            if(cmd != null)
+            if (count == 1)
             {
-                return cmd;
+	            if (!string.Equals(Metadata.Identifiers[0], arg, StringComparison.OrdinalIgnoreCase))
+	            {
+		            yield break;
+	            }
             }
-            return this;
-        }
+            else if (Metadata.Identifiers.All(x => !string.Equals(x, arg, StringComparison.OrdinalIgnoreCase)))
+            {
+	            yield break;
+            }
+            
+            pack.SetCursor(pack.Cursor + 1);
+
+            foreach (var command in base.FindCommands(pack))
+            {
+	            yield return command;
+            }
+
+            yield return new NodeResult(this, pack.Cursor);
+            
+            pack.SetCursor(pack.Cursor - 1);
+		}
 
 		/// <summary>
 		/// Executes command.
