@@ -23,7 +23,7 @@
         ValueTask<bool> HasScopeAsync(long userId, IEnumerable<string> scopeNames);
     }
 
-    public class ScopeService
+    public class ScopeService : IScopeService
     {
         private readonly IUnitOfWork context;
         private readonly IAsyncRepository<Scope> repository; 
