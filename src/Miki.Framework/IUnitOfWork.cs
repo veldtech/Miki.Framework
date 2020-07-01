@@ -3,9 +3,11 @@
     using System;
     using System.Runtime.InteropServices;
     using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
     using Patterns.Repositories;
 
+    /// <summary>
+    /// A pattern to abstractify transactions from storage APIs.
+    /// </summary>
     public interface IUnitOfWork : IDisposable, IAsyncDisposable
     {
         /// <summary>

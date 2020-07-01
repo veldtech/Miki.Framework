@@ -1,8 +1,11 @@
 ﻿namespace Miki.Framework
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Internal;
+    using Microsoft.EntityFrameworkCore.Storage;
     using Patterns.Repositories;
 
     public class EntityRepository<T> : IAsyncRepository<T>
@@ -36,6 +39,7 @@
         public ValueTask<T> GetAsync(params object[] id)
         {
             return context.Set<T>().FindAsync(id);
+            
         }
 
         public ValueTask<IEnumerable<T>> ListAsync()

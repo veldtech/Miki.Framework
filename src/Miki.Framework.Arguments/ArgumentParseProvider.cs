@@ -17,7 +17,7 @@
 		public object Peek(IArgumentPack p, Type type)
 		{
 			int cursor = p.Cursor;
-			object output = parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
+			object output = parsers.Where(x => IsAssignableFrom(type, x.OutputType))
 				.Where(x => x.CanParse(p, type))
 				.OrderByDescending(x => x.Priority)
 				.FirstOrDefault()?
@@ -30,8 +30,8 @@
 			=> (T)Peek(p, typeof(T));
 
 		public object Take(IArgumentPack p, Type type)
-			=> parsers.Where(x => type.GetTypeInfo().IsAssignableFrom(x.OutputType))
-				.Where(x => x.CanParse(p, type))
+			=> parsers.Where(x => IsAssignableFrom(type, x.OutputType))
+                .Where(x => x.CanParse(p, type))
 				.OrderByDescending(x => x.Priority)
 				.FirstOrDefault()?
 				.Parse(p, type);
@@ -39,7 +39,17 @@
 		public T Take<T>(IArgumentPack p)
 			=> (T)Take(p, typeof(T));
 
-		public void SeedAssembly(Assembly a)
+        private bool IsAssignableFrom(Type source, Type output)
+        {
+            if(source.IsEnum)
+            {
+                return output == typeof(Enum) 
+                       || source.IsAssignableFrom(output);
+            }
+            return source.IsAssignableFrom(output);
+        }
+
+        public void SeedAssembly(Assembly a)
 		{
             if (parsers.Count != 0)
             {
@@ -47,7 +57,7 @@
             }
 
             Type[] types = a.GetTypes()
-                .Where(x => x.GetTypeInfo().IsClass && typeof(IArgumentParser).GetTypeInfo().IsAssignableFrom(x))
+                .Where(x => x.IsClass && typeof(IArgumentParser).IsAssignableFrom(x))
                 .ToArray();
 
             foreach (var t in types)

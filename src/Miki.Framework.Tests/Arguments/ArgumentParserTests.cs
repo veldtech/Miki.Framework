@@ -1,13 +1,14 @@
 ﻿namespace Miki.Framework.Tests.Arguments
 {
     using System;
+    using System.Reflection;
     using Miki.Framework.Arguments;
     using Miki.Framework.Arguments.Parsers;
     using Xunit;
 
     public class ArgumentParserTests
     {
-        private enum TestValues
+        public enum TestValues
         {
             True,
             False

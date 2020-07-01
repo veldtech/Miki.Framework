@@ -9,7 +9,6 @@
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
-    using Miki.Discord.Common.Arguments;
 
     /// <summary>
     /// Message reference to use while a message is being queued to 

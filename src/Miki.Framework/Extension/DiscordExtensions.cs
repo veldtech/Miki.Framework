@@ -9,7 +9,6 @@
     using Discord.Common;
     using Framework;
     using Microsoft.Extensions.DependencyInjection;
-    using Miki.Discord.Common.Arguments;
 
     /// <summary>
     /// Extension methods for Miki.Discord

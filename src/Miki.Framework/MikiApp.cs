@@ -16,6 +16,7 @@
 
 		public IServiceProvider Services { get; protected set; }
 
+        [Obsolete("Get the pipeline from Services instead.")]
         public IAsyncEventingExecutor<IDiscordMessage> Pipeline { get; private set; }
 
         /// <summary>
@@ -33,11 +34,6 @@
             serviceCollection.AddSingleton(this);
             Services = serviceCollection.BuildServiceProvider();
 
-            if (Services.GetService<MessageWorker>() == null)
-            {
-                Log.Warning("No message worker setup. Messages will not send to data platforms.");
-            }
-
             Pipeline = ConfigurePipeline(Services);
             var providers = ConfigureProviders(Services, Pipeline);
 
@@ -46,10 +42,13 @@
         }
 
         public abstract ProviderCollection ConfigureProviders(
-            IServiceProvider services,
-            IAsyncEventingExecutor<IDiscordMessage> pipeline);
+            IServiceProvider services, IAsyncEventingExecutor<IDiscordMessage> pipeline);
 
-        public abstract IAsyncEventingExecutor<IDiscordMessage> ConfigurePipeline(IServiceProvider collection);
+        [Obsolete("Set pipeline up in ConfigureAsync instead")]
+        public virtual IAsyncEventingExecutor<IDiscordMessage> ConfigurePipeline(IServiceProvider collection)
+        {
+            return Services.GetService<IAsyncEventingExecutor<IDiscordMessage>>();
+        }
 
         public abstract Task ConfigureAsync(ServiceCollection collection);
     }

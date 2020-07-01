@@ -53,34 +53,6 @@
             Time-To-Live for cache objects.
             </summary>
         </member>
-        <member name="T:Miki.Framework.IContext">
-            <summary>
-            Session context for a single command. Keeps data and services for this specific session.
-            </summary>
-        </member>
-        <member name="P:Miki.Framework.IContext.Executable">
-            <summary>
-            The command executed in this current session.
-            </summary>
-        </member>
-        <member name="P:Miki.Framework.IContext.Services">
-            <summary>
-            Services built in <see cref="T:Miki.Framework.MikiApp"/>
-            </summary>
-        </member>
-        <member name="M:Miki.Framework.IContext.GetContext(System.String)">
-            <summary>
-            Context objects are used for specific session-only objects that are added through pipeline
-            objects.
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Miki.Framework.IContext.GetService(System.Type)">
-            <summary>
-            Used to retrieve services built in <see cref="T:Miki.Framework.MikiApp"/>
-            </summary>
-        </member>
         <member name="T:Miki.Framework.ContextObject">
             <inheritdoc cref="T:Miki.Framework.IMutableContext" />
         </member>
@@ -183,6 +155,34 @@
             Casts an ulong to a long.
             </summary>
         </member>
+        <member name="T:Miki.Framework.IContext">
+            <summary>
+            Session context for a single command. Keeps data and services for this specific session.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IContext.Executable">
+            <summary>
+            The command executed in this current session.
+            </summary>
+        </member>
+        <member name="P:Miki.Framework.IContext.Services">
+            <summary>
+            Services built in <see cref="T:Miki.Framework.MikiApp"/>
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.IContext.GetContext(System.String)">
+            <summary>
+            Context objects are used for specific session-only objects that are added through pipeline
+            objects.
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Miki.Framework.IContext.GetService(System.Type)">
+            <summary>
+            Used to retrieve services built in <see cref="T:Miki.Framework.MikiApp"/>
+            </summary>
+        </member>
         <member name="T:Miki.Framework.IExecutionResult`1">
             <summary>
             Result of an execution.
@@ -223,6 +223,21 @@
             request properly.</typeparam>
             <typeparam name="TResponse">Response object that handles </typeparam>
         </member>
+        <member name="T:Miki.Framework.IExecutableCommand">
+            <summary>
+            <see cref="T:Miki.Framework.IExecutable"/> with an unique identifier.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.IExecutableCommand.GetIdentifier">
+            <summary>
+            Gets the unique identifier attached to this Executable.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.IExecutable">
+            <summary>
+            Executes something with an <see cref="T:Miki.Framework.IContext"/> attached.
+            </summary>
+        </member>
         <member name="T:Miki.Framework.IMutableContext">
             <inheritdoc/>
         </member>
@@ -247,8 +262,28 @@
             Disables the aggregation of events.
             </summary>
         </member>
+        <member name="T:Miki.Framework.ProviderCollection">
+            <summary>
+            A collection of providers for the framework to subscribe to.
+            </summary>
+        </member>
         <member name="P:Miki.Framework.ProviderCollection.IsActive">
             <inheritdoc/>
+        </member>
+        <member name="T:Miki.Framework.IRepositoryFactory`1">
+            <summary>
+            Can be used to inject custom logic per type.
+            </summary>
+        </member>
+        <member name="M:Miki.Framework.IRepositoryFactory`1.Build(Microsoft.EntityFrameworkCore.DbContext)">
+            <summary>
+            Builds a repository to perform CRUD operations with.
+            </summary>
+        </member>
+        <member name="T:Miki.Framework.IUnitOfWork">
+            <summary>
+            A pattern to abstractify transactions from storage APIs.
+            </summary>
         </member>
         <member name="M:Miki.Framework.IUnitOfWork.GetRepository``1(Miki.Framework.IRepositoryFactory{``0})">
             <summary>

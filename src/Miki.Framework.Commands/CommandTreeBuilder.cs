@@ -80,7 +80,7 @@
 			if(commandAttrib == null)
 			{
 				throw new InvalidOperationException(
-					$"Multi command of type '{t.ToString()}' must have a valid CommandAttribute.");
+					$"Multi command of type '{t}' must have a valid CommandAttribute.");
 			}
 
 			if(commandAttrib.Aliases?.Count() == 0)

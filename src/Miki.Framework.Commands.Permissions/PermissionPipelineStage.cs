@@ -1,20 +1,20 @@
-﻿﻿namespace Miki.Framework.Commands.Permissions
- {
-     using Miki.Discord.Common;
-     using Miki.Framework.Commands.Permissions.Attributes;
-     using Miki.Framework.Commands.Permissions.Models;
-     using Miki.Framework.Commands.Pipelines;
-     using Miki.Logging;
-     using System;
-     using System.Diagnostics.CodeAnalysis;
-     using System.Linq;
-     using System.Threading.Tasks;
+﻿using Miki.Discord.Common;
+using Miki.Framework.Commands.Permissions.Attributes;
+using Miki.Framework.Commands.Permissions.Models;
+using Miki.Framework.Commands.Pipelines;
+using Miki.Logging;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading.Tasks;
 
-     /// <summary>
-     /// Pipeline stage for Miki's Command Pipeline system, checks if the permissions are valid for this
-     /// executable.
-     /// </summary>
-     public class PermissionPipelineStage : IPipelineStage
+namespace Miki.Framework.Commands.Permissions
+{
+    /// <summary>
+    /// Pipeline stage for Miki's Command Pipeline system, checks if the permissions are valid for this
+    /// executable.
+    /// </summary>
+    public class PermissionPipelineStage : IPipelineStage
      {
          private readonly PermissionService service;
 
@@ -88,35 +88,3 @@
          }
      }
  }
-
- namespace Miki.Framework.Commands
-{
-    using System;
-    using Microsoft.Extensions.DependencyInjection;
-    using Miki.Framework.Commands.Permissions;
-
-    /// <summary>
-    /// Helper functions for the PermissionPipelineStage.
-    /// </summary>
-    public static class PermissionExtensions
-	{
-        /// <summary>
-        /// Initializes the permissions system at this index on your CommandPipeline. Permissions will
-        /// give users a way to manage their entire command infrastructure in a ACL kind of manner.
-        ///
-        /// This stage requires you to already have set an Executable to work properly.
-        /// </summary>
-		public static CommandPipelineBuilder UsePermissions(this CommandPipelineBuilder builder)
-		{
-            if(builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
-
-            builder.UseStage(
-                new PermissionPipelineStage(
-                    builder.Services.GetRequiredService<PermissionService>()));
-			return builder;
-		}
-	}
-}
