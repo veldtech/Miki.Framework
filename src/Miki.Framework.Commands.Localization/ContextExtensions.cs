@@ -1,10 +1,9 @@
-﻿
+﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Framework.Commands.Localization;
+using Miki.Localization;
+
 namespace Miki.Framework.Commands
 {
-    using Microsoft.Extensions.DependencyInjection;
-    using Miki.Framework.Commands.Localization;
-    using Miki.Localization;
-
     public static class ContextExtensions
     {
         public static CommandPipelineBuilder UseLocalization(

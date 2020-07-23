@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework
-{
-    using Microsoft.Extensions.DependencyInjection;
-    using Miki.Framework.Commands;
-    using Miki.Framework.Commands.Stages;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Framework.Commands;
+using Miki.Framework.Commands.Stages;
 
+namespace Miki.Framework
+{
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ExecuteCommandExtensions'
     public static class ExecuteCommandExtensions
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ExecuteCommandExtensions'

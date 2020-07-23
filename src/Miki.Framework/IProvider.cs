@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework
-{
-    using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Can be used to have services with an active connection turn on and off.
     /// </summary>

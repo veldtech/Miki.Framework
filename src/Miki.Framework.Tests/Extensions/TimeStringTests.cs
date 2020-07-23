@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Tests.Extensions
-{
-    using System;
-    using Xunit;
+﻿using System;
+using Xunit;
 
+namespace Miki.Framework.Tests.Extensions
+{
     public class TimeStringTests
     {
         [Theory]

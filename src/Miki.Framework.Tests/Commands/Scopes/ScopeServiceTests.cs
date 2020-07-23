@@ -1,12 +1,12 @@
-﻿namespace Miki.Framework.Tests.Commands.Scopes
-{
-    using System;
-    using System.Threading.Tasks;
-    using Framework.Commands.Scopes;
-    using Framework.Commands.Scopes.Models;
-    using Microsoft.EntityFrameworkCore;
-    using Xunit;
+﻿using System;
+using System.Threading.Tasks;
+using Miki.Framework.Commands.Scopes;
+using Miki.Framework.Commands.Scopes.Models;
+using Microsoft.EntityFrameworkCore;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands.Scopes
+{
     public class ScopeServiceTests : BaseEntityTest<Scope>
     {
         private const string ValidScope = "scope.testing";

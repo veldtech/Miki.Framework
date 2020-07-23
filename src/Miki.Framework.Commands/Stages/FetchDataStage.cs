@@ -1,10 +1,11 @@
-﻿namespace Miki.Framework.Commands.Stages
-{
-    using System;
-    using System.Threading.Tasks;
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
+﻿using System;
+using System.Threading.Tasks;
+using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using Miki.Framework.Commands.Stages;
 
+namespace Miki.Framework.Commands.Stages
+{
     public class FetchDataStage : IPipelineStage
     {
         public static string ChannelArgumentKey = "framework-channel";
@@ -29,9 +30,6 @@
 
 namespace Miki.Framework
 {
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Stages;
-
     public static class FetchDataStageExtensions
     {
         public static IDiscordTextChannel GetChannel(this IContext context)

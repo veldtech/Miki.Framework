@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Arguments.Parsers
-{
-    using System;
+﻿using System;
 
+namespace Miki.Framework.Arguments.Parsers
+{
     public class GuidArgumentParser : IArgumentParser
 	{
 		public Type OutputType => typeof(Guid);

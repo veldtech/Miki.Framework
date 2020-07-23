@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework
-{
-    using System;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
+namespace Miki.Framework
+{
     public sealed class ProviderAdapter : IProvider
     {
         private readonly Func<Task> startAsync;

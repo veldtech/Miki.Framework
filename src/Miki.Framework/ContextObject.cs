@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework
-{
-    using Microsoft.Extensions.DependencyInjection;
-    using System;
-    using System.Collections.Generic;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 
+namespace Miki.Framework
+{
     /// <inheritdoc cref="IMutableContext" />
     public class ContextObject : IMutableContext, IDisposable
 	{

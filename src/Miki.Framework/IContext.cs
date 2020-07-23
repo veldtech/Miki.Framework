@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework
-{
-    using System;
+﻿using System;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Session context for a single command. Keeps data and services for this specific session.
     /// </summary>

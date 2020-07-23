@@ -1,15 +1,15 @@
-﻿namespace Miki.Framework.Tests.Commands
-{
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Discord.Common;
-    using Framework.Commands;
-    using Framework.Commands.Pipelines;
-    using Microsoft.Extensions.DependencyInjection;
-    using Moq;
-    using Xunit;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Miki.Discord.Common;
+using Miki.Framework.Commands;
+using Miki.Framework.Commands.Pipelines;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands
+{
     public class CommandPipelineTests
     {
         private readonly IServiceProvider provider;

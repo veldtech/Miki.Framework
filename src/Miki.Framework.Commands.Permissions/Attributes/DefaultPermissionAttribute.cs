@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands.Permissions.Attributes
+﻿using Miki.Framework.Commands.Permissions.Models;
+using System;
+
+namespace Miki.Framework.Commands.Permissions.Attributes
 {
-    using Miki.Framework.Commands.Permissions.Models;
-    using System;
-    
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 	public class DefaultPermissionAttribute : Attribute
 	{

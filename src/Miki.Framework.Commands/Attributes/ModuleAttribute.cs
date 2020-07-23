@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
+﻿using System;
 
+namespace Miki.Framework.Commands
+{
 	/// <summary>
 	/// The intial command container object. Will initiate <see cref="CommandTree"/> fetching for this
 	/// type.

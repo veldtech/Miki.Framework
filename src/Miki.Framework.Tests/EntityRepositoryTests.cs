@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework.Tests
-{
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    using Xunit;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Xunit;
 
+namespace Miki.Framework.Tests
+{
     public class Model
     {
         public int Key { get; set; }

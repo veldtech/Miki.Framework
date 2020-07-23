@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
+﻿using System;
 
+namespace Miki.Framework.Commands
+{
     public class NodeModule : NodeContainer
 	{
 		public NodeModule(string id, IServiceProvider provider, Type t)

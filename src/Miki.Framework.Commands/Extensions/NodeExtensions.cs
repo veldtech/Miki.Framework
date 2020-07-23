@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands
+{
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'NodeExtensions'
     public static class NodeExtensions
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'NodeExtensions'

@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework.Commands.Stages
-{
-    using System;
-    using System.Threading.Tasks;
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
-    using Miki.Logging;
+﻿using System;
+using System.Threading.Tasks;
+using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using Miki.Logging;
 
+namespace Miki.Framework.Commands.Stages
+{
     public class ExecuteCommandStage : IPipelineStage
     {
         private readonly CommandTree map;

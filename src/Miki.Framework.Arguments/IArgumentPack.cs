@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Arguments
-{
-    using Miki.Functional;
+﻿using Miki.Functional;
 
+namespace Miki.Framework.Arguments
+{
     /// <summary>
     /// A validated queue pattern for split arguments.
     /// </summary>

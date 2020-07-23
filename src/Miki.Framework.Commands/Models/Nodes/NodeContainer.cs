@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework.Commands
+﻿using Microsoft.Extensions.DependencyInjection;
+using Miki.Framework.Arguments;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Miki.Framework.Commands
 {
-    using Microsoft.Extensions.DependencyInjection;
-    using Miki.Framework.Arguments;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    
     public abstract class NodeContainer : Node
 	{
 		public List<Node> Children = new List<Node>();

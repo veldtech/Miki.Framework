@@ -1,10 +1,10 @@
-﻿namespace Miki.Framework.Commands.Permissions.Models
-{
-    using System;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Runtime.Serialization;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
+namespace Miki.Framework.Commands.Permissions.Models
+{
     public enum EntityType
 	{
 		User,

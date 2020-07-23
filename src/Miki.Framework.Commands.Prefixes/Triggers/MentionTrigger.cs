@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands.Prefixes.Triggers
-{
-    using System.Threading.Tasks;
-    using Miki.Discord.Common;
+﻿using System.Threading.Tasks;
+using Miki.Discord.Common;
 
+namespace Miki.Framework.Commands.Prefixes.Triggers
+{
     public class MentionTrigger : ITrigger
 	{
 		public async Task<string> CheckTriggerAsync(IContext context)

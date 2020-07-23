@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace Miki.Framework.Commands
+{
     /// <summary>
 	/// Command attributes are notated to show that this asynchronous method is a command that the
 	/// bot can execute. Keep in mind if you use the default <see cref="CommandTree"/> this will require

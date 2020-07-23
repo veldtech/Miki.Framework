@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework
+﻿using System;
+
+namespace Miki.Framework
 {
-    using System;
-    
     /// <inheritdoc/>
     public class ExecutionResult<T> : IExecutionResult<T>
     {

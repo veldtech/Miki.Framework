@@ -1,10 +1,11 @@
-﻿namespace Miki.Framework.Commands
+﻿using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using System;
+using System.Threading.Tasks;
+using Miki.Framework.Commands;
+
+namespace Miki.Framework.Commands
 {
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
-    using System;
-    using System.Threading.Tasks;
-	
     /// <summary>
     /// Sets up basic values such as query and the intial message entity.
     /// </summary>
@@ -24,9 +25,6 @@
 
 namespace Miki.Framework
 {
-    using Commands;
-    using Discord.Common;
-
     public static class CorePipelineStageExtensions
     {
 		public static IDiscordMessage GetMessage(this IContext context)

@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands
-{
-    using Miki.Localization;
-    using Miki.Localization.Exceptions;
+﻿using Miki.Localization;
+using Miki.Localization.Exceptions;
 
+namespace Miki.Framework.Commands
+{
     /// <summary>
     /// Localizable exception for when a command errors. When instructed to it will be automatically
     /// called to the upstream if a context fails to run, with the exception of other localized

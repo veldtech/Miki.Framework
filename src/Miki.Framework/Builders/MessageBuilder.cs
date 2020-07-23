@@ -1,7 +1,7 @@
-﻿namespace Miki.Common.Builders
-{
-    using System.Text;
+﻿using System.Text;
 
+namespace Miki.Common.Builders
+{
     public class MessageBuilder
 	{
 		private readonly StringBuilder _builder = new StringBuilder();

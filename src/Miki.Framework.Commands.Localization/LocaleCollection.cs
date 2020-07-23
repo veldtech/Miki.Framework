@@ -1,10 +1,10 @@
-﻿namespace Miki.Framework.Commands.Localization
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Miki.Localization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Miki.Localization;
 
+namespace Miki.Framework.Commands.Localization
+{
     public class LocaleCollection
     {
         private readonly HashSet<Locale> locales;

@@ -1,14 +1,14 @@
-﻿namespace Miki.Framework.Commands.Permissions
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Permissions.Models;
-    using Miki.Patterns.Repositories;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Miki.Discord.Common;
+using Miki.Framework.Commands.Permissions.Models;
+using Miki.Patterns.Repositories;
 
+namespace Miki.Framework.Commands.Permissions
+{
     /// <summary>
     /// Service that handles permissions, used as a basic ACL permission system.
     /// </summary>

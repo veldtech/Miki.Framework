@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands
-{
-    using Miki.Framework.Arguments;
-    using Miki.Framework.Commands.Nodes;
+﻿using Miki.Framework.Arguments;
+using Miki.Framework.Commands.Nodes;
 
+namespace Miki.Framework.Commands
+{
 	public class CommandTree
 	{
 		public NodeContainer Root { get; }

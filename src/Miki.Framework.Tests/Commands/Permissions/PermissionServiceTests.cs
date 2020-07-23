@@ -1,12 +1,12 @@
+using System;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using Miki.Framework.Commands.Permissions;
+using Miki.Framework.Commands.Permissions.Models;
+using Xunit;
+
 namespace Miki.Framework.Tests.Commands.Permissions
 {
-    using System;
-    using Microsoft.EntityFrameworkCore;
-    using System.Threading.Tasks;
-    using Miki.Framework.Commands.Permissions;
-    using Miki.Framework.Commands.Permissions.Models;
-    using Xunit;
-
     public class PermissionServiceTests : BaseEntityTest<Permission>
     {
         private const long ValidUserEntity = 0L;

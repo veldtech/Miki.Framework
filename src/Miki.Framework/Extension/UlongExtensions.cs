@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework
-{
-    using System;
+﻿using System;
 
+namespace Miki.Framework
+{
 	/// <summary>
 	/// Extension methods for the ulong type.
 	/// </summary>

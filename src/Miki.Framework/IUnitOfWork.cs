@@ -1,10 +1,10 @@
-﻿namespace Miki.Framework
-{
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Threading.Tasks;
-    using Patterns.Repositories;
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Miki.Patterns.Repositories;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// A pattern to abstractify transactions from storage APIs.
     /// </summary>

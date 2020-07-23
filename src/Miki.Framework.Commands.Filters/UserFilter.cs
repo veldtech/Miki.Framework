@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands.Filters
-{
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands.Filters
+{
 	/// <inheritdoc/>
     public class UserFilter : IFilter
 	{

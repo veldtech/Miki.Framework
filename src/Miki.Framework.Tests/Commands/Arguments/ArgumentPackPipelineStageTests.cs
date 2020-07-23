@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Tests.Commands.Arguments
-{
-    using System.Threading.Tasks;
-    using Miki.Framework.Commands.Pipelines;
-    using Xunit;
+﻿using System.Threading.Tasks;
+using Miki.Framework.Commands.Pipelines;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands.Arguments
+{
     public class ArgumentPackPipelineStageTests
     {
         [Fact]

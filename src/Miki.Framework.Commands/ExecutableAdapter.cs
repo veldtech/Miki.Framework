@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands
+{
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ExecutableAdapter'
     public class ExecutableAdapter : IExecutable
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ExecutableAdapter'

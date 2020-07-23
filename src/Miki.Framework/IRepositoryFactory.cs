@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework
-{
-    using Microsoft.EntityFrameworkCore;
-    using Patterns.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Patterns.Repositories;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Can be used to inject custom logic per type.
     /// </summary>

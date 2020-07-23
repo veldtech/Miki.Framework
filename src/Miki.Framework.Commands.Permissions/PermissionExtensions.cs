@@ -1,10 +1,9 @@
-﻿
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Miki.Framework.Commands.Permissions;
+
 namespace Miki.Framework.Commands
 {
-    using System;
-    using Microsoft.Extensions.DependencyInjection;
-    using Miki.Framework.Commands.Permissions;
-
     /// <summary>
     /// Helper functions for the PermissionPipelineStage.
     /// </summary>

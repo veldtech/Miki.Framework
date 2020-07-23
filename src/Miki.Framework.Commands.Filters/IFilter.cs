@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands.Filters
-{
-    using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands.Filters
+{
     /// <summary>
     /// Asynchronous filter interface for the <see cref="FilterPipelineStage"/>.
     /// </summary>

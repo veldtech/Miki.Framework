@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Miki.Framework
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    
     /// <summary>
     /// A collection of providers for the framework to subscribe to.
     /// </summary>

@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
-    using Miki.Framework.Commands.Nodes;
+﻿using System;
+using Miki.Framework.Commands.Nodes;
 
+namespace Miki.Framework.Commands
+{
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ICommandBuildStep'
     public interface ICommandBuildStep
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ICommandBuildStep'

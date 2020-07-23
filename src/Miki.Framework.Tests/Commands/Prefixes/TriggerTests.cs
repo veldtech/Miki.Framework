@@ -1,19 +1,19 @@
-﻿namespace Miki.Framework.Tests.Commands.Prefixes
-{
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    using Miki.Cache;
-    using Miki.Cache.InMemory;
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands;
-    using Miki.Framework.Commands.Prefixes.Models;
-    using Miki.Framework.Commands.Prefixes.Triggers;
-    using Miki.Serialization.Protobuf;
-    using Moq;
-    using Xunit;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Miki.Cache;
+using Miki.Cache.InMemory;
+using Miki.Discord.Common;
+using Miki.Framework.Commands;
+using Miki.Framework.Commands.Prefixes.Models;
+using Miki.Framework.Commands.Prefixes.Triggers;
+using Miki.Serialization.Protobuf;
+using Moq;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands.Prefixes
+{
     public interface ITestDiscordMessage : IDiscordMessage
     {
 

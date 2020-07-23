@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Commands.Prefixes
-{
-    using System;
-    using System.Collections.Generic;
-    using Miki.Framework.Commands.Prefixes.Triggers;
+﻿using System;
+using System.Collections.Generic;
+using Miki.Framework.Commands.Prefixes.Triggers;
 
+namespace Miki.Framework.Commands.Prefixes
+{
     public class PrefixCollectionBuilder
     {
         internal readonly List<ITrigger> triggers = new List<ITrigger>();

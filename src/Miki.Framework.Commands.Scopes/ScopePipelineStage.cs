@@ -1,19 +1,20 @@
-﻿
+﻿using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using Miki.Framework.Commands.Scopes.Attributes;
+using Miki.Logging;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Miki.Framework.Commands.Scopes;
+
 namespace Miki.Framework.Commands.Scopes
 {
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
-    using Miki.Framework.Commands.Scopes.Attributes;
-    using Miki.Logging;
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-
     public class ScopePipelineStage : IPipelineStage
 	{
-        private readonly ScopeService service;
+        private readonly IScopeService service;
 
-        public ScopePipelineStage(ScopeService service)
+        public ScopePipelineStage(IScopeService service)
         {
             this.service = service;
         }
@@ -54,9 +55,6 @@ namespace Miki.Framework.Commands.Scopes
 
 namespace Miki.Framework.Commands
 {
-    using Microsoft.Extensions.DependencyInjection;
-    using Miki.Framework.Commands.Scopes;   
-
     public static class ScopeExtensions
 	{
         /// <summary>
@@ -66,7 +64,7 @@ namespace Miki.Framework.Commands
         public static CommandPipelineBuilder UseScopes(this CommandPipelineBuilder builder)
 		{
             return builder.UseStage(
-                new ScopePipelineStage(builder.Services.GetService<ScopeService>()));
+                new ScopePipelineStage(builder.Services.GetService<IScopeService>()));
 		}
 	}
 }

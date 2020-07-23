@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Commands.Prefixes.Triggers
-{
-    using System.Linq;
-    using System;
-    using System.Threading.Tasks;
+﻿using System.Linq;
+using System;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands.Prefixes.Triggers
+{
     public class PrefixTrigger : ITrigger
 	{
 		public string Value { get; internal set; }

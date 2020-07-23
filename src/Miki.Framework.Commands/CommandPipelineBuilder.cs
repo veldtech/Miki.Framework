@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
-    using System.Collections.Generic;
-    using Miki.Framework.Commands.Pipelines;
+﻿using System;
+using System.Collections.Generic;
+using Miki.Framework.Commands.Pipelines;
 
+namespace Miki.Framework.Commands
+{
 	/// <summary>
 	/// Builds Command Pipelines. Helper pattern to keep your code clean.
 	/// </summary>

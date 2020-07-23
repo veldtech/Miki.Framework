@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Tests
-{
-    using System;
-    using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 
+namespace Miki.Framework.Tests
+{
     /// <inheritdoc />
     public class TestContext<T> : DbContext
         where T : class

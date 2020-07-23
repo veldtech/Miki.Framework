@@ -1,14 +1,14 @@
-﻿namespace Miki.Framework.Tests.Commands.Prefixes
-{
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
-    using Framework.Commands.Prefixes.Models;
-    using Microsoft.EntityFrameworkCore;
-    using Miki.Framework.Commands.Prefixes;
-    using Miki.Framework.Commands.Prefixes.Triggers;
-    using Moq;
-    using Xunit;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Miki.Framework.Commands.Prefixes.Models;
+using Microsoft.EntityFrameworkCore;
+using Miki.Framework.Commands.Prefixes;
+using Miki.Framework.Commands.Prefixes.Triggers;
+using Moq;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands.Prefixes
+{
     // TODO(velddev): rework prefixes to have a better system to better seperate 
 
     public class PrefixServiceTests

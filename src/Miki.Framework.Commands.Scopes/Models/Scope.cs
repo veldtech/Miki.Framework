@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands.Scopes.Models
-{
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Runtime.Serialization;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
+namespace Miki.Framework.Commands.Scopes.Models
+{
     [Table("Scopes")]
     [DataContract]
 	public class Scope

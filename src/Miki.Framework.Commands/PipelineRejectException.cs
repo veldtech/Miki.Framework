@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
+﻿using System;
 
+namespace Miki.Framework.Commands
+{
     /// <summary>
     /// Internal Command pipeline exception when a pipeline stage stops the pipeline.
     /// </summary>

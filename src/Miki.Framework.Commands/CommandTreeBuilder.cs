@@ -1,12 +1,12 @@
-﻿namespace Miki.Framework.Commands
+﻿using Miki.Framework.Commands.Nodes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+
+namespace Miki.Framework.Commands
 {
-    using Miki.Framework.Commands.Nodes;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading.Tasks;
-    
     public class CommandTreeBuilder
 	{
         [Obsolete("use 'CommandTreeBuilder::AddCommandBuildStep()' intead")]

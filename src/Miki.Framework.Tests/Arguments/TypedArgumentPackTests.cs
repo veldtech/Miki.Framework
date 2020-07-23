@@ -1,10 +1,10 @@
-﻿namespace Miki.Framework.Tests.Arguments
-{
-    using System;
-    using System.Reflection;
-    using Miki.Framework.Arguments;
-    using Xunit;
+﻿using System;
+using System.Reflection;
+using Miki.Framework.Arguments;
+using Xunit;
 
+namespace Miki.Framework.Tests.Arguments
+{
     public class TypedArgumentPackTests
     {
         private TypedArgumentPack GetPack(params string[] arguments)

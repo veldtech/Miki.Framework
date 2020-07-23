@@ -1,8 +1,7 @@
-﻿namespace Miki.Framework.Commands.Filters
+﻿using System.Threading.Tasks;
+
+namespace Miki.Framework.Commands.Filters
 {
-    using System.Threading.Tasks;
-
-
     /// <inheritdoc/>
 	public class BotFilter : IFilter
 	{

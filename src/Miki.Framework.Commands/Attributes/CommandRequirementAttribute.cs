@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands
+{
     public abstract class CommandRequirementAttribute : Attribute, ICommandRequirement
 	{
 		public abstract Task<bool> CheckAsync(IContext e);

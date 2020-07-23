@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework
-{
-    using System.Threading.Tasks;
-    using Miki.Discord.Common;
-    using Microsoft.Extensions.DependencyInjection;
-    using System;
-    using Logging;
+﻿using System.Threading.Tasks;
+using Miki.Discord.Common;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using Miki.Logging;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Starting point of Miki.Framework. Extend this class to create a managed start flow.
     /// </summary>

@@ -1,7 +1,8 @@
-﻿namespace Miki.Framework
+﻿using System;
+using System.Text.RegularExpressions;
+
+namespace Miki.Framework
 {
-    using System;
-    using System.Text.RegularExpressions;
     public static class StringExtension
 	{
 		public static TimeSpan GetTimeFromString(this string value)

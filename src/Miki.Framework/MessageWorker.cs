@@ -1,15 +1,15 @@
-﻿namespace Miki.Framework
-{
-    using Discord.Common;
-    using Logging;
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.CompilerServices;
-    using System.Threading.Tasks;
+﻿using Miki.Discord.Common;
+using Miki.Logging;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Message reference to use while a message is being queued to 
     /// </summary>

@@ -1,14 +1,14 @@
-﻿namespace Miki.Framework.Commands.Localization.Services
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Miki.Framework;
-    using Miki.Localization;
-    using Miki.Patterns.Repositories;
-    using Models;
-    using Models.Exceptions;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Miki.Framework;
+using Miki.Localization;
+using Miki.Patterns.Repositories;
+using Miki.Framework.Commands.Localization.Models;
+using Miki.Framework.Commands.Localization.Models.Exceptions;
 
+namespace Miki.Framework.Commands.Localization.Services
+{
     public class LocalizationService : ILocalizationService
     {
         private readonly IUnitOfWork context;

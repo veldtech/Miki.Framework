@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework.Tests.Arguments
-{
-    using System;
-    using System.Reflection;
-    using Miki.Framework.Arguments;
-    using Miki.Framework.Arguments.Parsers;
-    using Xunit;
+﻿using System;
+using System.Reflection;
+using Miki.Framework.Arguments;
+using Miki.Framework.Arguments.Parsers;
+using Xunit;
 
+namespace Miki.Framework.Tests.Arguments
+{
     public class ArgumentParserTests
     {
         public enum TestValues

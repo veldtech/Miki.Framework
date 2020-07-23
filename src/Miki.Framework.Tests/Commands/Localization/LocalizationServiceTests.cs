@@ -1,14 +1,14 @@
-﻿namespace Miki.Framework.Tests.Commands.Localization
-{
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Framework.Commands.Localization.Services;
-    using Miki.Framework.Commands.Localization;
-    using Miki.Framework.Commands.Localization.Models;
-    using Miki.Framework.Commands.Localization.Models.Exceptions;
-    using Miki.Localization;
-    using Xunit;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Miki.Framework.Commands.Localization.Services;
+using Miki.Framework.Commands.Localization;
+using Miki.Framework.Commands.Localization.Models;
+using Miki.Framework.Commands.Localization.Models.Exceptions;
+using Miki.Localization;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands.Localization
+{
     public class LocalizationServiceTests : BaseEntityTest<ChannelLanguage>  
     {
         private const long Id = 0L;

@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Arguments.Parsers
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace Miki.Framework.Arguments.Parsers
+{
     public class SuffixedIntArgumentParser : IArgumentParser
 	{
 		private readonly Dictionary<char, long> suffixes = new Dictionary<char, long>

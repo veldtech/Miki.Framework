@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands.Localization.Models.Exceptions
-{
-    using System;
+﻿using System;
 
+namespace Miki.Framework.Commands.Localization.Models.Exceptions
+{
     public class LocaleNotFoundException : Exception
     {
         public string Iso3 { get; }

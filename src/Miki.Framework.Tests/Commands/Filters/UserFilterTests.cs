@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework.Tests.Commands.Filters
-{
-    using Miki.Framework.Commands.Filters;
-    using System.Threading.Tasks;
-    using Miki.Discord.Common;
-    using Moq;
-    using Xunit;
+﻿using Miki.Framework.Commands.Filters;
+using System.Threading.Tasks;
+using Miki.Discord.Common;
+using Moq;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands.Filters
+{
     public class UserFilterTests
     {
         private readonly UserFilter userFilter;

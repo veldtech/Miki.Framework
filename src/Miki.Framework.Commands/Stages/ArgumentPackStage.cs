@@ -1,11 +1,12 @@
-﻿namespace Miki.Framework.Commands.Pipelines
-{
-    using Miki.Discord.Common;
-    using Miki.Framework.Arguments;
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
+﻿using Miki.Discord.Common;
+using Miki.Framework.Arguments;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Miki.Framework.Commands.Pipelines;
 
+namespace Miki.Framework.Commands.Pipelines
+{
     /// <summary>
     /// Allows you to use FIFO-like argument readers. Used in other packages as a dependency.
     /// </summary>
@@ -47,9 +48,6 @@
 
 namespace Miki.Framework.Commands
 {
-    using Miki.Framework.Arguments;
-    using Miki.Framework.Commands.Pipelines;
-
 	/// <summary>
 	/// Helper class for builder extensions
 	/// </summary>
@@ -76,9 +74,6 @@ namespace Miki.Framework.Commands
 
 namespace Miki.Framework
 {
-    using Miki.Framework.Arguments;
-    using Miki.Framework.Commands.Pipelines;
-
     /// <summary>
     /// Helper class for context extensions
     /// </summary>

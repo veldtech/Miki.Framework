@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands
-{
-    using Miki.Framework.Commands.Prefixes;
-    using Microsoft.Extensions.DependencyInjection;
+﻿using Miki.Framework.Commands.Prefixes;
+using Microsoft.Extensions.DependencyInjection;
 
+namespace Miki.Framework.Commands
+{
     public static class PipelineBuilderExtensions
     {
         public const string PrefixMatchKey = "prefix-match";

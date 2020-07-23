@@ -1,13 +1,13 @@
-﻿namespace Miki.Framework.Tests.Commands.Prefixes
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Miki.Framework.Commands.Prefixes;
-    using Moq;
-    using Xunit;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using Miki.Framework.Commands.Prefixes;
+using Moq;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands.Prefixes
+{
     public class PipelineStageTests
     {
 

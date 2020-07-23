@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Arguments
+﻿using System;
+
+namespace Miki.Framework.Arguments
 {
-    using System;
-    
     public interface IArgumentParser
 	{
 		Type OutputType { get; }

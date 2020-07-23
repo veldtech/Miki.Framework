@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Commands.Permissions.Exceptions
-{
-    using System;
-    using Miki.Localization;
-    using Miki.Localization.Exceptions;
+﻿using System;
+using Miki.Localization;
+using Miki.Localization.Exceptions;
 
+namespace Miki.Framework.Commands.Permissions.Exceptions
+{
     public class PermissionUnauthorizedException : LocalizedException
     {
         public override IResource LocaleResource => new LanguageResource("error_permissions_invalid");

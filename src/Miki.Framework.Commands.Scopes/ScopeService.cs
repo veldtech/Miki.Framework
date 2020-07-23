@@ -1,13 +1,13 @@
-﻿namespace Miki.Framework.Commands.Scopes
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    using Models;
-    using Patterns.Repositories;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Miki.Framework.Commands.Scopes.Models;
+using Miki.Patterns.Repositories;
 
+namespace Miki.Framework.Commands.Scopes
+{
     public interface IScopeService
     {
         /// <summary>

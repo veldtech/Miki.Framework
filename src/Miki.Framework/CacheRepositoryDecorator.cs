@@ -1,12 +1,12 @@
-﻿namespace Miki.Framework
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
-    using Cache;
-    using Patterns.Repositories;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Miki.Cache;
+using Miki.Patterns.Repositories;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Cached decorator pattern to automatically cache a fetched repository entity.
     /// </summary>

@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework.Commands.Nodes
-{
-    using Miki.Framework.Arguments;
-    using Miki.Logging;
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
+﻿using Miki.Framework.Arguments;
+using Miki.Logging;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands.Nodes
+{
     /// <summary>
 	/// Executable Node that can contain multiple nodes, while keeping a default executable.
 	/// </summary>

@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework
-{
-    using System;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Result of an execution.
     /// </summary>

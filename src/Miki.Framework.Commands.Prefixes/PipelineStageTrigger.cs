@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework.Commands.Prefixes
-{
-    using System;
-    using System.Threading.Tasks;
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
-    using Miki.Logging;
+﻿using System;
+using System.Threading.Tasks;
+using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using Miki.Logging;
 
+namespace Miki.Framework.Commands.Prefixes
+{
     public class PipelineStageTrigger : IPipelineStage
     {
         private readonly IPrefixService service;

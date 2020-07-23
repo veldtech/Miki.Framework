@@ -1,15 +1,15 @@
-﻿namespace Miki.Framework
-{
-    using System;
-    using System.IO;
-    using System.Net;
-    using System.Threading.Tasks;
-    using Common.Builders;
-    using Discord;
-    using Discord.Common;
-    using Framework;
-    using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
+using Miki.Common.Builders;
+using Miki.Discord;
+using Miki.Discord.Common;
+using Miki.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Extension methods for Miki.Discord
     /// </summary>

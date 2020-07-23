@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Commands.Permissions
-{
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Miki.Framework.Commands.Permissions.Models;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Miki.Framework.Commands.Permissions.Models;
 
+namespace Miki.Framework.Commands.Permissions
+{
     public interface IPermissionService
     {
         /// <summary>

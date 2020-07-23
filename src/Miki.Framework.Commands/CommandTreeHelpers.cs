@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Commands
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Miki.Framework.Commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    
     internal static class CommandTreeHelpers
     {
         internal static object CreateInstance(Type type, IServiceProvider app)

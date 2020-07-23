@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework
-{
-    using System;
-    using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Context object usable for testing. Avoids having to mock a lot of context related fetching.
     /// </summary>

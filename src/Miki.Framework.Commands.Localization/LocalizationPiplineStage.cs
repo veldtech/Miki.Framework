@@ -1,12 +1,12 @@
-﻿namespace Miki.Framework.Commands.Localization
-{
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
-    using Miki.Localization;
-    using System;
-    using System.Threading.Tasks;
-    using Miki.Framework.Commands.Localization.Services;
+﻿using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using Miki.Localization;
+using System;
+using System.Threading.Tasks;
+using Miki.Framework.Commands.Localization.Services;
 
+namespace Miki.Framework.Commands.Localization
+{
     public class LocalizationPipelineStage : IPipelineStage
     {
         public const string LocaleContextKey = "framework-localization";

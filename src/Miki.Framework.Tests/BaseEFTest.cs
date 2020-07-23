@@ -1,9 +1,9 @@
-﻿namespace Miki.Framework.Tests
-{
-    using Microsoft.Data.Sqlite;
-    using Microsoft.EntityFrameworkCore;
-    using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
+namespace Miki.Framework.Tests
+{
     /// <summary>
     /// Creates a test environment with a single-column sqlite database.
     /// </summary>

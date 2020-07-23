@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands.Prefixes.Triggers
-{
-    using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands.Prefixes.Triggers
+{
     public interface ITrigger
 	{
 		Task<string> CheckTriggerAsync(IContext context);

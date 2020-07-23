@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands
+{
     public interface ICommandRequirement
 	{
 		Task<bool> CheckAsync(IContext e);

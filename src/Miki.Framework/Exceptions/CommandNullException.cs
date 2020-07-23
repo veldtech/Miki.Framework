@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Exceptions
+﻿using Miki.Localization;
+using Miki.Localization.Exceptions;
+
+namespace Miki.Framework.Exceptions
 {
-    using Miki.Localization;
-    using Miki.Localization.Exceptions;
-    
     class CommandNullException : LocalizedException
 	{
 		private readonly string command;

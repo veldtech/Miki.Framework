@@ -1,10 +1,10 @@
-﻿namespace Miki.Framework.Arguments
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Miki.Functional;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Miki.Functional;
 
+namespace Miki.Framework.Arguments
+{
     /// <inheritdoc/>
     public class ArgumentPack : IArgumentPack
 	{

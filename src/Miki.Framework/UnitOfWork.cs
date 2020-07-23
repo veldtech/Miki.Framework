@@ -1,10 +1,10 @@
-﻿namespace Miki.Framework
-{
-    using System.Runtime.InteropServices;
-    using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    using Patterns.Repositories;
+﻿using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Miki.Patterns.Repositories;
 
+namespace Miki.Framework
+{
     /// <summary>
     /// Default unit of work pattern, uses Entity Framework by default.
     /// </summary>

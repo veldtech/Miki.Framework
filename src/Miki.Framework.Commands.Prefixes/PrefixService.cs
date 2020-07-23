@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Commands.Prefixes
-{
-    using Miki.Framework.Commands.Prefixes.Triggers;
-    using System.Threading.Tasks;
+﻿using Miki.Framework.Commands.Prefixes.Triggers;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands.Prefixes
+{
     public class PrefixService : IPrefixService
     {
         private readonly PrefixCollection collection;

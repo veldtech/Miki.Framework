@@ -1,10 +1,10 @@
-﻿namespace Miki.Framework.Commands.Pipelines
-{
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
-    using Discord.Common;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Miki.Discord.Common;
 
+namespace Miki.Framework.Commands.Pipelines
+{
     /// <summary>
     /// Chainable pipeline stage which mutates and moves forward to the next stage.
     /// </summary>

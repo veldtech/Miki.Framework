@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Services
-{
-    using Miki.Logging;
-    using System;
+﻿using Miki.Logging;
+using System;
 
+namespace Miki.Framework.Services
+{
     public class LoggingService
 	{
 		private LogLevel logLevel;

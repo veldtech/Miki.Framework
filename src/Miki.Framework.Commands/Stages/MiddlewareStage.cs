@@ -1,10 +1,12 @@
-﻿namespace Miki.Framework.Commands.Stages
-{
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
-    using System;
-    using System.Threading.Tasks;
+﻿using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using System;
+using System.Threading.Tasks;
+using Miki.Framework.Commands;
+using Miki.Framework.Commands.Stages;
 
+namespace Miki.Framework.Commands.Stages
+{
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'MiddlewareStage'
     public class MiddlewareStage : IPipelineStage
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'MiddlewareStage'
@@ -33,12 +35,6 @@
 
 namespace Miki.Framework
 {
-    using System;
-    using System.Threading.Tasks;
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands;
-    using Miki.Framework.Commands.Stages;
-
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'ContextExtensions'
     public static class ContextExtensions
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'ContextExtensions'

@@ -1,8 +1,8 @@
-﻿namespace Miki.Framework.Arguments.Parsers
-{
-    using System;
-    using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
+namespace Miki.Framework.Arguments.Parsers
+{
     public class StringArgumentParser : IArgumentParser
 	{
 		public Type OutputType

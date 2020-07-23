@@ -1,13 +1,13 @@
-﻿namespace Miki.Framework.Commands.States
-{
-    using Microsoft.EntityFrameworkCore;
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
-    using Miki.Framework.Commands.States;
-    using Miki.Logging;
-    using System;
-    using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using Miki.Framework.Commands.States;
+using Miki.Logging;
+using System;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands.States
+{
     /// <summary>
     /// A very basic state management pipeline stage for customizable per-channel states.
     /// </summary>
@@ -139,8 +139,6 @@
 
 namespace Miki.Framework.Commands
 {
-    using Miki.Framework.Commands.States;
-
     public static class Extensions
     {
         public static CommandPipelineBuilder UseStates(

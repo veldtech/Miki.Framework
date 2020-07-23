@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Routines
-{
-    using System;
+﻿using System;
 
+namespace Miki.Framework.Routines
+{
     public class RoutineAttribute : Attribute
     {
     }

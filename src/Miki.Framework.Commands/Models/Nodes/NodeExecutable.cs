@@ -1,10 +1,10 @@
-﻿﻿namespace Miki.Framework.Commands.Nodes
-{
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
+namespace Miki.Framework.Commands.Nodes
+{
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member 'CommandDelegate'
     public delegate Task CommandDelegate(IContext c);
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member 'CommandDelegate'

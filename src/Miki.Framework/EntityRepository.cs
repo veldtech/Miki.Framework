@@ -1,13 +1,13 @@
-﻿namespace Miki.Framework
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Internal;
-    using Microsoft.EntityFrameworkCore.Storage;
-    using Patterns.Repositories;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
+using Miki.Patterns.Repositories;
 
+namespace Miki.Framework
+{
     public class EntityRepository<T> : IAsyncRepository<T>
         where T : class
     {

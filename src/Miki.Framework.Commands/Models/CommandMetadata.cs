@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
+namespace Miki.Framework.Commands
+{
 	public struct CommandMetadata
 	{
 		/// <summary>

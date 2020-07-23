@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands.States
-{
-    using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
+namespace Miki.Framework.Commands.States
+{
     [DataContract]
     public class CommandState
 	{

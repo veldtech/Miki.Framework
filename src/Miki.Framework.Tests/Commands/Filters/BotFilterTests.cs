@@ -1,11 +1,11 @@
-﻿namespace Miki.Framework.Tests.Commands.Filters
-{
-    using System.Threading.Tasks;
-    using Miki.Framework.Commands.Filters;
-    using Moq;
-    using Miki.Discord.Common;
-    using Xunit;
+﻿using System.Threading.Tasks;
+using Miki.Framework.Commands.Filters;
+using Moq;
+using Miki.Discord.Common;
+using Xunit;
 
+namespace Miki.Framework.Tests.Commands.Filters
+{
     public class BotFilterTests
     {
         private readonly BotFilter filter = new BotFilter();

@@ -1,10 +1,10 @@
-﻿namespace Miki.Framework.Commands
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
+namespace Miki.Framework.Commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    
 	/// <summary>
 	/// Represents an internal command node.
 	/// </summary>

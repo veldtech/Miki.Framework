@@ -1,7 +1,7 @@
-﻿namespace Miki.Framework.Commands.Prefixes.Models
-{
-    using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
+namespace Miki.Framework.Commands.Prefixes.Models
+{
     [DataContract]
 	public class Prefix
 	{

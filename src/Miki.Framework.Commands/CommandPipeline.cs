@@ -1,13 +1,13 @@
-﻿namespace Miki.Framework.Commands
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Threading.Tasks;
-    using Miki.Discord.Common;
-    using Miki.Framework.Commands.Pipelines;
-    using Miki.Logging;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Miki.Discord.Common;
+using Miki.Framework.Commands.Pipelines;
+using Miki.Logging;
 
+namespace Miki.Framework.Commands
+{
     public class CommandPipeline : IAsyncEventingExecutor<IDiscordMessage>
     {
         public IReadOnlyList<IPipelineStage> PipelineStages { get; }

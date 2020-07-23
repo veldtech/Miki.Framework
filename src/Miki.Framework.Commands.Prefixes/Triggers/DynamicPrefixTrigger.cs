@@ -1,12 +1,12 @@
-﻿namespace Miki.Framework.Commands.Prefixes.Triggers
-{
-    using System;
-    using System.Threading.Tasks;
-    using Miki.Cache;
-    using Miki.Discord.Common.Models;
-    using Miki.Framework.Commands.Prefixes.Models;
-    using Miki.Patterns.Repositories;
+﻿using System;
+using System.Threading.Tasks;
+using Miki.Cache;
+using Miki.Discord.Common.Models;
+using Miki.Framework.Commands.Prefixes.Models;
+using Miki.Patterns.Repositories;
 
+namespace Miki.Framework.Commands.Prefixes.Triggers
+{
     public class DynamicPrefixTrigger : ITrigger
 	{
 		public string DefaultValue { get; internal set; }
